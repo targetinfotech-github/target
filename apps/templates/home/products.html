@@ -1,0 +1,359 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+    <style>
+        .selected-row {
+            background-color: #d3d3d3;
+        }
+
+        .invalid-feedback {
+            color: red;
+            font-size: 0.875em;
+            display: block;
+        }
+
+        .row {
+            padding: 20px;
+        }
+
+        .form-errors .alert {
+            color: #fff;
+            background-color: #dc3545;
+            border-color: #dc3545;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-errors .alert p {
+            margin: 0;
+            padding: 0;
+            font-size: 0.875em;
+        }
+
+
+        #form_submit {
+            display: block;
+            margin-top: 1rem;
+        }
+
+        table a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+
+    </style>
+{% endblock stylesheets %}
+
+{% block content %}
+    {% load static %}
+    <div class="pb-4">
+        <h1>{{ label }}</h1>
+
+        {% if flag == 'create' %}
+            <a href="{% url 'get_product_modal' %}">
+                <button class="btn btn-tertiary" type="button">Update</button>
+            </a>
+            <a href="{% url 'view_product' %}">
+                <button class="btn btn-success" type="button">View</button>
+            </a>
+        {% endif %}
+
+        {% if flag != 'create' %}
+            <a href="{% url 'create_product' %}">
+
+                <button class="btn btn-info" type="button">Create</button>
+            </a>
+            <a href="{% url 'get_product_modal' %}">
+                <button class="btn btn-tertiary" type="button">Update</button>
+            </a>
+            {% if flag != 'view' %}
+                <a href="{% url 'view_product' %}">
+                    <button class="btn btn-success" type="button">View</button>
+                </a>
+            {% endif %}
+        {% endif %}
+    </div>
+    {% if flag == 'view' %}
+        <form class="navbar-search form-inline" id="navbar-search-main" method="post"
+              action="{% url 'view_product' %}">
+            {% csrf_token %}
+            <div class="input-group input-group-merge search-bar pb-4">
+                <a href="{% url 'view_product' %}">
+                    <button type="button" class="btn-sm btn-warning">reset</button>
+                </a>
+
+                <input type="text" class="form-control" id="top_bar_InputIconLeft" placeholder="Search"
+                       aria-label="Search" aria-describedby="topbar-addon" style="max-width: 25%"
+                       oninput="autocomplete_()" name="product_name" autocomplete="off">
+<button type="submit" class="input-group-text" id="topbar-addon">
+                    <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
+                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                         aria-hidden="true">
+                        <path fill-rule="evenodd"
+                              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                              clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+
+            </div>
+        </form>
+        <div class="card border-0 shadow mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-centered table-nowrap mb-0 rounded">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Product Name</th>
+                            <th scope="col">Product Code</th>
+                            <th scope="col">Manufacture</th>
+                            <th scope="col">Buy Rate</th>
+                            <th scope="col">Sell Rate</th>
+                        </tr>
+                        </thead>
+                        <!-- Item -->
+                        <tbody>
+                        {% for product in product_data %}
+                            <tr id="row-{{ product.id }}">
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td><a href="{% url 'update_product' product.id %}">{{ product.product_name }}</a></td>
+                                <td>{{ product.product_code }}</td>
+                                <td>{{ product.manufacturer }}</td>
+                                <td>{{ product.buy_rate }}</td>
+                                <td>{{ product.sell_rate }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        <!-- End of Item -->
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <!-- Button trigger modal -->
+    {% if flag == 'modal' %}
+        <form method="post" action="{% url 'get_product_modal' %}">
+            {% csrf_token %}
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Select Product</h5>
+                        </div>
+                        <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+                            <div class="table-responsive">
+                                <table class="table table-centered table-nowrap mb-0 rounded">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Product Name</th>
+                                        <th scope="col">Product Code</th>
+                                        <th scope="col">Manufact</th>
+                                        <th scope="col">Buy Rate</th>
+                                        <th scope="col">Sell Rate</th>
+                                    </tr>
+                                    </thead>
+                                    <!-- Item -->
+                                    <tbody>
+                                    {% for product in product_data %}
+                                        <tr id="row-{{ product.id }}"
+                                            onclick="selectProduct('{{ product.id }}')">
+                                            <th scope="row">{{ forloop.counter }}</th>
+                                            <td>{{ product.product_name }}</td>
+                                            <td>{{ product.product_code }}</td>
+                                            <td>{{ product.manufacturer }}</td>
+                                            <td>{{ product.buy_rate }}</td>
+                                            <td>{{ product.sell_rate }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                    <!-- End of Item -->
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="{% url 'create_product' %}">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </a>
+                            <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
+                                    name="submit_selected_record" value="" style="display: flex">Update
+                            </button>
+                            <button type="submit" class="btn btn-danger" id="delete_selected_record"
+                                    name="delete_selected_record" value="" style="display: flex">Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    {% endif %}
+    {% if flag != 'view' %}
+        <div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-errors">
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-errors">
+                    {% for field in form %}
+                        {% if field.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in field.errors %}
+                                    <p><strong>{{ field.label }}:</strong> {{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <label for="{{ form.manufacturer.id_for_label }}">{{ form.manufacturer.label }}</label>
+                            <select class="form-select" aria-label="Default select example"
+                                    name="{{ form.manufacturer.name }}">
+                                {% for value, label in form.manufacturer.field.choices %}
+                                    <option value="{{ value }}"
+                                            {% if form.manufacturer.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="{{ form.product_name.id_for_label }}">Product Name</label>
+                            <input type="text" class="form-control" name="{{ form.product_name.name }}"
+                                   value="{{ form.product_name.value|default_if_none:''}}"
+                                   placeholder="Enter the product name">
+                        </div>
+                        <div class="col">
+                            <label for="{{ form.product_code.id_for_label }}">Product Code</label>
+                            <input type="text" class="form-control" name="{{ form.product_code.name }}"
+                                   value="{{ form.product_code.value|default_if_none:'' }}"
+                                   placeholder="Enter the product code">
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col">
+                            <label for="{{ form.print_name.id_for_label }}">Print Name</label>
+                            <input type="text" class="form-control" name="{{ form.print_name.name }}"
+                                   value="{{ form.print_name.value|default_if_none:'' }}"
+                                   placeholder="Enter the print name">
+                        </div>
+                        <div class="col">
+                            <label for="{{ form.group.id_for_label }}">Group</label>
+                            <select class="form-select" aria-label="Default select example"
+                                    name="{{ form.group.name }}">
+                                {% for value, label in form.group.field.choices %}
+                                    <option value="{{ value }}"
+                                            {% if form.group.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="{{ form.contact.id_for_label }}">Contact Number</label>
+                            <input type="text" class="form-control" name="{{ form.contact.name }}"
+                                   value="{{ form.contact.value|default_if_none:'' }}"
+                                   placeholder="Enter the contact number">
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col">
+                            <label for="{{ form.buy_rate.id_for_label }}">Buy Price</label>
+                            <input type="number" step="0.01" class="form-control" name="{{ form.buy_rate.name }}"
+                                   value="{{ form.buy_rate.value|default_if_none:'' }}"
+                                   placeholder="Enter the buy rate">
+                        </div>
+                        <div class="col">
+                            <label for="{{ form.sell_rate.id_for_label }}">Sell Price</label>
+                            <input type="number" step="0.01" class="form-control" name="{{ form.sell_rate.name }}"
+                                   value="{{ form.sell_rate.value|default_if_none:'' }}"
+                                   placeholder="Enter the sell rate">
+                        </div>
+                        <div class="col">
+                            <label for="{{ form.mrp.id_for_label }}">MRP</label>
+                            <input type="number" step="0.01" class="form-control" name="{{ form.mrp.name }}"
+                                   value="{{ form.mrp.value|default_if_none:'' }}"
+                                   placeholder="Enter the MRP">
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-md-3">
+                            <label for="{{ form.stock_option.id_for_label }}">{{ form.stock_option.label }}</label>
+                            <select class="form-select" aria-label="Default select example"
+                                    name="{{ form.stock_option.name }}">
+                                {% for value, label in form.stock_option.field.choices %}
+                                    <option value="{{ value }}"
+                                            {% if form.stock_option.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="justify-content: center;">
+                    <div class="col-auto">
+                        <button class="btn btn-danger" type="submit" name="submit_record" id="form_submit">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    {% endif %}
+
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'assets/js/master.js' %}"></script>
+    <script>
+        function autocomplete_() {
+            var productNames = JSON.parse('{{ dataJson | escapejs}}');
+            var input = document.getElementById('top_bar_InputIconLeft');
+            var term = input.value.toLowerCase();
+            if (term.length >= 3) {
+                var matchingNames = productNames.filter(name =>
+                    name.toLowerCase().includes(term)
+                );
+                console.log(matchingNames)
+                input.setAttribute("list", "autocomplete-list");
+                var datalist = document.getElementById("autocomplete-list");
+                if (datalist) {
+                    datalist.remove();
+                }
+
+                datalist = document.createElement("datalist");
+                datalist.id = "autocomplete-list";
+                matchingNames.forEach(name => {
+                    var option_element = document.createElement("option");
+                    option_element.value = name;
+                    datalist.appendChild(option_element);
+                });
+                input.parentNode.appendChild(datalist);
+            } else {
+                input.setAttribute("list", "");
+            }
+        }
+    </script>
+{% endblock javascripts %}

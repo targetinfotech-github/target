@@ -1,0 +1,15 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div>
+    <a href="{% url 'create_manufacturer' %}"><button type="button" class="btn btn-primary">Manufacturer</button></a>
+    <a href="{% url 'create_product' %}"><button type="button" class="btn btn-secondary">Product</button></a>
+    <a href="{% url 'create_customer' %}"><button type="button" class="btn btn-secondary">Customer</button></a>
+    <a href="{% url 'get_receipt_modal' %}"><button type="button" class="btn btn-secondary">Receipt</button></a>
+</div>
+{% endblock %}

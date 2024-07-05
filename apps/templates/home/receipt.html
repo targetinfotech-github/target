@@ -1,0 +1,224 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    {% load static %}
+
+    {% if flag == 'modal' %}
+        <form method="post" action="{% url 'get_receipt_modal' %}">
+            {% csrf_token %}
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Set Receipt Details</h5>
+                        </div>
+                        <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+                            <div>
+                                <label for="receipt_type">Receipt Type:</label>
+                                <select id="receipt_type" name="receipt_type">
+                                    {% for value, label in form.fields.receipt_type.choices %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label for="receipt_status">Receipt Status:</label>
+                                <select id="receipt_status" name="receipt_status">
+                                    {% for choice in form.fields.receipt_status.choices %}
+                                        {% if choice.0 == form.instance.receipt_type %}
+                                            {% for sub_choice in choice.1 %}
+                                                <option value="{{ sub_choice.0 }}">{{ sub_choice.1 }}</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label for="date">Date:</label>
+                                {{ form.date }}
+                            </div>
+                        <div>
+                            <label for="manufacturer">Manufacturer:</label>
+                            {{ form.manufacturer }}
+                        </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="{% url 'home' %}">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submit_selected_record"
+                                    name="submit_selected_record" value="" style="display: flex">Update
+                            </button>
+                            {#                            <button type="submit" class="btn btn-primary" id="delete_selected_record"#}
+                            {#                                    name="delete_selected_record" value="" style="display: flex">Delete#}
+                            {#                            </button>#}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    {% endif %}
+
+    <div class="container">
+        <h1>Add Receipt</h1>
+        <form id="receipt-form" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div id="product-container">
+                <div class="product-row">
+
+                    <button type="button" class="btn btn-primary add-product">+</button>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" name="submit" value="submitReport"
+                    onclick="submit_record_event(event)" id="submit-button">Submit
+            </button>
+            <button type="submit" class="btn-sm btn-warning" name="reset" id="reset-button"
+                    onclick="delete_record_event(event)" value="resetReport">Reset
+            </button>
+            <p id="net_amount" class="pt-5 px-3">Net Amount: 0.00</p>
+            <input id="net_amount_input" name="net_amount_input" hidden="hidden" value="0">
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM fully loaded and parsed');
+            var myModal = new bootstrap.Modal(document.getElementById('exampleModalCenter'), {
+                backdrop: 'static',
+                keyboard: false
+            });
+            myModal.show();
+            var receiptTypeSelect = document.getElementById('receipt_type');
+            var receiptStatusSelect = document.getElementById('receipt_status');
+
+            receiptTypeSelect.addEventListener('change', function () {
+                var selectedReceiptType = this.value;
+                receiptStatusSelect.innerHTML = '';
+
+                {% for choice in form.fields.receipt_status.choices %}
+                    if (selectedReceiptType === '{{ choice.0 }}') {
+                        {% for sub_choice in choice.1 %}
+                            var option = document.createElement('option');
+                            option.value = '{{ sub_choice.0 }}';
+                            option.text = '{{ sub_choice.1 }}';
+                            receiptStatusSelect.add(option);
+                        {% endfor %}
+                    }
+                {% endfor %}
+            });
+        });
+
+        var form_status = `{{ form }}`
+        console.log(form_status)
+        const reset_record = document.getElementById('reset-button')
+        let productIndex = 0;
+        const netAmountText = document.getElementById('net_amount')
+        const netAmountInput = document.getElementById('net_amount_input')
+
+        function addProductRow() {
+            const container = document.getElementById('product-container');
+            const newRow = document.createElement('div');
+            newRow.classList.add('product-row');
+
+            newRow.innerHTML = `
+    <div class="form-group">
+        <label for="product-name-${productIndex}">Product Name</label>
+        <select class="form-control" id="product-name-${productIndex}" name="product_name_${productIndex}" required>
+            <option value="">Select a product</option>
+            {% for product in product_data %}
+            <option value="{{ product.id }}" data-buy-price="{{ product.buy_rate }}">{{ product.product_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="quantity-${productIndex}">Quantity</label>
+        <input type="number" class="form-control" id="quantity-${productIndex}" name="quantity_${productIndex}" min="1" value="1" required>
+    </div>
+    <div class="form-group">
+        <label for="discount-${productIndex}">Discount (in %)</label>
+        <input type="number" class="form-control" id="discount-${productIndex}" name="discount_${productIndex}" min="0" step="0.01" value="0">
+    </div>
+    <button type="button" class="btn btn-primary remove-product">-</button>`;
+
+            container.appendChild(newRow);
+            const removeButtons = document.querySelectorAll('.remove-product');
+            removeButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    button.parentElement.remove();
+                    updateNetAmount();
+                });
+            });
+
+            const productSelect = newRow.querySelector('select');
+            const quantityInput = newRow.querySelector('input[name^="quantity"]');
+            const discountInput = newRow.querySelector('input[name^="discount"]');
+
+            productSelect.addEventListener('change', () => {
+                updateNetAmount();
+            });
+
+            quantityInput.addEventListener('input', () => {
+                updateNetAmount();
+            });
+
+            discountInput.addEventListener('input', () => {
+                updateNetAmount();
+            });
+
+            productIndex++;
+            updateNetAmount();
+        }
+
+        document.querySelectorAll('.add-product').forEach((button) => {
+            button.addEventListener('click', addProductRow);
+        });
+
+        function delete_record_event(event) {
+            var confirmation = confirm('Are you sure you want to delete this record?');
+            if (!confirmation) {
+                event.preventDefault(); // Prevent form submission if the user cancels
+            }
+        }
+
+        function submit_record_event(event) {
+            if (productIndex <= 0) {
+                event.preventDefault();
+                alert('Please add at least one product.');
+            }
+        }
+
+        function updateNetAmount() {
+            let totalNetAmount = 0;
+            const productRows = document.querySelectorAll('.product-row');
+            productRows.forEach((row) => {
+                const productSelect = row.querySelector('select');
+                const quantityInput = row.querySelector('input[name^="quantity"]');
+                const discountInput = row.querySelector('input[name^="discount"]');
+
+                if (productSelect && quantityInput) {
+                    const buyPrice = parseFloat(productSelect.options[productSelect.selectedIndex]?.dataset.buyPrice) || 0;
+                    const quantity = parseFloat(quantityInput.value) || 0;
+                    const discount = parseFloat(discountInput.value) || 0;
+
+                    const netAmount = (buyPrice * quantity) * (1 - discount / 100);
+                    totalNetAmount += netAmount;
+                }
+            });
+            netAmountText.textContent = `Net Amount: ${totalNetAmount.toFixed(2)}`;
+            if (netAmountInput) {
+                netAmountInput.value = totalNetAmount.toFixed(2);
+            }
+        }
+    </script>
+{% endblock javascripts %}
