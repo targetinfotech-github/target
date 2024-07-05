@@ -3,6 +3,7 @@
 Copyright (c) 2019 - present AppSeed.us
 """
 import json
+import time
 
 from django import template
 from django.contrib.auth.decorators import login_required
@@ -29,18 +30,23 @@ import logging
 logger = logging.getLogger(__name__)
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def index(request):
     context = {'segment': 'index'}
-    receipt = Receipt.objects.values()
-    receipt_product = ReceiptProduct.objects.values()
-    print('---------sadasd-')
-    print(receipt)
-    print(receipt_product)
+    manufacturer = Manufacturer.objects.count()
+    group = Group.objects.count()
+    product = Product.objects.count()
+    customer = Customer.objects.count()
+    print(group)
+    print(manufacturer)
+    print(product)
+    print(customer)
     html_template = loader.get_template('home/dashboard.html')
     return HttpResponse(html_template.render(context, request))
 
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def pages(request):
     context = {}
     # All resource paths end in .html.
@@ -59,6 +65,7 @@ def pages(request):
         return render(request, 'home/page-500.html')
     
 # @login_required(login_url="/login/")
+@measure_execution_time
 def create_manufacturer(request):
     try:
         manufacturer = Manufacturer.objects.all()
@@ -88,6 +95,7 @@ def create_manufacturer(request):
 
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def get_manufacturer_modal(request):
     # try:
     manufacturer_data = Manufacturer.objects.annotate(
@@ -114,6 +122,7 @@ def get_manufacturer_modal(request):
     #     return render(request,'home/page-500.html')
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def update_manufacturer(request,pk):
     try:
         manufacturer_data = Manufacturer.objects.get(id=pk)
@@ -135,6 +144,7 @@ def update_manufacturer(request,pk):
 
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def delete_manufacturer(request,pk):
     try:
         manufacturer = Manufacturer.objects.get(id=pk)
@@ -170,9 +180,13 @@ def view_manufacturer(request):
 
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def create_product(request):
     try:
+        start_time = time.time()
         Group.objects.get_or_create_general_manufacturer()
+        group_time = time.time() - start_time
+        print(f'Group time: {group_time}')
         if request.method == 'POST':
             form = ProductForm(request.POST)
             print('post')
@@ -182,7 +196,9 @@ def create_product(request):
                 print(Product.objects.values())
                 return HttpResponseRedirect(reverse('home'))
         else:
+            start = time.time()
             form = ProductForm()
+            print(f'form time: {time.time() - start}')
         context = {'form': form,
                    'manufacturer_data': None,
                    'flag': 'create',
@@ -195,6 +211,7 @@ def create_product(request):
 
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def get_product_modal(request):
     try:
         # product_data = Product.objects.values('id','product_name','product_code',
@@ -223,6 +240,7 @@ def get_product_modal(request):
 
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def delete_product(request,pk):
     try:
         product = Product.objects.get(id=pk)
@@ -235,6 +253,7 @@ def delete_product(request,pk):
 
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def update_product(request,pk):
     try:
         product_data = Product.objects.get(id=pk)
@@ -253,6 +272,7 @@ def update_product(request,pk):
         return render(request,'home/page-500.html')
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def view_product(request):
     try:
         if request.method == 'POST':
@@ -262,8 +282,14 @@ def view_product(request):
             else:
                 product_data = Product.objects.all()
         else:
+            start = time.time()
             product_data = Product.objects.all()
+            end = time.time()
+            print(f'total time for product.all()::{end-start}')
+        start = time.time()
         product_name = list(Product.objects.values_list('product_name', flat=True))
+        end = time.time()
+        print(f'total time for product_name::{end - start}')
         dataJson = json.dumps(product_name)
         context = {'flag': 'view', 'product_data': product_data,'dataJson':dataJson,
                    'label':'View Product'}
@@ -274,6 +300,7 @@ def view_product(request):
         return render(request,'home/page-500.html')
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def get_receipt_modal(request):
     try:
         if request.method == 'POST':
@@ -294,6 +321,7 @@ def get_receipt_modal(request):
         return render(request,'home/page-500.html')
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def add_product(request,pk):
     try:
         try:
@@ -352,6 +380,7 @@ def add_product(request,pk):
 
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def create_group(request):
     # try:
     if request.method == 'POST':
@@ -369,6 +398,7 @@ def create_group(request):
     #     return render(request,'home/page-500.html')
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def view_group(request):
     try:
         if request.method == 'POST':
@@ -389,6 +419,7 @@ def view_group(request):
     except:
         return render(request,'home/page-500.html')
 
+@measure_execution_time
 def get_group_modal(request):
     # try:
     group_data = Group.objects.exclude(group_name='General Manufacturer').annotate(
@@ -423,6 +454,7 @@ def get_group_modal(request):
 
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def update_group(request,pk):
     try:
         group_data = Group.objects.get(id=pk)
@@ -443,6 +475,7 @@ def update_group(request,pk):
 
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def delete_group(request,pk):
     # try:
     group = Group.objects.get(id=pk)
@@ -459,6 +492,7 @@ def delete_group(request,pk):
 
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def create_customer(request):
     # try:
     if request.method == 'POST':
@@ -480,6 +514,7 @@ def create_customer(request):
 
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def get_customer_modal(request):
     # try:
     customer_data = Customer.objects.values('id','customer_name',
@@ -505,6 +540,7 @@ def get_customer_modal(request):
     #     return render(request,'home/page-500.html')
 
 # @login_required(login_url="/login/")/
+@measure_execution_time
 def update_customer(request,pk):
     # try:
     customer_data = Customer.objects.get(id=pk)
@@ -526,6 +562,7 @@ def update_customer(request,pk):
 
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def delete_customer(request,pk):
     try:
         customer = Customer.objects.get(id=pk)
@@ -537,6 +574,7 @@ def delete_customer(request,pk):
         return render(request, 'home/page-500.html')
 
 # @login_required(login_url="/login/")
+@measure_execution_time
 def view_customer(request):
     # try:
     if request.method == 'POST':
