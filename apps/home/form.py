@@ -99,6 +99,7 @@ class GroupForm(forms.ModelForm):
         self.fields['group_name'].required = True
 
 
+
 # class CustomReceiptForm(forms.Form):
 #     receipt_type = [('purchases', 'Purchases'),
 #                     ('adjustments', 'Adjustments'),

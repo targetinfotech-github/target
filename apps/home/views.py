@@ -8,8 +8,9 @@ import time
 from django import template
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
@@ -102,10 +103,10 @@ def get_manufacturer_modal(request):
         product_count=Count('product_manufacturer')).values(
         'id', 'name', 'type', 'sh_name', 'print_name', 'product_count'
     )
+
     # manufacturer_data = Manufacturer.objects.values('id','name','contact', 'sh_name','print_name')
     form = ManufacturerForm()
-    context = {'manufacturer_data':manufacturer_data,'form':form, 'flag':'modal',
-               'label':'Update Manufacturer'}
+
     if request.method == 'POST':
         if 'submit_selected_record' in request.POST:
             id = request.POST['submit_selected_record']
@@ -115,6 +116,11 @@ def get_manufacturer_modal(request):
             return redirect('delete_manufacturer', int(id))
         else:
             return redirect('create_manufacturer')
+    paginator = Paginator(manufacturer_data, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {'manufacturer_data': page_obj, 'form': form, 'flag': 'modal',
+               'label': 'Update Manufacturer','page_obj':page_obj}
     return render(request, 'home/manufacturer.html', context=context)
     # except template.TemplateDoesNotExist:
     #     return render(request,'home/page-404.html')
@@ -170,8 +176,11 @@ def view_manufacturer(request):
 
         manufacturer_name = list(Manufacturer.objects.values_list('name', flat=True))
         dataJson = json.dumps(manufacturer_name)
-        context = {'flag':'view','manufacturer_data':manufacturer_data,
-               'dataJson': dataJson,'label':'View Manufacturer'}
+        paginator = Paginator(manufacturer_data, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context = {'flag':'view','manufacturer_data':page_obj,
+               'dataJson': dataJson,'label':'View Manufacturer','page_obj':page_obj}
         return render(request, 'home/manufacturer.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request,'home/page-404.html')
@@ -214,15 +223,10 @@ def create_product(request):
 @measure_execution_time
 def get_product_modal(request):
     try:
-        # product_data = Product.objects.values('id','product_name','product_code',
-        #                                      'manufacturer','buy_rate','sell_rate')
         product_data = Product.objects.select_related('manufacturer').\
         values('id', 'product_name', 'product_code',
                'manufacturer__name', 'buy_rate', 'sell_rate')
-        # product_name = Product.objects.values('product_name')
         form = ProductForm()
-        context = {'product_data': product_data, 'form': form, 'flag': 'modal',
-                   'label':'Update Product'}
         if request.method == 'POST':
             if 'submit_selected_record' in request.POST:
                 id = request.POST['submit_selected_record']
@@ -232,6 +236,11 @@ def get_product_modal(request):
                 return redirect('delete_product', int(id))
             else:
                 return redirect('create_product')
+        paginator = Paginator(product_data, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context = {'product_data': page_obj, 'form': form, 'flag': 'modal',
+                   'label': 'Update Product', 'page_obj': page_obj}
         return render(request, 'home/products.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'home/page-404.html')
@@ -275,29 +284,26 @@ def update_product(request,pk):
 @measure_execution_time
 def view_product(request):
     try:
-        if request.method == 'POST':
-            product_name = request.POST.get('product_name')
-            if product_name:
-                product_data = Product.objects.filter(product_name=product_name)
-            else:
-                product_data = Product.objects.all()
-        else:
-            start = time.time()
-            product_data = Product.objects.all()
-            end = time.time()
-            print(f'total time for product.all()::{end-start}')
-        start = time.time()
-        product_name = list(Product.objects.values_list('product_name', flat=True))
-        end = time.time()
-        print(f'total time for product_name::{end - start}')
-        dataJson = json.dumps(product_name)
-        context = {'flag': 'view', 'product_data': product_data,'dataJson':dataJson,
-                   'label':'View Product'}
+        query = ''
+        results = Product.objects.select_related('manufacturer').values(
+            'id', 'product_name', 'product_code', 'manufacturer__name', 'buy_rate', 'sell_rate',
+                                                                'manufacturer','buy_rate','sell_rate')
+        paginator = Paginator(results, 10)
+        page_number = request.GET.get('page')
+        try:
+            page_obj = paginator.page(page_number)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+
+        context = {'flag': 'view','label':'View Product','product_data':page_obj,'page_obj':page_obj, 'query': query}
         return render(request, 'home/products.html', context)
     except template.TemplateDoesNotExist:
         return render(request,'home/page-404.html')
     except:
         return render(request,'home/page-500.html')
+
 
 # @login_required(login_url="/login/")
 @measure_execution_time
@@ -312,6 +318,7 @@ def get_receipt_modal(request):
                 return redirect('add_product',pk=id)
         else:
             form = ReceiptForm()
+
         context = {'form': form, 'flag': 'modal'}
         return render(request, 'home/receipt.html', context=context)
     except template.TemplateDoesNotExist:
@@ -400,24 +407,26 @@ def create_group(request):
 # @login_required(login_url="/login/")
 @measure_execution_time
 def view_group(request):
-    try:
-        if request.method == 'POST':
-            group_name = request.POST.get('group_name')
-            print(group_name)
-            if group_name:
-                group_data = Group.objects.filter(group_name=group_name)
-            else:
-                group_data = Group.objects.all()
+    # try:
+    if request.method == 'POST':
+        group_name = request.POST.get('group_name')
+        if group_name:
+            group_data = Group.objects.filter(group_name=group_name)
         else:
             group_data = Group.objects.all()
-        group_name = list(Group.objects.values_list('group_name', flat=True))
-        dataJson = json.dumps(group_name)
-        context = {'flag': 'view', 'group_data': group_data,'dataJson':dataJson,'label':'View Group'}
-        return render(request, 'home/group.html', context)
-    except template.TemplateDoesNotExist:
-        return render(request,'home/page-404.html')
-    except:
-        return render(request,'home/page-500.html')
+    else:
+        group_data = Group.objects.all()  # QuerySet of your group data
+    paginator = Paginator(group_data, 10)  # Show 10 groups per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    group_name = list(Group.objects.values_list('group_name', flat=True))
+    dataJson = json.dumps(group_name)
+    context = {'flag': 'view', 'group_data': page_obj,'dataJson':dataJson,'label':'View Group','page_obj':page_obj}
+    return render(request, 'home/group.html', context)
+    # except template.TemplateDoesNotExist:
+    #     return render(request,'home/page-404.html')
+    # except:
+    #     return render(request,'home/page-500.html')
 
 @measure_execution_time
 def get_group_modal(request):
@@ -426,11 +435,10 @@ def get_group_modal(request):
         product_count = Count('product_group')
     ).values('id', 'group_id', 'group_name',
             'print_name', 'sh_name', 'hsn_code','product_count')
-    general_manufacturer = Group.objects.filter(group_name='General Manufacturer').annotate(
-        product_count = Count('product_group')).values('id', 'group_id', 'group_name',
-        'print_name', 'sh_name', 'hsn_code','product_count')
-    print(group_data)
-    print(general_manufacturer)
+    # general_manufacturer = Group.objects.filter(group_name='General Manufacturer').annotate(
+    #     product_count = Count('product_group')).values('id', 'group_id', 'group_name',
+    #     'print_name', 'sh_name', 'hsn_code','product_count')
+
     form = GroupForm()
     if request.method == 'POST':
         if 'submit_selected_record' in request.POST:
@@ -442,8 +450,11 @@ def get_group_modal(request):
         else:
             return redirect('create_group')
     # removable = False if Group.objects.prefetch_related('product_group').exists() else True
+    paginator = Paginator(group_data, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     context = {'form': form, 'flag': 'modal','label': 'Update Group',
-               'group_data':group_data,'label':'Update Group','general_manufacturer':general_manufacturer}
+               'group_data':page_obj,'label':'Update Group','page_obj':page_obj}
     return render(request, 'home/group.html', context=context)
     # except template.TemplateDoesNotExist:
     #     return render(request,'home/page-404.html')
@@ -521,8 +532,6 @@ def get_customer_modal(request):
     'sh_name','print_name')
     # manufacturer_data = Manufacturer.objects.values('id','name','contact', 'sh_name','print_name')
     form = CustomerForm()
-    context = {'customer_data':customer_data,'form':form, 'flag':'modal',
-               'label':'Update Customer'}
     if request.method == 'POST':
         if 'submit_selected_record' in request.POST:
             id = request.POST['submit_selected_record']
@@ -533,6 +542,11 @@ def get_customer_modal(request):
             return redirect('delete_customer', int(id))
         else:
             return redirect('create_customer')
+    paginator = Paginator(customer_data, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {'customer_data': page_obj, 'form': form, 'flag': 'modal',
+               'label': 'Update Customer','page_obj':page_obj}
     return render(request, 'home/customer.html', context=context)
     # except template.TemplateDoesNotExist:
     #     return render(request,'home/page-404.html')
@@ -588,10 +602,44 @@ def view_customer(request):
 
     customer_name = list(Customer.objects.values_list('customer_name', flat=True))
     dataJson = json.dumps(customer_name)
-    context = {'flag':'view','customer_data':customer_data,
-           'dataJson': dataJson,'label':'View Customer'}
+    paginator = Paginator(customer_data, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    for i in page_obj:
+        print(i)
+    context = {'flag':'view','customer_data':page_obj,
+           'dataJson': dataJson,'label':'View Customer','page_obj':page_obj}
     return render(request, 'home/customer.html', context=context)
     # except template.TemplateDoesNotExist:
     #     return render(request,'home/page-404.html')
     # except:
     #     return render(request,'home/page-500.html')
+
+# views.py
+
+
+def search_router(request,model_search):
+    query = ''
+    if model_search.strip() in 'products':
+        print('product search route')
+        query = request.GET.get('product_name', '')
+        if query:
+            results = (Product.objects.filter(Q(product_name__icontains=query) | Q(product_code__icontains=query)).select_related('manufacturer').
+            values('id', 'product_name', 'product_code', 'manufacturer__name', 'buy_rate', 'sell_rate',
+                                                                'manufacturer','buy_rate','sell_rate'))
+            paginator = Paginator(results, 10)
+            page_number = request.GET.get('page')
+            try:
+                page_obj = paginator.page(page_number)
+            except PageNotAnInteger:
+                page_obj = paginator.page(1)
+            except EmptyPage:
+                page_obj = paginator.page(paginator.num_pages)
+
+            context = {'flag': 'view','label':'View Product','product_data':page_obj,'page_obj':page_obj, 'query': query}
+            return render(request, 'home/products.html', context)
+
+    elif model_search in 'manufacturer':
+        query = request.GET.get('manufacturer_name', '')
+        #similarly do for manufacturer, groups, customer, and also for get model search--- in all html file..
+        # can give like product_modal..

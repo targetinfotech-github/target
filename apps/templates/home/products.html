@@ -77,19 +77,17 @@
             {% endif %}
         {% endif %}
     </div>
+    <!-- home/products.html -->
     {% if flag == 'view' %}
-        <form class="navbar-search form-inline" id="navbar-search-main" method="post"
-              action="{% url 'view_product' %}">
-            {% csrf_token %}
+        <form method="get" action="{% url 'search_router' 'products' %}">
             <div class="input-group input-group-merge search-bar pb-4">
                 <a href="{% url 'view_product' %}">
                     <button type="button" class="btn-sm btn-warning">reset</button>
                 </a>
-
                 <input type="text" class="form-control" id="top_bar_InputIconLeft" placeholder="Search"
                        aria-label="Search" aria-describedby="topbar-addon" style="max-width: 25%"
-                       oninput="autocomplete_()" name="product_name" autocomplete="off">
-<button type="submit" class="input-group-text" id="topbar-addon">
+                       name="product_name" autocomplete="off" value="{{ query }}">
+                <button type="submit" class="input-group-text" id="topbar-addon">
                     <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
                          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
                          aria-hidden="true">
@@ -98,9 +96,9 @@
                               clip-rule="evenodd"></path>
                     </svg>
                 </button>
-
             </div>
         </form>
+
         <div class="card border-0 shadow mb-4">
             <div class="card-body">
                 <div class="table-responsive">
@@ -110,44 +108,70 @@
                             <th scope="col">#</th>
                             <th scope="col">Product Name</th>
                             <th scope="col">Product Code</th>
-                            <th scope="col">Manufacture</th>
+                            <th scope="col">Manufacturer</th>
                             <th scope="col">Buy Rate</th>
                             <th scope="col">Sell Rate</th>
                         </tr>
                         </thead>
-                        <!-- Item -->
                         <tbody>
                         {% for product in product_data %}
                             <tr id="row-{{ product.id }}">
                                 <th scope="row">{{ forloop.counter }}</th>
                                 <td><a href="{% url 'update_product' product.id %}">{{ product.product_name }}</a></td>
                                 <td>{{ product.product_code }}</td>
-                                <td>{{ product.manufacturer }}</td>
+                                <td>{{ product.manufacturer__name }}</td>
                                 <td>{{ product.buy_rate }}</td>
                                 <td>{{ product.sell_rate }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
-                        <!-- End of Item -->
                     </table>
                 </div>
+
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item">
+                            <a class="page-link" href="?product_name={{ query }}&page=1" aria-label="First">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">First</span>
+                            </a>
+                        </li>
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link"
+                                                     href="?product_name={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                            </li>
+                        {% endif %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link"
+                                                     href="?product_name={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                            </li>
+                        {% endif %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?product_name={{ query }}&page={{ page_obj.paginator.num_pages }}"
+                               aria-label="Last">
+                                <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">Last</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     {% endif %}
+
     <!-- Button trigger modal -->
     {% if flag == 'modal' %}
-        <form method="post" action="{% url 'get_product_modal' %}">
-            {% csrf_token %}
-
-            <!-- Modal -->
-            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLongTitle">Select Product</h5>
-                        </div>
-                        <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Select Product</h5>
+                    </div>
+                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+                        <form method="GET" action="{% url 'get_product_modal' %}">
                             <div class="table-responsive">
                                 <table class="table table-centered table-nowrap mb-0 rounded">
                                     <thead>
@@ -176,8 +200,44 @@
                                     </tbody>
                                     <!-- End of Item -->
                                 </table>
+                                <div>
+                                    <nav aria-label="Page navigation example">
+                                        <ul class="pagination">
+                                            <li class="page-item">
+                                                <a class="page-link"
+                                                   href="?page={% if page_obj.has_previous %}1{% else %}#{% endif %}"
+                                                   aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                    <span class="sr-only">First</span>
+                                                </a>
+                                            </li>
+                                            {% if page_obj.has_previous %}
+                                                <li class="page-item"><a class="page-link"
+                                                                         href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                                                </li>
+                                            {% endif %}
+
+                                            <li class="page-item active"><a class="page-link"
+                                                                            href="#">{{ page_obj.number }}</a></li>
+                                            {% if page_obj.has_next %}
+                                                <li class="page-item"><a class="page-link"
+                                                                         href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                                                </li>
+                                            {% endif %}
+
+                                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}"
+                                               aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                                <span class="sr-only">Last</span>
+                                            </a>
+                                        </ul>
+                                    </nav>
+                                </div>
                             </div>
-                        </div>
+                        </form>
+                    </div>
+                    <form method="post" action="{% url 'get_product_modal' %}">
+                        {% csrf_token %}
                         <div class="modal-footer">
                             <a href="{% url 'create_product' %}">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -189,10 +249,11 @@
                                     name="delete_selected_record" value="" style="display: flex">Delete
                             </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
-        </form>
+        </div>
+
     {% endif %}
     {% if flag != 'view' %}
         <div>
