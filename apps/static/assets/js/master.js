@@ -52,7 +52,6 @@ function selectManufacturer(id, related) {
 }
 
 
-
 function selectProduct(id) {
     var selectedRow = document.getElementById('row-' + id);
 
@@ -146,6 +145,7 @@ function selectGroup(id, related) {
         selectedRowId = id;
     }
 }
+
 delete_record.addEventListener('click', function (event) {
     var confirmation = confirm('Are you sure you want to delete this record?');
     if (!confirmation) {

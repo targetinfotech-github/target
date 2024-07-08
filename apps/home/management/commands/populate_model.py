@@ -1,6 +1,6 @@
 # populate_manufacturers.py
 from django.core.management.base import BaseCommand
-from apps.home.factories import ManufacturerFactory, ProductFactory, GroupFactory, CustomerFactory
+from apps.home.services.factories import ManufacturerFactory, ProductFactory, GroupFactory, CustomerFactory
 
 
 class Command(BaseCommand):

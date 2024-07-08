@@ -76,17 +76,19 @@
     </div>
     {% if flag == 'view' %}
 
-        <form class="navbar-search form-inline" id="navbar-search-main" method="post"
-              action="{% url 'view_manufacturer' %}">
-            {% csrf_token %}
+        <form method="get" action="{% url 'search_router' 'manufacturer' %}">
             <div class="input-group input-group-merge search-bar pb-4">
                 <a href="{% url 'view_manufacturer' %}">
                     <button type="button" class="btn-sm btn-warning">reset</button>
                 </a>
 
+                {#                <input type="text" class="form-control" id="top_bar_InputIconLeft" placeholder="Search"#}
+                {#                       aria-label="Search" aria-describedby="topbar-addon" style="max-width: 25%"#}
+                {#                       oninput="autocomplete_()" name="manufacturer_name" autocomplete="off">#}
                 <input type="text" class="form-control" id="top_bar_InputIconLeft" placeholder="Search"
                        aria-label="Search" aria-describedby="topbar-addon" style="max-width: 25%"
-                       oninput="autocomplete_()" name="manufacturer_name" autocomplete="off">
+                       oninput="autocomplete_manufacturer()"
+                       name="manufacturer_details" autocomplete="off">
                 <button type="submit" class="input-group-text" id="topbar-addon">
                     <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
                          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
@@ -129,120 +131,116 @@
                         <!-- End of Item -->
                     </table>
                 </div>
-                <form method="GET" action="{% url 'view_manufacturer' %}">
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination">
-                            <li class="page-item">
-                                <a class="page-link"
-                                   href="?page={% if page_obj.has_previous %}1{% else %}#{% endif %}"
-                                   aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                    <span class="sr-only">First</span>
-                                </a>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item">
+                            <a class="page-link" href="?manufacturer_details={{ query }}&page=1" aria-label="First">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">First</span>
+                            </a>
+                        </li>
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link"
+                                                     href="?manufacturer_details={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
                             </li>
-                            {% if page_obj.has_previous %}
-                                <li class="page-item"><a class="page-link"
-                                                         href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
-                                </li>
-                            {% endif %}
-
-                            <li class="page-item active"><a class="page-link"
-                                                            href="#">{{ page_obj.number }}</a></li>
-                            {% if page_obj.has_next %}
-                                <li class="page-item"><a class="page-link"
-                                                         href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
-                                </li>
-                            {% endif %}
-
-                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}"
-                               aria-label="Next">
+                        {% endif %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link"
+                                                     href="?manufacturer_details={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                            </li>
+                        {% endif %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?manufacturer_details={{ query }}&page={{ page_obj.paginator.num_pages }}"
+                               aria-label="Last">
                                 <span aria-hidden="true">&raquo;</span>
                                 <span class="sr-only">Last</span>
                             </a>
-                        </ul>
-                    </nav>
-                </form>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     {% endif %}
     <!-- Button trigger modal -->
     {% if flag == 'modal' %}
 
-            <!-- Modal -->
-            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLongTitle">Select Manufacturer</h5>
-                        </div>
-                        <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
-                            <form method="GET" action="{% url 'get_manufacturer_modal' %}">
-                                <div class="table-responsive">
-                                    <table class="table table-centered table-nowrap mb-0 rounded">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col">#</th>
-                                            <th scope="col">type</th>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Print Name</th>
-                                            <th scope="col">Sh Name</th>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Select Manufacturer</h5>
+                    </div>
+                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+                        <form method="GET" action="{% url 'get_manufacturer_modal' %}">
+                            <div class="table-responsive">
+                                <table class="table table-centered table-nowrap mb-0 rounded">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">type</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Print Name</th>
+                                        <th scope="col">Sh Name</th>
+                                    </tr>
+                                    </thead>
+                                    <!-- Item -->
+                                    <tbody>
+                                    {% for manufacturer in manufacturer_data %}
+                                        <tr id="row-{{ manufacturer.id }}"
+                                            onclick="selectManufacturer('{{ manufacturer.id }}',
+                                                    '{% if manufacturer.product_count > 0 %}1{% else %}0{% endif %}')">
+                                            <th scope="row">{{ forloop.counter }}</th>
+                                            <td>{{ manufacturer.type }}</td>
+                                            <td>{{ manufacturer.name }}</td>
+                                            <td>{{ manufacturer.print_name }}</td>
+                                            <td>{{ manufacturer.sh_name }}</td>
                                         </tr>
-                                        </thead>
-                                        <!-- Item -->
-                                        <tbody>
-                                        {% for manufacturer in manufacturer_data %}
-                                            <tr id="row-{{ manufacturer.id }}"
-                                                onclick="selectManufacturer('{{ manufacturer.id }}',
-                                                        '{% if manufacturer.product_count > 0 %}1{% else %}0{% endif %}')">
-                                                <th scope="row">{{ forloop.counter }}</th>
-                                                <td>{{ manufacturer.type }}</td>
-                                                <td>{{ manufacturer.name }}</td>
-                                                <td>{{ manufacturer.print_name }}</td>
-                                                <td>{{ manufacturer.sh_name }}</td>
-                                            </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                        <!-- End of Item -->
-                                    </table>
-                                    <div>
-                                        <nav aria-label="Page navigation example">
-                                            <ul class="pagination">
-                                                <li class="page-item">
-                                                    <a class="page-link"
-                                                       href="?page={% if page_obj.has_previous %}1{% else %}#{% endif %}"
-                                                       aria-label="Previous">
-                                                        <span aria-hidden="true">&laquo;</span>
-                                                        <span class="sr-only">First</span>
-                                                    </a>
-                                                </li>
-                                                {% if page_obj.has_previous %}
-                                                    <li class="page-item"><a class="page-link"
-                                                                             href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
-                                                    </li>
-                                                {% endif %}
-
-                                                <li class="page-item active"><a class="page-link"
-                                                                                href="#">{{ page_obj.number }}</a></li>
-                                                {% if page_obj.has_next %}
-                                                    <li class="page-item"><a class="page-link"
-                                                                             href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
-                                                    </li>
-                                                {% endif %}
-
-                                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}"
-                                                   aria-label="Next">
-                                                    <span aria-hidden="true">&raquo;</span>
-                                                    <span class="sr-only">Last</span>
+                                    {% endfor %}
+                                    </tbody>
+                                    <!-- End of Item -->
+                                </table>
+                                <div>
+                                    <nav aria-label="Page navigation example">
+                                        <ul class="pagination">
+                                            <li class="page-item">
+                                                <a class="page-link"
+                                                   href="?page={% if page_obj.has_previous %}1{% else %}#{% endif %}"
+                                                   aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                    <span class="sr-only">First</span>
                                                 </a>
-                                            </ul>
-                                        </nav>
-                                    </div>
+                                            </li>
+                                            {% if page_obj.has_previous %}
+                                                <li class="page-item"><a class="page-link"
+                                                                         href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                                                </li>
+                                            {% endif %}
+
+                                            <li class="page-item active"><a class="page-link"
+                                                                            href="#">{{ page_obj.number }}</a></li>
+                                            {% if page_obj.has_next %}
+                                                <li class="page-item"><a class="page-link"
+                                                                         href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                                                </li>
+                                            {% endif %}
+
+                                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}"
+                                               aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                                <span class="sr-only">Last</span>
+                                            </a>
+                                        </ul>
+                                    </nav>
                                 </div>
-                            </form>
-                        </div>
-                     <form method="post" action="{% url 'get_manufacturer_modal' %}">
-            {% csrf_token %}
+                            </div>
+                        </form>
+                    </div>
+                    <form method="post" action="{% url 'get_manufacturer_modal' %}">
+                        {% csrf_token %}
                         <div class="modal-footer">
                             <a href="{% url 'create_manufacturer' %}">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -254,10 +252,10 @@
                                     name="delete_selected_record" value="" style="display: flex">Delete
                             </button>
                         </div>
-                     </form>
-                    </div>
+                    </form>
                 </div>
             </div>
+        </div>
     {% endif %}
     {% if flag != 'view' %}
         <form method="post">
@@ -334,32 +332,48 @@
 
     <script>
 
-        function autocomplete_() {
-            var manufacturerNames = JSON.parse('{{ dataJson | escapejs}}');
-            var input = document.getElementById('top_bar_InputIconLeft');
-            var term = input.value.toLowerCase();
-            if (term.length >= 3) {
-                var matchingNames = manufacturerNames.filter(name =>
-                    name.toLowerCase().includes(term)
-                );
-                console.log(matchingNames)
-                input.setAttribute("list", "autocomplete-list");
-                var datalist = document.getElementById("autocomplete-list");
-                if (datalist) {
-                    datalist.remove();
-                }
+        function autocomplete_dropdown(data, input) {
+            var existingDatalist = document.getElementById("autocomplete-list");
+            if (existingDatalist) {
+                existingDatalist.remove();
+            }
 
-                datalist = document.createElement("datalist");
-                datalist.id = "autocomplete-list";
-                matchingNames.forEach(name => {
-                    var option_element = document.createElement("option");
-                    option_element.value = name;
-                    datalist.appendChild(option_element);
+            var datalist = document.createElement("datalist");
+            datalist.id = "autocomplete-list";
+
+            data.forEach(name => {
+                var option_element = document.createElement("option");
+                option_element.value = name;
+                datalist.appendChild(option_element);
+            });
+
+            input.parentNode.appendChild(datalist);
+
+            input.setAttribute("list", "autocomplete-list");
+        }
+
+        function autocomplete_manufacturer() {
+            var input = document.getElementById('top_bar_InputIconLeft');
+
+            if (input.value.length >= 3) {
+                $.ajax({
+                    url: "{% url 'search_router' 'manufacturer' %}",
+                    data: {
+                        'autocomplete_query': input.value
+                    },
+                    success: function (data) {
+                        autocomplete_dropdown(data, input);
+                    },
+                    error: function (error) {
+                        console.error('Error fetching autocomplete suggestions:', error);
+                    }
                 });
-                input.parentNode.appendChild(datalist);
             } else {
-                // Clear the autocomplete options
-                input.setAttribute("list", "");
+                input.removeAttribute("list");
+                var existingDatalist = document.getElementById("autocomplete-list");
+                if (existingDatalist) {
+                    existingDatalist.remove();
+                }
             }
         }
     </script>
