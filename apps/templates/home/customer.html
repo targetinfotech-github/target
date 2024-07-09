@@ -172,6 +172,30 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLongTitle">Select Customer</h5>
                     </div>
+                    <div style="display: inline-flex;margin: 10px">
+                        <form method="get" action="{% url 'search_router' 'customer_modal' %}">
+                            <div class="input-group input-group-merge search-bar pb-4">
+                                <a href="{% url 'view_customer' %}">
+                                    <button type="button" class="btn-sm btn-warning">reset</button>
+                                </a>
+
+                                <input type="text" class="form-control" id="top_bar_InputIconLeft" placeholder="Search"
+                                       aria-label="Search" aria-describedby="topbar-addon" style="max-width: 50%"
+                                       oninput="autocomplete_customer()" name="customer_modal_details"
+                                       autocomplete="off">
+                                <button type="submit" class="input-group-text" id="topbar-addon">
+                                    <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
+                                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                         aria-hidden="true">
+                                        <path fill-rule="evenodd"
+                                              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                              clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+
+                            </div>
+                        </form>
+                    </div>
                     <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
                         <form method="GET" action="{% url 'get_customer_modal' %}">
                             <div class="table-responsive">
@@ -187,50 +211,56 @@
                                     </thead>
                                     <!-- Item -->
                                     <tbody>
-                                    {% for customer in customer_data %}
-                                        <tr id="row-{{ customer.id }}"
-                                            onclick="selectCustomer('{{ customer.id }}')">
-                                            <th scope="row">{{ forloop.counter }}</th>
-                                            <td>{{ customer.customer_name }}</td>
-                                            <td>{{ customer.print_name }}</td>
-                                            <td>{{ customer.sh_name }}</td>
-                                            <td>{{ customer.email }}</td>
-                                        </tr>
-                                    {% endfor %}
+                                    {% if customer_data %}
+                                        {% for customer in customer_data %}
+                                            <tr id="row-{{ customer.id }}"
+                                                onclick="selectCustomer('{{ customer.id }}')">
+                                                <th scope="row">{{ forloop.counter }}</th>
+                                                <td>{{ customer.customer_name }}</td>
+                                                <td>{{ customer.print_name }}</td>
+                                                <td>{{ customer.sh_name }}</td>
+                                                <td>{{ customer.email }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
                                     </tbody>
                                     <!-- End of Item -->
                                 </table>
                             </div>
                             <div>
-                                <ul class="pagination">
-                                    <li class="page-item">
-                                        <a class="page-link"
-                                           href="?page={% if page_obj.has_previous %}1{% else %}#{% endif %}"
-                                           aria-label="Previous">
-                                            <span aria-hidden="true">&laquo;</span>
-                                            <span class="sr-only">First</span>
-                                        </a>
-                                    </li>
-                                    {% if page_obj.has_previous %}
-                                        <li class="page-item"><a class="page-link"
-                                                                 href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
-                                        </li>
-                                    {% endif %}
-
-                                    <li class="page-item active"><a class="page-link"
-                                                                    href="#">{{ page_obj.number }}</a></li>
-                                    {% if page_obj.has_next %}
-                                        <li class="page-item"><a class="page-link"
-                                                                 href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
-                                        </li>
-                                    {% endif %}
-
-                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}"
-                                       aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                        <span class="sr-only">Last</span>
-                                    </a>
-                                </ul>
+                                {% if customer_data %}
+                                    <nav aria-label="Page navigation example">
+                                        <ul class="pagination">
+                                            <li class="page-item">
+                                                <a class="page-link" href="?customer_modal_details={{ query }}&page=1"
+                                                   aria-label="First">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                    <span class="sr-only">First</span>
+                                                </a>
+                                            </li>
+                                            {% if page_obj.has_previous %}
+                                                <li class="page-item"><a class="page-link"
+                                                                         href="?customer_modal_details={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                                                </li>
+                                            {% endif %}
+                                            <li class="page-item active"><a class="page-link"
+                                                                            href="#">{{ page_obj.number }}</a></li>
+                                            {% if page_obj.has_next %}
+                                                <li class="page-item"><a class="page-link"
+                                                                         href="?customer_modal_details={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                                                </li>
+                                            {% endif %}
+                                            <li class="page-item">
+                                                <a class="page-link"
+                                                   href="?customer_modal_details={{ query }}&page={{ page_obj.paginator.num_pages }}"
+                                                   aria-label="Last">
+                                                    <span aria-hidden="true">&raquo;</span>
+                                                    <span class="sr-only">Last</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                {% endif %}
                             </div>
                         </form>
                     </div>

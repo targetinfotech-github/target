@@ -1,5 +1,4 @@
-import datetime
-
+from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -32,6 +31,8 @@ class Group(models.Model):
     consolidation_code = models.CharField(max_length=30, null=True, blank=True)
     hsn_code = models.CharField(max_length=30, null=True, blank=True)
     gcr_code = models.CharField(max_length=30, null=True, blank=True)
+    last_accessed = models.DateTimeField(default=now,null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True,null=True,blank=True)
     objects = GroupManager()
 
     def __str__(self):
@@ -42,6 +43,7 @@ class Group(models.Model):
         db_table = 'Group'
 
     def save(self, *args, **kwargs):
+        self.last_accessed = now()
         if not self.print_name or self.print_name is None:
             self.print_name = self.group_name
         super().save(*args, **kwargs)
@@ -60,7 +62,8 @@ class Manufacturer(models.Model):
     address = models.TextField(max_length=255, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     contact = models.CharField(max_length=20, null=True, blank=True)
-
+    last_accessed = models.DateTimeField(default=now,null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True,null=True,blank=True)
     def __str__(self):
         return self.name
 
@@ -69,6 +72,7 @@ class Manufacturer(models.Model):
         db_table = 'Manufacturer'
 
     def save(self, *args, **kwargs):
+        self.last_accessed = now()
         if not self.print_name or self.print_name is None:
             self.print_name = self.name
         super().save(*args, **kwargs)
@@ -94,13 +98,18 @@ class Product(models.Model):
     mrp = models.DecimalField(decimal_places=2,max_digits=12, null=True, blank=True)
     stock_option = models.CharField(choices=STOCK_OPTION_CHOICE, max_length=20, default='quantity_wise')
     group = models.ForeignKey(Group,on_delete=models.CASCADE,related_name='product_group',null=True,blank=True)
-
+    last_accessed = models.DateTimeField(default=now,null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True,null=True,blank=True)
     def __str__(self):
         return f"{self.product_name} ({self.product_code})"
 
     class Meta:
         ordering = ['-id']
         db_table = 'Product'
+
+    def save(self,*args,**kwargs):
+        self.last_accessed = now()
+        super().save(*args,**kwargs)
 
 class Customer(models.Model):
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
@@ -110,7 +119,8 @@ class Customer(models.Model):
     contact = models.CharField(max_length=20, null=True, blank=True)
     address = models.TextField(max_length=255, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
-
+    last_accessed = models.DateTimeField(default=now,null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True,null=True,blank=True)
     def __str__(self):
         return f"{self.customer_name}_({self.id})"
 
@@ -119,6 +129,7 @@ class Customer(models.Model):
         db_table = 'Customer'
 
     def save(self, *args, **kwargs):
+        self.last_accessed = now()
         if not self.print_name or self.print_name is None:
             self.print_name = self.customer_name
         super().save(*args, **kwargs)
@@ -156,12 +167,14 @@ class Receipt(models.Model):
     manufacturer = models.ForeignKey(Manufacturer,on_delete=models.PROTECT,related_name='receipt_manufacturers')
     # can do like Manufacturer.receipt_manufacturer.all()
     net_amount = models.DecimalField(decimal_places=2,max_digits=8,null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True,null=True,blank=True)
 
     def __str__(self):
         return f"{self.receipt_type}_({self.manufacturer.name})"
 
     class Meta:
         db_table = 'Receipt'
+
 class ReceiptProduct(models.Model):
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE, related_name='receipt_models')

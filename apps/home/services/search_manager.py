@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from django.db.models import Q
 
 from apps.home.models import Product, Manufacturer, Customer, Group
+from apps.home.services.exceptions import ModelNotFound
+
 
 class SearchService:
     def __init__(self, request, model_search):
@@ -12,22 +14,16 @@ class SearchService:
         self.details_query = request.GET.get(f'{self.model_search}_details', '')
 
     def get_autocomplete_data(self):
-        """
-        Fetch autocomplete suggestions based on the model type.
-        """
-        if self.model_search == 'product':
+        if self.model_search == 'product' or self.model_search == 'product_modal':
             return self.get_product_autocomplete()
-        elif self.model_search == 'manufacturer':
+        elif self.model_search == 'manufacturer' or self.model_search == 'manufacturer_modal':
             return self.get_manufacturer_autocomplete()
-        elif self.model_search == 'customer':
+        elif self.model_search == 'customer' or self.model_search == 'customer_modal':
             return self.get_customer_autocomplete()
-        elif self.model_search == 'group':
+        elif self.model_search == 'group' or self.model_search == 'group_modal':
             return self.get_group_autocomplete()
 
     def get_product_autocomplete(self):
-        """
-        Get product autocomplete suggestions.
-        """
         products = Product.objects.filter(
             Q(product_name__icontains=self.autocomplete_query) |
             Q(product_code__icontains=self.autocomplete_query)
@@ -39,9 +35,6 @@ class SearchService:
         return list(products)
 
     def get_manufacturer_autocomplete(self):
-        """
-        Get manufacturer autocomplete suggestions.
-        """
         manufacturers = Manufacturer.objects.filter(
             Q(name__icontains=self.autocomplete_query) |
             Q(email__icontains=self.autocomplete_query)
@@ -53,9 +46,6 @@ class SearchService:
         return list(manufacturers)
 
     def get_customer_autocomplete(self):
-        """
-        Get customer autocomplete suggestions.
-        """
         customers = Customer.objects.filter(
             Q(customer_name__icontains=self.autocomplete_query) |
             Q(email__icontains=self.autocomplete_query)
@@ -67,9 +57,6 @@ class SearchService:
         return list(customers)
 
     def get_group_autocomplete(self):
-        """
-        Get group autocomplete suggestions.
-        """
         groups = Group.objects.filter(
             Q(group_name__icontains=self.autocomplete_query) |
             Q(code_name__icontains=self.autocomplete_query)
@@ -81,46 +68,36 @@ class SearchService:
         return list(groups)
 
     def get_search_results(self):
-        """
-        Get search results based on the model type and query.
-        """
-        if self.model_search == 'product':
+        if self.model_search == 'product' or self.model_search == 'product_modal':
             return self.get_product_search_results()
-        elif self.model_search == 'manufacturer':
+        elif self.model_search == 'manufacturer' or self.model_search == 'manufacturer_modal':
             return self.get_manufacturer_search_results()
-        elif self.model_search == 'customer':
+        elif self.model_search == 'customer' or self.model_search == 'customer_modal':
             return self.get_customer_search_results()
-        elif self.model_search == 'group':
+        elif self.model_search == 'group' or self.model_search == 'group_modal':
             return self.get_group_search_results()
 
     def get_product_search_results(self):
-        """
-        Fetch search results for products.
-        """
         results = Product.objects.filter(
             Q(product_name__icontains=self.details_query) |
             Q(product_code__icontains=self.details_query)
         ).select_related('manufacturer').values(
             'id', 'product_name', 'product_code', 'manufacturer__name', 'buy_rate', 'sell_rate', 'manufacturer'
         )
+        print('product object',results)
         return self.paginate_results(results)
 
     def get_manufacturer_search_results(self):
-        """
-        Fetch search results for manufacturers.
-        """
         results = Manufacturer.objects.filter(
             Q(name__icontains=self.details_query) |
             Q(email__icontains=self.details_query)
         ).values(
-            'id', 'name', 'print_name', 'sh_name', 'contact'
+            'id', 'name', 'print_name', 'sh_name', 'contact','type'
         )
         return self.paginate_results(results)
 
     def get_customer_search_results(self):
-        """
-        Fetch search results for customers.
-        """
+
         results = Customer.objects.filter(
             Q(customer_name__icontains=self.details_query) |
             Q(email__icontains=self.details_query)
@@ -149,40 +126,21 @@ class SearchService:
             page_obj = paginator.page(paginator.num_pages)
         return page_obj
 
-    def get_context(self, page_obj):
-        context = {}
-        if self.model_search == 'product':
-            context = {
-                'flag': 'view',
-                'label': 'View Product',
-                'product_data': page_obj,
-                'page_obj': page_obj,
-                'query': self.details_query
-            }
-        elif self.model_search == 'manufacturer':
-            context = {
-                'flag': 'view',
-                'label': 'View Manufacturer',
-                'manufacturer_data': page_obj,
-                'page_obj': page_obj,
-                'query': self.details_query
-            }
-        elif self.model_search == 'customer':
-            context = {
-                'flag': 'view',
-                'label': 'View Customer',
-                'customer_data': page_obj,
-                'page_obj': page_obj,
-                'query': self.details_query
-            }
-        elif self.model_search == 'group':
-            context = {
-                'flag': 'view',
-                'label': 'View Group',
-                'group_data': page_obj,
-                'page_obj': page_obj,
-                'query': self.details_query
-            }
+    def get_context(self, page_obj,*args,**kwargs):
+        model_prefix = self.model_search.split('_')[0]
+        print(f'modal prefix: {model_prefix}')
+        context = {
+            'flag': 'view',
+            'label': f'View {self.model_search.title()}',
+            f'{model_prefix}_data': page_obj,
+            'page_obj': page_obj,
+            'query': self.details_query,
+        }
+        if args:
+            for key, value in args:
+                context[key] = value
+        if kwargs:
+            context.update(kwargs)
         return context
 
 
@@ -204,6 +162,7 @@ class SearchService:
     #     template = template_map.get(self.model_search, 'home/index.html')
     #     # return template
     #     return self.request.render(template, context)
+
 class masterSearchEndpoint(SearchService):
     def __init__(self, request, model_search):
         super().__init__(request, model_search)
@@ -216,14 +175,23 @@ class masterSearchEndpoint(SearchService):
             return JsonResponse('',safe=False)
 
 
-    def detailed_data(self):
-        print('detailed data',self.details_query)
+    def masterSearchRouter(self):
+        masterModal = ['product_modal','manufacturer_modal','customer_modal','group_modal']
+        masterView = ['product','manufacturer','customer','group']
+        print('master search router')
+        if self.model_search in masterModal:
+            template,context = self.detailed_data_modal()
+            return template,context
+        elif self.model_search in masterView:
+            template,context = self.detailed_data_views()
+            return template, context
+        else:
+            raise ModelNotFound()
+
+    def detailed_data_views(self):
         if self.details_query:
-            print('if condition')
             page_obj = self.get_search_results()
-            print(page_obj)
             context = self.get_context(page_obj)
-            print('context--',context)
             template_map = {
                 'product': 'home/products.html',
                 'manufacturer': 'home/manufacturer.html',
@@ -231,7 +199,21 @@ class masterSearchEndpoint(SearchService):
                 'group': 'home/group.html'
             }
             template = template_map.get(self.model_search, 'home/index.html')
-            # return template
-            # return self.request.render(template, context)
-            print(f'template:{template}, context:{context}')
             return template,context
+
+    def detailed_data_modal(self):
+        if self.details_query:
+            page_obj = self.get_search_results()
+            context = self.get_context(page_obj)
+            context['label'] = f'Update {self.model_search}'
+            context['flag'] = 'modal'
+            template_map = {
+                'product_modal': 'home/products.html',
+                'manufacturer_modal': 'home/manufacturer.html',
+                'customer_modal': 'home/customer.html',
+                'group_modal': 'home/group.html'
+            }
+            template = template_map.get(self.model_search, 'home/index.html')
+            return template,context
+
+    

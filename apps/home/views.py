@@ -69,17 +69,11 @@ def pages(request):
 def create_manufacturer(request):
     try:
         manufacturer = Manufacturer.objects.all()
-        print(manufacturer)
         if request.method == 'POST':
-            print('post data')
             form = ManufacturerForm(request.POST)
             if form.is_valid():
                 name = form.cleaned_data['name']
-                print(f'form name:: {name}')
                 form.save()
-                print('form saved')
-                man = Manufacturer.objects.get(name=name)
-                print(f'man:: {man.type}')
                 return HttpResponseRedirect(reverse('home'))
         else:
             form = ManufacturerForm()
@@ -194,22 +188,14 @@ def view_manufacturer(request):
 @measure_execution_time
 def create_product(request):
     try:
-        start_time = time.time()
         Group.objects.get_or_create_general_manufacturer()
-        group_time = time.time() - start_time
-        print(f'Group time: {group_time}')
         if request.method == 'POST':
             form = ProductForm(request.POST)
-            print('post')
             if form.is_valid():
-                print('form valid')
                 form.save()
-                print(Product.objects.values())
                 return HttpResponseRedirect(reverse('home'))
         else:
-            start = time.time()
             form = ProductForm()
-            print(f'form time: {time.time() - start}')
         context = {'form': form,
                    'manufacturer_data': None,
                    'flag': 'create',
@@ -242,7 +228,7 @@ def get_product_modal(request):
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         context = {'product_data': page_obj, 'form': form, 'flag': 'modal',
-                   'label': 'Update Product', 'page_obj': page_obj}
+                   'label': 'Update Product', 'page_obj': page_obj,'query':''}
         return render(request, 'home/products.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'home/page-404.html')
@@ -628,13 +614,19 @@ def view_customer(request):
 # @measure_execution_time
 def search_router(request,model_search):
     autocomplete_query = request.GET.get('autocomplete_query', '')
-    details_query = request.GET.get(f'{model_search}_details', '')
-    print(f'request.GET dictionary::: {request.GET.dict()}')
+    print(f'request.GET dictionary::: {request.GET.dict()}, model search:{model_search}')
     masterSearchObject = masterSearchEndpoint(request, model_search)
     if autocomplete_query:
         json_object = masterSearchObject.autocomplete_data()
         return json_object
-    elif details_query:
-        print(f'detailed query:: {details_query}')
-        template, context= masterSearchObject.detailed_data()
-        return render(request,template,context)
+    else:
+        template, context = masterSearchObject.masterSearchRouter()
+        print(f'template: {template}, context::{context}')
+        return render(request, template, context)
+    # elif details_query:
+    #     template, context = masterSearchObject.detailed_data_views()
+    #     return render(request,template,context)
+    # else:
+    #     print('executed modal')
+    #     template, context = masterSearchObject.detailed_data_modal()
+    #     return render(request, template, context)
