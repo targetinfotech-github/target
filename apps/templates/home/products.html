@@ -332,29 +332,17 @@
 
                 <div class="container">
                     <div class="row">
-                        {#                        <div class="col">#}
-                        {#                            <label for="{{ form.manufacturer.id_for_label }}">{{ form.manufacturer.label }}</label>#}
-                        {#                            <select class="form-select" aria-label="Default select example"#}
-                        {#                                    name="{{ form.manufacturer.name }}">#}
-                        {#                                {% for value, label in form.manufacturer.field.choices %}#}
-                        {#                                    <option value="{{ value }}"#}
-                        {#                                            {% if form.manufacturer.value == value %}selected{% endif %}>#}
-                        {#                                        {{ label }}#}
-                        {#                                    </option>#}
-                        {#                                {% endfor %}#}
-                        {#                            </select>#}
-                        {#                        </div>#}
                         <div class="col">
                             <label for="{{ form.manufacturer.id_for_label }}">{{ form.manufacturer.label }}</label>
                             <select class="form-select" aria-label="Default select example"
-                                    name="{{ form.manufacturer.name }}" id="manufacturer-select">
-                                <!-- Placeholder options will be dynamically loaded -->
+                                    name="{{ form.manufacturer.name }}">
+                                {% for value, label in form.manufacturer.field.choices %}
+                                    <option value="{{ value }}"
+                                            {% if form.manufacturer.value == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
                             </select>
-                            <div id="manufacturer-loader" class="d-none">
-                                <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
                         </div>
                         <div class="col">
                             <label for="{{ form.product_name.id_for_label }}">Product Name</label>
@@ -452,54 +440,6 @@
 
     <script src="{% static 'assets/js/master.js' %}"></script>
     <script>
-        let currentPage = 1;
-        let isLoading = false;
-
-        function loadManufacturers(page) {
-            if (isLoading) return;
-            isLoading = true;
-
-            const manufacturerSelect = document.getElementById('manufacturer-select');
-            const manufacturerLoader = document.getElementById('manufacturer-loader');
-
-            manufacturerLoader.classList.remove('d-none');
-
-            fetch(`/api/manufacturers?page=${page}`)
-                .then(response => response.json())
-                .then(data => {
-                    data.results.forEach(manufacturer => {
-                        const option = document.createElement('option');
-                        option.value = manufacturer.id;
-                        option.text = manufacturer.name;
-                        if (manufacturer.id === {{ form.manufacturer.value }}) {
-                            option.selected = true;
-                        }
-                        manufacturerSelect.add(option);
-                    });
-
-                    if (data.next) {
-                        currentPage++;
-                    } else {
-                        manufacturerLoader.classList.add('d-none');
-                    }
-                    isLoading = false;
-                })
-                .catch(error => {
-                    console.error('Error loading manufacturers:', error);
-                    isLoading = false;
-                    manufacturerLoader.classList.add('d-none');
-                });
-        }
-
-        // Initial load
-        loadManufacturers(currentPage);
-
-        // Infinite scrolling
-        window.addEventListener('scroll', () => {
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight && !isLoading) {
-                loadManufacturers(currentPage);
-            }
-        });
 
         function autocomplete_dropdown(data, input) {
             var existingDatalist = document.getElementById("autocomplete-list");
