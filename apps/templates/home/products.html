@@ -102,7 +102,7 @@
                 <a href="{% url 'view_product' %}">
                     <button type="button" class="btn-sm btn-warning">reset</button>
                 </a>
-                <input type="text" class="form-control" id="top_bar_InputIconLeft" placeholder="Search"
+                <input type="text" class="form-control" id="fetch_product" placeholder="Search"
                        aria-label="Search" aria-describedby="topbar-addon" style="max-width: 25%"
                        oninput="autocomplete_product()" name="product_details" autocomplete="off" value="{{ query }}">
                 <button type="submit" class="input-group-text" id="topbar-addon">
@@ -134,15 +134,15 @@
                             </thead>
                             <tbody>
                             {% for product in product_data %}
-                            <tr id="row-{{ product.id }}">
-                                <th scope="row">{{ forloop.counter }}</th>
-                                <td><a href="{% url 'update_product' product.id %}">{{ product.product_name }}</a>
-                                </td>
-                                <td>{{ product.product_code }}</td>
-                                <td>{{ product.manufacturer__name }}</td>
-                                <td>{{ product.buy_rate }}</td>
-                                <td>{{ product.sell_rate }}</td>
-                            </tr>
+                                <tr id="row-{{ product.id }}">
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td><a href="{% url 'update_product' product.id %}">{{ product.product_name }}</a>
+                                    </td>
+                                    <td>{{ product.product_code }}</td>
+                                    <td>{{ product.manufacturer__name }}</td>
+                                    <td>{{ product.buy_rate }}</td>
+                                    <td>{{ product.sell_rate }}</td>
+                                </tr>
                             {% endfor %}
                             </tbody>
                         </table>
@@ -179,7 +179,7 @@
                             </li>
                         </ul>
                     </nav>
-                    {% else %}
+                {% else %}
                     <div class="d-flex justify-content-center">
                         <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">
                             <p class="text-dark mb-0">Product not created!</p>
@@ -341,13 +341,12 @@
                         {% endif %}
                     {% endfor %}
                 </div>
-
                 <div class="container">
                     <div class="row">
                         <div class="col">
                             <label for="{{ form.manufacturer.id_for_label }}">{{ form.manufacturer.label }}</label>
                             <select class="form-select" aria-label="Default select example"
-                                    name="{{ form.manufacturer.name }}">
+                                    name="{{ form.manufacturer.name }}" required>
                                 {% for value, label in form.manufacturer.field.choices %}
                                     <option value="{{ value }}"
                                             {% if form.manufacturer.value == value %}selected{% endif %}>
@@ -360,13 +359,13 @@
                             <label for="{{ form.product_name.id_for_label }}">Product Name</label>
                             <input type="text" class="form-control" name="{{ form.product_name.name }}"
                                    value="{{ form.product_name.value|default_if_none:''}}"
-                                   placeholder="Enter the product name">
+                                   placeholder="Enter the product name" required>
                         </div>
                         <div class="col">
                             <label for="{{ form.product_code.id_for_label }}">Product Code</label>
                             <input type="text" class="form-control" name="{{ form.product_code.name }}"
                                    value="{{ form.product_code.value|default_if_none:'' }}"
-                                   placeholder="Enter the product code">
+                                   placeholder="Enter the product code" required>
                         </div>
                     </div>
                     <div class="row">
@@ -375,12 +374,12 @@
                             <label for="{{ form.print_name.id_for_label }}">Print Name</label>
                             <input type="text" class="form-control" name="{{ form.print_name.name }}"
                                    value="{{ form.print_name.value|default_if_none:'' }}"
-                                   placeholder="Enter the print name">
+                                   placeholder="Enter the print name" required>
                         </div>
                         <div class="col">
                             <label for="{{ form.group.id_for_label }}">Group</label>
                             <select class="form-select" aria-label="Default select example"
-                                    name="{{ form.group.name }}">
+                                    name="{{ form.group.name }}" required>
                                 {% for value, label in form.group.field.choices %}
                                     <option value="{{ value }}"
                                             {% if form.group.value == value %}selected{% endif %}>
@@ -402,19 +401,19 @@
                             <label for="{{ form.buy_rate.id_for_label }}">Buy Price</label>
                             <input type="number" step="0.01" class="form-control" name="{{ form.buy_rate.name }}"
                                    value="{{ form.buy_rate.value|default_if_none:'' }}"
-                                   placeholder="Enter the buy rate">
+                                   placeholder="Enter the buy rate" required>
                         </div>
                         <div class="col">
                             <label for="{{ form.sell_rate.id_for_label }}">Sell Price</label>
                             <input type="number" step="0.01" class="form-control" name="{{ form.sell_rate.name }}"
                                    value="{{ form.sell_rate.value|default_if_none:'' }}"
-                                   placeholder="Enter the sell rate">
+                                   placeholder="Enter the sell rate" required>
                         </div>
                         <div class="col">
                             <label for="{{ form.mrp.id_for_label }}">MRP</label>
                             <input type="number" step="0.01" class="form-control" name="{{ form.mrp.name }}"
                                    value="{{ form.mrp.value|default_if_none:'' }}"
-                                   placeholder="Enter the MRP">
+                                   placeholder="Enter the MRP" required>
                         </div>
                     </div>
                     <div class="row">
@@ -452,7 +451,6 @@
 
     <script src="{% static 'assets/js/master.js' %}"></script>
     <script>
-
         function autocomplete_dropdown(data, input) {
             var existingDatalist = document.getElementById("autocomplete-list");
             if (existingDatalist) {
@@ -473,22 +471,17 @@
             input.setAttribute("list", "autocomplete-list");
         }
 
-        function autocomplete_product() {
-            var input = document.getElementById('top_bar_InputIconLeft');
+        async function autocomplete_product() {
+            var input = document.getElementById('fetch_product');
 
             if (input.value.length >= 3) {
-                $.ajax({
-                    url: "{% url 'search_router' 'product' %}",
-                    data: {
-                        'autocomplete_query': input.value
-                    },
-                    success: function (data) {
-                        autocomplete_dropdown(data, input);
-                    },
-                    error: function (error) {
-                        console.error('Error fetching autocomplete suggestions:', error);
-                    }
-                });
+                try {
+                    const response = await fetch("{% url 'search_router' 'product' %}?autocomplete_query=" + input.value);
+                    const data = await response.json();
+                    autocomplete_dropdown(data, input);
+                } catch (error) {
+                    console.error('Error fetching autocomplete suggestions:', error);
+                }
             } else {
                 input.removeAttribute("list");
                 var existingDatalist = document.getElementById("autocomplete-list");
@@ -497,5 +490,6 @@
                 }
             }
         }
+
     </script>
 {% endblock javascripts %}

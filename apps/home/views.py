@@ -108,8 +108,6 @@ def get_manufacturer_modal(request):
             'id', 'name', 'type', 'sh_name', 'print_name', 'product_count'
         )
 
-        # manufacturer_data = Manufacturer.objects.values('id','name','contact', 'sh_name','print_name')
-
         if request.method == 'POST':
             if 'submit_selected_record' in request.POST:
                 id = request.POST['submit_selected_record']
@@ -190,51 +188,52 @@ def view_manufacturer(request):
 # @login_required(login_url="/login/")
 @measure_execution_time
 def create_product(request):
-    # try:
-    Group.objects.get_or_create_general_manufacturer()
-    if request.method == 'POST':
-        form = ProductForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('home'))
-    else:
-        form = ProductForm()
-    context = {'form': form,
-               'manufacturer_data': None,
-               'flag': 'create',
-               'label': 'Create Product'}
-    return render(request, 'home/products.html', context)
-    # except template.TemplateDoesNotExist:
-    #     return render(request, 'home/page-404.html')
-    # except:
-    #     return render(request, 'home/page-500.html')
+    try:
+        Group.objects.get_or_create_general_manufacturer()
+        if request.method == 'POST':
+            form = ProductForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect(reverse('home'))
+        else:
+            form = ProductForm()
+        context = {'form': form,
+                   'manufacturer_data': None,
+                   'flag': 'create',
+                   'label': 'Create Product'}
+        return render(request, 'home/products.html', context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'home/page-404.html')
+    except:
+        return render(request, 'home/page-500.html')
+
 
 
 # @login_required(login_url="/login/")
 @measure_execution_time
 def get_product_modal(request):
-    # try:
-    product_data = Product.objects.select_related('manufacturer'). \
-        values('id', 'product_name', 'product_code',
-               'manufacturer__name', 'buy_rate', 'sell_rate')
-    # form = ProductForm()
-    if request.method == 'POST':
-        if 'submit_selected_record' in request.POST:
-            id = request.POST['submit_selected_record']
-            return redirect('update_product', int(id))
-        elif 'delete_selected_record' in request.POST:
-            id = request.POST['delete_selected_record']
-            return redirect('delete_product', int(id))
-        else:
-            return redirect('create_product')
-    page_obj = pagination(request, product_data)
-    context = {'product_data': page_obj, 'form': None, 'flag': 'modal',
-               'label': 'Update Product', 'page_obj': page_obj,'query':''}
-    return render(request, 'home/products.html', context=context)
-    # except template.TemplateDoesNotExist:
-    #     return render(request, 'home/page-404.html')
-    # except:
-    #     return render(request, 'home/page-500.html')
+    try:
+        product_data = Product.objects.select_related('manufacturer'). \
+            values('id', 'product_name', 'product_code',
+                   'manufacturer__name', 'buy_rate', 'sell_rate')
+        # form = ProductForm()
+        if request.method == 'POST':
+            if 'submit_selected_record' in request.POST:
+                id = request.POST['submit_selected_record']
+                return redirect('update_product', int(id))
+            elif 'delete_selected_record' in request.POST:
+                id = request.POST['delete_selected_record']
+                return redirect('delete_product', int(id))
+            else:
+                return redirect('create_product')
+        page_obj = pagination(request, product_data)
+        context = {'product_data': page_obj, 'form': None, 'flag': 'modal',
+                   'label': 'Update Product', 'page_obj': page_obj,'query':''}
+        return render(request, 'home/products.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'home/page-404.html')
+    except:
+        return render(request, 'home/page-500.html')
 
 
 # @login_required(login_url="/login/")
@@ -586,9 +585,11 @@ def view_customer(request):
         return render(request,'home/page-500.html')
 
 
-@measure_execution_time
+# @measure_execution_time
 def search_router(request,model_search):
+    print('search router')
     autocomplete_query = request.GET.get('autocomplete_query', '')
+    print(autocomplete_query)
     masterSearchObject = masterSearchEndpoint(request, model_search)
     print(type(masterSearchObject))
     if autocomplete_query:
