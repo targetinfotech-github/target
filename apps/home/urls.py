@@ -27,7 +27,7 @@ urlpatterns = [
 
     # Receipts
     path('get_receipt_modal/',views.get_receipt_modal, name="get_receipt_modal"),
-    path('add_product/<int:pk>',views.add_product, name="add_product"),
+    path('add_product/<int:pk>', views.create_receipt, name="add_product"),
 
     # Groups
     path('create_group/',views.create_group, name="create_group"),

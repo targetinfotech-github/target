@@ -128,7 +128,6 @@ class SearchService:
 
     def get_context(self, page_obj,*args,**kwargs):
         model_prefix = self.model_search.split('_')[0]
-        print(f'modal prefix: {model_prefix}')
         context = {
             'flag': 'view',
             'label': f'View {self.model_search.title()}',
@@ -178,7 +177,6 @@ class masterSearchEndpoint(SearchService):
     def masterSearchRouter(self):
         masterModal = ['product_modal','manufacturer_modal','customer_modal','group_modal']
         masterView = ['product','manufacturer','customer','group']
-        print('master search router')
         if self.model_search in masterModal:
             template,context = self.detailed_data_modal()
             return template,context

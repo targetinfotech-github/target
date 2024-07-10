@@ -96,6 +96,7 @@ class Product(models.Model):
     buy_rate = models.DecimalField(decimal_places=2,max_digits=12, null=True, blank=True)
     sell_rate = models.DecimalField(decimal_places=2,max_digits=12, null=True, blank=True)
     mrp = models.DecimalField(decimal_places=2,max_digits=12, null=True, blank=True)
+    net_quantity = models.PositiveIntegerField(null=True,blank=True)
     stock_option = models.CharField(choices=STOCK_OPTION_CHOICE, max_length=20, default='quantity_wise')
     group = models.ForeignKey(Group,on_delete=models.CASCADE,related_name='product_group',null=True,blank=True)
     last_accessed = models.DateTimeField(default=now,null=True,blank=True)
@@ -179,9 +180,7 @@ class ReceiptProduct(models.Model):
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE, related_name='receipt_models')
     # can do like Receipts.receipt_product.all()
-    #make this many to many field
-    product = models.ForeignKey(Product, on_delete=models.PROTECT,related_name='receipt_products')
-    # give net_quantity in product
+    product = models.ForeignKey(Product, on_delete=models.PROTECT,related_name='receipt_products',null=True,blank=True)
     quantity = models.PositiveIntegerField()
     discount = models.FloatField()
 

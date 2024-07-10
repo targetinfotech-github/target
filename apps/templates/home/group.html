@@ -85,7 +85,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLongTitle">Select Group</h5>
                 </div>
-                <div style="display: inline-flex; margin: 10px" >
+                <div style="display: inline-flex; margin: 10px">
                     <form method="get" action="{% url 'search_router' 'group_modal' %}">
                         <div class="input-group input-group-merge search-bar pb-4">
                             <a href="{% url 'view_customer' %}">
@@ -108,21 +108,21 @@
                     </form>
                 </div>
                 <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
-                    <div class="table-responsive">
-                        <table class="table table-centered table-nowrap mb-0 rounded">
-                            <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Group Id</th>
-                                <th scope="col">Group Name</th>
-                                <th scope="col">Print Name</th>
-                                <th scope="col">Sh Name</th>
-                                <th scope="col">HSN Code</th>
-                            </tr>
-                            </thead>
-                            <!-- Item -->
-                            <tbody>
-                            {% if group_data %}
+                    {% if group_data %}
+                        <div class="table-responsive">
+                            <table class="table table-centered table-nowrap mb-0 rounded">
+                                <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Group Id</th>
+                                    <th scope="col">Group Name</th>
+                                    <th scope="col">Print Name</th>
+                                    <th scope="col">Sh Name</th>
+                                    <th scope="col">HSN Code</th>
+                                </tr>
+                                </thead>
+                                <!-- Item -->
+                                <tbody>
                                 {% for group in group_data %}
                                     <tr id="row-{{ group.id }}"
                                         onclick="selectGroup('{{ group.id }}','{% if group.product_count > 0 %}1{% else %}0{% endif %}')">
@@ -134,13 +134,11 @@
                                         <td>{{ group.hsn_code }}</td>
                                     </tr>
                                 {% endfor %}
-                            {% endif %}
-                            </tbody>
+                                </tbody>
 
-                            <!-- End of Item -->
-                        </table>
-                        <div>
-                            {% if group_data %}
+                                <!-- End of Item -->
+                            </table>
+                            <div>
                                 <nav aria-label="Page navigation example">
                                     <ul class="pagination">
                                         <li class="page-item">
@@ -172,9 +170,15 @@
                                         </li>
                                     </ul>
                                 </nav>
-                            {% endif %}
+                            </div>
                         </div>
-                    </div>
+                    {% else %}
+                        <div class="d-flex justify-content-center">
+                            <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">
+                                <p class="text-dark mb-0">Group not created!</p>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
 
                 <form method="post" action="{% url 'get_group_modal' %}">
@@ -191,7 +195,6 @@
                                 name="delete_selected_record" value="" style="display: flex">Delete
                         </button>
                     </div>
-                </form>
                 </form>
             </div>
         </div>
@@ -220,65 +223,73 @@
         </form>
         <div class="card border-0 shadow mb-4">
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-centered table-nowrap mb-0 rounded">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Group Id</th>
-                            <th scope="col">Group Name</th>
-                            <th scope="col">Print Name</th>
-                            <th scope="col">Sh Name</th>
-                            <th scope="col">HSN Code</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for group in group_data %}
-                            <tr id="row-{{ group.id }}">
-                                <th scope="row">{{ forloop.counter }}</th>
-                                <td>{{ group.group_id }}</td>
-                                <td><a href="{% url 'update_group' group.id %}">{{ group.group_name }}</a></td>
-                                <td>{{ group.print_name }}</td>
-                                <td>{{ group.sh_name }}</td>
-                                <td>{{ group.hsn_code }}</td>
+                {% if group_data %}
+                    <div class="table-responsive">
+                        <table class="table table-centered table-nowrap mb-0 rounded">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Group Id</th>
+                                <th scope="col">Group Name</th>
+                                <th scope="col">Print Name</th>
+                                <th scope="col">Sh Name</th>
+                                <th scope="col">HSN Code</th>
                             </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                            </thead>
+                            <tbody>
+                            {% for group in group_data %}
+                                <tr id="row-{{ group.id }}">
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>{{ group.group_id }}</td>
+                                    <td><a href="{% url 'update_group' group.id %}">{{ group.group_name }}</a></td>
+                                    <td>{{ group.print_name }}</td>
+                                    <td>{{ group.sh_name }}</td>
+                                    <td>{{ group.hsn_code }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
 
-            <nav aria-label="Page navigation example">
-                <ul class="pagination">
-                    <li class="page-item">
-                        <a class="page-link" href="?group_details={{ query }}&page=1" aria-label="First">
-                            <span aria-hidden="true">&laquo;</span>
-                            <span class="sr-only">First</span>
-                        </a>
-                    </li>
-                    {% if page_obj.has_previous %}
-                        <li class="page-item"><a class="page-link"
-                                                 href="?group_details={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
-                        </li>
-                    {% endif %}
-                    <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
-                    {% if page_obj.has_next %}
-                        <li class="page-item"><a class="page-link"
-                                                 href="?group_details={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
-                        </li>
-                    {% endif %}
-                    <li class="page-item">
-                        <a class="page-link"
-                           href="?group_details={{ query }}&page={{ page_obj.paginator.num_pages }}"
-                           aria-label="Last">
-                            <span aria-hidden="true">&raquo;</span>
-                            <span class="sr-only">Last</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item">
+                                <a class="page-link" href="?group_details={{ query }}&page=1" aria-label="First">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">First</span>
+                                </a>
+                            </li>
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?group_details={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                                </li>
+                            {% endif %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?group_details={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                                </li>
+                            {% endif %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="?group_details={{ query }}&page={{ page_obj.paginator.num_pages }}"
+                                   aria-label="Last">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Last</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% else %}
+                    <div class="d-flex justify-content-center">
+                        <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">
+                            <p class="text-dark mb-0">Group not created!</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-    {% elif flag != 'view' %}
+    {% elif flag != 'view' and flag != 'modal' %}
 
         <form method="post">
             {% csrf_token %}

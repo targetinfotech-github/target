@@ -1,4 +1,6 @@
 
+from django.contrib import messages
+
 @measure_execution_time
 def search_router(request, model_search):
     if model_search.strip() in 'products':

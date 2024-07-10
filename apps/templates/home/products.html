@@ -119,40 +119,40 @@
 
         <div class="card border-0 shadow mb-4">
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-centered table-nowrap mb-0 rounded">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Product Name</th>
-                            <th scope="col">Product Code</th>
-                            <th scope="col">Manufacturer</th>
-                            <th scope="col">Buy Rate</th>
-                            <th scope="col">Sell Rate</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% if product_data %}
-                            {% for product in product_data %}
-                                <tr id="row-{{ product.id }}">
-                                    <th scope="row">{{ forloop.counter }}</th>
-                                    <td><a href="{% url 'update_product' product.id %}">{{ product.product_name }}</a>
-                                    </td>
-                                    <td>{{ product.product_code }}</td>
-                                    <td>{{ product.manufacturer__name }}</td>
-                                    <td>{{ product.buy_rate }}</td>
-                                    <td>{{ product.sell_rate }}</td>
-                                </tr>
-                            {% endfor %}
-                        {% endif %}
-                        </tbody>
-                    </table>
-                </div>
                 {% if product_data %}
+                    <div class="table-responsive">
+                        <table class="table table-centered table-nowrap mb-0 rounded">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Product Name</th>
+                                <th scope="col">Product Code</th>
+                                <th scope="col">Manufacturer</th>
+                                <th scope="col">Buy Rate</th>
+                                <th scope="col">Sell Rate</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for product in product_data %}
+                            <tr id="row-{{ product.id }}">
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td><a href="{% url 'update_product' product.id %}">{{ product.product_name }}</a>
+                                </td>
+                                <td>{{ product.product_code }}</td>
+                                <td>{{ product.manufacturer__name }}</td>
+                                <td>{{ product.buy_rate }}</td>
+                                <td>{{ product.sell_rate }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
                     <nav aria-label="Page navigation example">
                         <ul class="pagination">
                             <li class="page-item">
-                                <a class="page-link" href="?product_details={{ query }}&page=1" aria-label="First">
+                                <a class="page-link" href="?product_details={{ query }}&page=1"
+                                   aria-label="First">
                                     <span aria-hidden="true">&laquo;</span>
                                     <span class="sr-only">First</span>
                                 </a>
@@ -162,7 +162,8 @@
                                                          href="?product_details={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
                                 </li>
                             {% endif %}
-                            <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+                            <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a>
+                            </li>
                             {% if page_obj.has_next %}
                                 <li class="page-item"><a class="page-link"
                                                          href="?product_details={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
@@ -178,6 +179,12 @@
                             </li>
                         </ul>
                     </nav>
+                    {% else %}
+                    <div class="d-flex justify-content-center">
+                        <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">
+                            <p class="text-dark mb-0">Product not created!</p>
+                        </div>
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -218,22 +225,23 @@
                             </form>
                         </div>
                     </div>
+
                     <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
-                        <div class="table-responsive">
-                            <table class="table table-centered table-nowrap mb-0 rounded">
-                                <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Product Name</th>
-                                    <th scope="col">Product Code</th>
-                                    <th scope="col">Manufacturer</th>
-                                    <th scope="col">Buy Rate</th>
-                                    <th scope="col">Sell Rate</th>
-                                </tr>
-                                </thead>
-                                <!-- Item -->
-                                <tbody>
-                                {% if product_data %}
+                        {% if product_data %}
+                            <div class="table-responsive">
+                                <table class="table table-centered table-nowrap mb-0 rounded">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Product Name</th>
+                                        <th scope="col">Product Code</th>
+                                        <th scope="col">Manufacturer</th>
+                                        <th scope="col">Buy Rate</th>
+                                        <th scope="col">Sell Rate</th>
+                                    </tr>
+                                    </thead>
+                                    <!-- Item -->
+                                    <tbody>
                                     {% for product in product_data %}
                                         <tr id="row-{{ product.id }}"
                                             onclick="selectProduct('{{ product.id }}')">
@@ -245,12 +253,10 @@
                                             <td>{{ product.sell_rate }}</td>
                                         </tr>
                                     {% endfor %}
-                                {% endif %}
-                                </tbody>
-                                <!-- End of Item -->
-                            </table>
-                            <div>
-                                {% if product_data %}
+                                    </tbody>
+                                    <!-- End of Item -->
+                                </table>
+                                <div>
                                     <nav aria-label="Page navigation example">
                                         <ul class="pagination">
                                             <li class="page-item">
@@ -282,9 +288,15 @@
                                             </li>
                                         </ul>
                                     </nav>
-                                {% endif %}
+                                </div>
                             </div>
-                        </div>
+                        {% else %}
+                            <div class="d-flex justify-content-center">
+                                <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">
+                                    <p class="text-dark mb-0">Product not created!</p>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
                     <form method="post" action="{% url 'get_product_modal' %}">
                         {% csrf_token %}
@@ -305,7 +317,7 @@
         </div>
 
     {% endif %}
-    {% if flag != 'view' %}
+    {% if flag != 'view' and flag != 'modal' %}
         <div>
             <form method="post">
                 {% csrf_token %}

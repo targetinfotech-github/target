@@ -75,7 +75,6 @@
         {% endif %}
     </div>
     {% if flag == 'view' %}
-
         <form method="get" action="{% url 'search_router' 'customer' %}">
             <div class="input-group input-group-merge search-bar pb-4">
                 <a href="{% url 'view_customer' %}">
@@ -99,67 +98,76 @@
         </form>
         <div class="card border-0 shadow mb-4">
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-centered table-nowrap mb-0 rounded">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Print Name</th>
-                            <th scope="col">Short Name</th>
-                            <th scope="col">Contact</th>
-                            <th scope="col">Email</th>
-                        </tr>
-                        </thead>
-                        <!-- Item -->
-                        <tbody>
-                        {% for customer in customer_data %}
-                            <tr id="row-{{ customer.id }}">
-                                <th scope="row">{{ forloop.counter }}</th>
-                                <td>
-                                    <a href="{% url 'update_customer' customer.id %}">{{ customer.customer_name }}</a>
-                                </td>
-                                <td>{{ customer.print_name }}</td>
-                                <td>{{ customer.sh_name }}</td>
-                                <td>{{ customer.contact }}</td>
-                                <td>{{ customer.email }}</td>
+                {% if customer_data %}
+                    <div class="table-responsive">
+                        <table class="table table-centered table-nowrap mb-0 rounded">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Print Name</th>
+                                <th scope="col">Short Name</th>
+                                <th scope="col">Contact</th>
+                                <th scope="col">Email</th>
                             </tr>
-                        {% endfor %}
-                        </tbody>
-                        <!-- End of Item -->
-                    </table>
-                </div>
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-                        <li class="page-item">
-                            <a class="page-link" href="?customer_details={{ query }}&page=1" aria-label="First">
-                                <span aria-hidden="true">&laquo;</span>
-                                <span class="sr-only">First</span>
-                            </a>
-                        </li>
-                        {% if page_obj.has_previous %}
-                            <li class="page-item"><a class="page-link"
-                                                     href="?customer_details={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                            </thead>
+                            <!-- Item -->
+                            <tbody>
+                            {% for customer in customer_data %}
+                                <tr id="row-{{ customer.id }}">
+                                    <th scope="row">{{ forloop.counter }}</th>
+                                    <td>
+                                        <a href="{% url 'update_customer' customer.id %}">{{ customer.customer_name }}</a>
+                                    </td>
+                                    <td>{{ customer.print_name }}</td>
+                                    <td>{{ customer.sh_name }}</td>
+                                    <td>{{ customer.contact }}</td>
+                                    <td>{{ customer.email }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <!-- End of Item -->
+                        </table>
+                    </div>
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item">
+                                <a class="page-link" href="?customer_details={{ query }}&page=1" aria-label="First">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">First</span>
+                                </a>
                             </li>
-                        {% endif %}
-                        <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
-                        {% if page_obj.has_next %}
-                            <li class="page-item"><a class="page-link"
-                                                     href="?customer_details={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?customer_details={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                                </li>
+                            {% endif %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?customer_details={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                                </li>
+                            {% endif %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="?customer_details={{ query }}&page={{ page_obj.paginator.num_pages }}"
+                                   aria-label="Last">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Last</span>
+                                </a>
                             </li>
-                        {% endif %}
-                        <li class="page-item">
-                            <a class="page-link"
-                               href="?customer_details={{ query }}&page={{ page_obj.paginator.num_pages }}"
-                               aria-label="Last">
-                                <span aria-hidden="true">&raquo;</span>
-                                <span class="sr-only">Last</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+                        </ul>
+                    </nav>
+                {% else %}
+                    <div class="d-flex justify-content-center">
+                        <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">
+                            <p class="text-dark mb-0">Customer not created!</p>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
+
     {% endif %}
     <!-- Button trigger modal -->
     {% if flag == 'modal' %}
@@ -197,7 +205,7 @@
                         </form>
                     </div>
                     <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
-                        <form method="GET" action="{% url 'get_customer_modal' %}">
+                        {% if customer_data %}
                             <div class="table-responsive">
                                 <table class="table table-centered table-nowrap mb-0 rounded">
                                     <thead>
@@ -211,58 +219,60 @@
                                     </thead>
                                     <!-- Item -->
                                     <tbody>
-                                    {% if customer_data %}
-                                        {% for customer in customer_data %}
-                                            <tr id="row-{{ customer.id }}"
-                                                onclick="selectCustomer('{{ customer.id }}')">
-                                                <th scope="row">{{ forloop.counter }}</th>
-                                                <td>{{ customer.customer_name }}</td>
-                                                <td>{{ customer.print_name }}</td>
-                                                <td>{{ customer.sh_name }}</td>
-                                                <td>{{ customer.email }}</td>
-                                            </tr>
-                                        {% endfor %}
-                                    {% endif %}
+                                    {% for customer in customer_data %}
+                                        <tr id="row-{{ customer.id }}"
+                                            onclick="selectCustomer('{{ customer.id }}')">
+                                            <th scope="row">{{ forloop.counter }}</th>
+                                            <td>{{ customer.customer_name }}</td>
+                                            <td>{{ customer.print_name }}</td>
+                                            <td>{{ customer.sh_name }}</td>
+                                            <td>{{ customer.email }}</td>
+                                        </tr>
+                                    {% endfor %}
                                     </tbody>
                                     <!-- End of Item -->
                                 </table>
                             </div>
                             <div>
-                                {% if customer_data %}
-                                    <nav aria-label="Page navigation example">
-                                        <ul class="pagination">
-                                            <li class="page-item">
-                                                <a class="page-link" href="?customer_modal_details={{ query }}&page=1"
-                                                   aria-label="First">
-                                                    <span aria-hidden="true">&laquo;</span>
-                                                    <span class="sr-only">First</span>
-                                                </a>
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination">
+                                        <li class="page-item">
+                                            <a class="page-link" href="?customer_modal_details={{ query }}&page=1"
+                                               aria-label="First">
+                                                <span aria-hidden="true">&laquo;</span>
+                                                <span class="sr-only">First</span>
+                                            </a>
+                                        </li>
+                                        {% if page_obj.has_previous %}
+                                            <li class="page-item"><a class="page-link"
+                                                                     href="?customer_modal_details={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
                                             </li>
-                                            {% if page_obj.has_previous %}
-                                                <li class="page-item"><a class="page-link"
-                                                                         href="?customer_modal_details={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
-                                                </li>
-                                            {% endif %}
-                                            <li class="page-item active"><a class="page-link"
-                                                                            href="#">{{ page_obj.number }}</a></li>
-                                            {% if page_obj.has_next %}
-                                                <li class="page-item"><a class="page-link"
-                                                                         href="?customer_modal_details={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
-                                                </li>
-                                            {% endif %}
-                                            <li class="page-item">
-                                                <a class="page-link"
-                                                   href="?customer_modal_details={{ query }}&page={{ page_obj.paginator.num_pages }}"
-                                                   aria-label="Last">
-                                                    <span aria-hidden="true">&raquo;</span>
-                                                    <span class="sr-only">Last</span>
-                                                </a>
+                                        {% endif %}
+                                        <li class="page-item active"><a class="page-link"
+                                                                        href="#">{{ page_obj.number }}</a></li>
+                                        {% if page_obj.has_next %}
+                                            <li class="page-item"><a class="page-link"
+                                                                     href="?customer_modal_details={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
                                             </li>
-                                        </ul>
-                                    </nav>
-                                {% endif %}
+                                        {% endif %}
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="?customer_modal_details={{ query }}&page={{ page_obj.paginator.num_pages }}"
+                                               aria-label="Last">
+                                                <span aria-hidden="true">&raquo;</span>
+                                                <span class="sr-only">Last</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
                             </div>
-                        </form>
+                        {% else %}
+                            <div class="d-flex justify-content-center">
+                                <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">
+                                    <p class="text-dark mb-0">Customer not created!</p>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
                     <form method="post" action="{% url 'get_customer_modal' %}">
                         {% csrf_token %}
@@ -282,7 +292,7 @@
             </div>
         </div>
     {% endif %}
-    {% if flag != 'view' %}
+    {% if flag != 'view' and flag != 'modal' %}
         <form method="post">
             {% csrf_token %}
             <div class="form-errors">
