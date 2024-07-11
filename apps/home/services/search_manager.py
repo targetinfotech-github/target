@@ -2,7 +2,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import JsonResponse
 from django.db.models import Q
 
-from apps.home.models import Product, Manufacturer, Customer, Group
+from apps.home.models import Product, Manufacturer, Customer, ProductGroup
 from apps.home.services.exceptions import ModelNotFound
 
 
@@ -57,12 +57,12 @@ class SearchService:
         return list(customers)
 
     def get_group_autocomplete(self):
-        groups = Group.objects.filter(
+        groups = ProductGroup.objects.filter(
             Q(group_name__icontains=self.autocomplete_query) |
             Q(code_name__icontains=self.autocomplete_query)
         ).values_list('group_name', flat=True)[:10]
         if not groups:
-            groups = Group.objects.filter(
+            groups = ProductGroup.objects.filter(
                 code_name__icontains=self.autocomplete_query
             ).values_list('code_name', flat=True)[:10]
         return list(groups)
@@ -84,7 +84,6 @@ class SearchService:
         ).select_related('manufacturer').values(
             'id', 'product_name', 'product_code', 'manufacturer__name', 'buy_rate', 'sell_rate', 'manufacturer'
         )
-        print('product object',results)
         return self.paginate_results(results)
 
     def get_manufacturer_search_results(self):
@@ -107,7 +106,7 @@ class SearchService:
         return self.paginate_results(results)
 
     def get_group_search_results(self):
-        results = Group.objects.filter(
+        results = ProductGroup.objects.filter(
             Q(group_name__icontains=self.details_query) |
             Q(code_name__icontains=self.details_query)
         ).values(
@@ -201,6 +200,7 @@ class masterSearchEndpoint(SearchService):
 
     def detailed_data_modal(self):
         if self.details_query:
+
             page_obj = self.get_search_results()
             context = self.get_context(page_obj)
             context['label'] = f'Update {self.model_search}'

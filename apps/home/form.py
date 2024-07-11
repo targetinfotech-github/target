@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django import forms
-from .models import Manufacturer, Product, Group, Customer
+from .models import Manufacturer, Product, ProductGroup, Customer
 from django import forms
 from .models import Receipt, ReceiptProduct, Manufacturer, Product
 from django.db import transaction
@@ -80,7 +80,7 @@ class CustomerForm(forms.ModelForm):
 
 class GroupForm(forms.ModelForm):
     class Meta:
-        model = Group
+        model = ProductGroup
         # fields = ['type','name', 'print_name', 'sh_name', 'contact','hsn_code','address','email']
         fields = '__all__'
         widgets = {

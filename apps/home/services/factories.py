@@ -5,7 +5,7 @@ from decimal import Decimal
 
 import factory
 from factory.django import DjangoModelFactory
-from apps.home.models import Manufacturer, Product, Group, Customer
+from apps.home.models import Manufacturer, Product, ProductGroup, Customer
 import faker
 
 # fake = faker.Faker
@@ -41,7 +41,7 @@ class ManufacturerFactory(DjangoModelFactory):
 
 class GroupFactory(DjangoModelFactory):
     class Meta:
-        model = Group
+        model = ProductGroup
 
 
     group_id = factory.Sequence(

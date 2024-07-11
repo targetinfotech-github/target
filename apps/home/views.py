@@ -5,6 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 import time
 
 from django import template
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import transaction
 from django.db.models import Count, Q
@@ -15,7 +16,7 @@ from django.urls import reverse
 from apps.home.services.decorators import measure_execution_time
 from apps.home.form import ManufacturerForm, ProductForm, ReceiptForm, GroupForm, CustomerForm
 from django.shortcuts import render, redirect
-from apps.home.models import Manufacturer, Product, Receipt, ReceiptProduct, Group, Customer
+from apps.home.models import Manufacturer, Product, Receipt, ReceiptProduct, ProductGroup, Customer
 import json
 
 # views.py or any module
@@ -28,12 +29,12 @@ from apps.home.services.search_manager import SearchService, masterSearchEndpoin
 logger = logging.getLogger(__name__)
 
 
-# @login_required(login_url="/login/")
 @measure_execution_time
+@login_required(login_url="/login/")
 def index(request):
     context = {'segment': 'index'}
     manufacturer = Manufacturer.objects.count()
-    group = Group.objects.count()
+    group = ProductGroup.objects.count()
     product = Product.objects.count()
     customer = Customer.objects.count()
     print(group)
@@ -44,7 +45,7 @@ def index(request):
     return HttpResponse(html_template.render(context, request))
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def pages(request):
     context = {}
@@ -77,7 +78,7 @@ def pagination(request,queryset):
     return page_obj
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def create_manufacturer(request):
     try:
@@ -99,35 +100,38 @@ def create_manufacturer(request):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def get_manufacturer_modal(request):
-    try:
-        manufacturer_data = Manufacturer.objects.annotate(
-            product_count=Count('product_manufacturer')).values(
-            'id', 'name', 'type', 'sh_name', 'print_name', 'product_count'
-        )
+    print(request.GET.dict())
+    # try:
+    query=''
+    manufacturer_data = Manufacturer.objects.annotate(
+        product_count=Count('product_manufacturer')
+    ).values(
+        'id', 'name', 'type', 'sh_name', 'print_name', 'product_count'
+    ).order_by('name')
 
-        if request.method == 'POST':
-            if 'submit_selected_record' in request.POST:
-                id = request.POST['submit_selected_record']
-                return redirect('update_manufacturer', int(id))
-            elif 'delete_selected_record' in request.POST:
-                id = request.POST['delete_selected_record']
-                return redirect('delete_manufacturer', int(id))
-            else:
-                return redirect('create_manufacturer')
-        page_obj = pagination(request,manufacturer_data)
-        context = {'manufacturer_data': page_obj, 'form': None, 'flag': 'modal',
-                   'label': 'Update Manufacturer', 'page_obj': page_obj,'query':''}
-        return render(request, 'home/manufacturer.html', context=context)
-    except template.TemplateDoesNotExist:
-        return render(request,'home/page-404.html')
-    except:
-        return render(request,'home/page-500.html')
+    if request.method == 'POST':
+        if 'submit_selected_record' in request.POST:
+            id = request.POST['submit_selected_record']
+            return redirect('update_manufacturer', int(id))
+        elif 'delete_selected_record' in request.POST:
+            id = request.POST['delete_selected_record']
+            return redirect('delete_manufacturer', int(id))
+        else:
+            return redirect('create_manufacturer')
+    page_obj = pagination(request,manufacturer_data)
+    context = {'manufacturer_data': page_obj, 'form': None, 'flag': 'modal',
+               'label': 'Update Manufacturer', 'page_obj': page_obj,'query':query}
+    return render(request, 'home/manufacturer.html', context=context)
+    # except template.TemplateDoesNotExist:
+    #     return render(request,'home/page-404.html')
+    # except:
+    #     return render(request,'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def update_manufacturer(request, pk):
     try:
@@ -149,7 +153,7 @@ def update_manufacturer(request, pk):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def delete_manufacturer(request, pk):
     try:
@@ -162,7 +166,7 @@ def delete_manufacturer(request, pk):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def view_manufacturer(request):
     try:
@@ -170,11 +174,11 @@ def view_manufacturer(request):
         if request.method == 'POST':
             manufacturer_name = request.POST.get('manufacturer_name')
             if manufacturer_name:
-                manufacturer_data = Manufacturer.objects.filter(name__icontains=manufacturer_name)
+                manufacturer_data = Manufacturer.objects.filter(name__icontains=manufacturer_name).order_by('name')
             else:
-                manufacturer_data = Manufacturer.objects.all()
+                manufacturer_data = Manufacturer.objects.all().order_by('name')
         else:
-            manufacturer_data = Manufacturer.objects.all()
+            manufacturer_data = Manufacturer.objects.all().order_by('name')
         page_obj = pagination(request, manufacturer_data)
         context = {'flag': 'view', 'manufacturer_data': page_obj,'query':query,
                    'label': 'View Manufacturer', 'page_obj': page_obj}
@@ -185,11 +189,11 @@ def view_manufacturer(request):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def create_product(request):
     try:
-        Group.objects.get_or_create_general_manufacturer()
+        ProductGroup.objects.get_or_create_general_manufacturer()
         if request.method == 'POST':
             form = ProductForm(request.POST)
             if form.is_valid():
@@ -209,13 +213,13 @@ def create_product(request):
 
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def get_product_modal(request):
     try:
         product_data = Product.objects.select_related('manufacturer'). \
             values('id', 'product_name', 'product_code',
-                   'manufacturer__name', 'buy_rate', 'sell_rate')
+                   'manufacturer__name', 'buy_rate', 'sell_rate').order_by('product_name')
         # form = ProductForm()
         if request.method == 'POST':
             if 'submit_selected_record' in request.POST:
@@ -236,7 +240,7 @@ def get_product_modal(request):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def delete_product(request, pk):
     try:
@@ -249,7 +253,7 @@ def delete_product(request, pk):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def update_product(request, pk):
     try:
@@ -269,14 +273,14 @@ def update_product(request, pk):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def view_product(request):
     try:
         query = ''
         results = Product.objects.select_related('manufacturer').values(
             'id', 'product_name', 'product_code', 'manufacturer__name', 'buy_rate', 'sell_rate',
-            'manufacturer', 'buy_rate', 'sell_rate')
+            'manufacturer', 'buy_rate', 'sell_rate').order_by('product_name')
         page_obj = pagination(request, results)
         context = {'flag': 'view', 'label': 'View Product', 'product_data': page_obj, 'page_obj': page_obj,
                    'query': query}
@@ -287,7 +291,7 @@ def view_product(request):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def get_receipt_modal(request):
     try:
@@ -310,7 +314,7 @@ def get_receipt_modal(request):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def create_receipt(request, pk):
     try:
@@ -370,7 +374,7 @@ def create_receipt(request, pk):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def create_group(request):
     try:
@@ -389,18 +393,18 @@ def create_group(request):
         return render(request,'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def view_group(request):
     try:
         if request.method == 'POST':
-            group_name = request.POST.get('group_name')
+            group_name = request.POST.get('group_name').order_by('group_name')
             if group_name:
-                group_data = Group.objects.filter(group_name=group_name)
+                group_data = ProductGroup.objects.filter(group_name=group_name).order_by('group_name')
             else:
-                group_data = Group.objects.all()
+                group_data = ProductGroup.objects.all().order_by('group_name')
         else:
-            group_data = Group.objects.all()
+            group_data = ProductGroup.objects.all().order_by('group_name')
         page_obj = pagination(request, group_data)
         context = {'flag': 'view', 'group_data': page_obj,'label': 'View Group',
                    'page_obj': page_obj,'query':''}
@@ -410,14 +414,14 @@ def view_group(request):
     except:
         return render(request,'home/page-500.html')
 
-
+@login_required(login_url="/login/")
 @measure_execution_time
 def get_group_modal(request):
     try:
-        group_data = Group.objects.exclude(group_name='General Manufacturer').annotate(
+        group_data = ProductGroup.objects.exclude(group_name='General Manufacturer').annotate(
             product_count=Count('product_group')
         ).values('id', 'group_id', 'group_name',
-                 'print_name', 'sh_name', 'hsn_code', 'product_count')
+                 'print_name', 'sh_name', 'hsn_code', 'product_count').order_by('group_name')
 
         if request.method == 'POST':
             if 'submit_selected_record' in request.POST:
@@ -439,11 +443,11 @@ def get_group_modal(request):
         return render(request,'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def update_group(request, pk):
     try:
-        group_data = Group.objects.get(id=pk)
+        group_data = ProductGroup.objects.get(id=pk)
         if request.method == 'POST':
             form = GroupForm(request.POST, instance=group_data)
             if form.is_valid():
@@ -460,11 +464,11 @@ def update_group(request, pk):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def delete_group(request, pk):
     try:
-        group = Group.objects.get(id=pk)
+        group = ProductGroup.objects.get(id=pk)
         if group.product_group.exists():
             print('product under group exists')
         else:
@@ -476,7 +480,7 @@ def delete_group(request, pk):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def create_customer(request):
     try:
@@ -498,12 +502,12 @@ def create_customer(request):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def get_customer_modal(request):
     try:
         customer_data = Customer.objects.values('id', 'customer_name',
-                                                'sh_name', 'print_name')
+                                                'sh_name', 'print_name').order_by('customer_name')
         if request.method == 'POST':
             if 'submit_selected_record' in request.POST:
                 id = request.POST['submit_selected_record']
@@ -526,7 +530,7 @@ def get_customer_modal(request):
         return render(request,'home/page-500.html')
 
 
-# @login_required(login_url="/login/")/
+@login_required(login_url="/login/")
 @measure_execution_time
 def update_customer(request, pk):
     try:
@@ -547,7 +551,7 @@ def update_customer(request, pk):
         return render(request,'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def delete_customer(request, pk):
     try:
@@ -560,22 +564,21 @@ def delete_customer(request, pk):
         return render(request, 'home/page-500.html')
 
 
-# @login_required(login_url="/login/")
+@login_required(login_url="/login/")
 @measure_execution_time
 def view_customer(request):
     try:
         if request.method == 'POST':
             customer_name = request.POST.get('customer_name')
             if customer_name:
-                customer_data = Customer.objects.filter(name__icontains=customer_name)
+                customer_data = Customer.objects.filter(name__icontains=customer_name).order_by('customer_name')
             else:
-                customer_data = Customer.objects.all()
+                customer_data = Customer.objects.all().order_by('customer_name')
         else:
-            customer_data = Customer.objects.all()
+            customer_data = Customer.objects.all().order_by('customer_name')
 
         page_obj = pagination(request, customer_data)
-        for i in page_obj:
-            print(i)
+
         context = {'flag': 'view', 'customer_data': page_obj,
                    'label': 'View Customer', 'page_obj': page_obj,'query':''}
         return render(request, 'home/customer.html', context=context)
@@ -585,13 +588,12 @@ def view_customer(request):
         return render(request,'home/page-500.html')
 
 
-# @measure_execution_time
+@measure_execution_time
 def search_router(request,model_search):
-    print('search router')
     autocomplete_query = request.GET.get('autocomplete_query', '')
-    print(autocomplete_query)
+    manufacturer_modal_details = request.GET.get('manufacturer_modal_details', '')
+    print(f'manufacturer_modal_details ::{manufacturer_modal_details}')
     masterSearchObject = masterSearchEndpoint(request, model_search)
-    print(type(masterSearchObject))
     if autocomplete_query:
         json_object = masterSearchObject.autocomplete_data()
         return json_object

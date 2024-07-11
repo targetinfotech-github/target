@@ -1,0 +1,24 @@
+{#{% if search_url == 'search_router' %}#}
+{#    <form method= "get" action = "{% url search_url url_type %}">#}
+{#{% else %}#}
+{#    <form method = "get" action = "{% url search_url %}">#}
+{#{% endif %}#}
+<form method= "get" action = "{% url 'search_router' url_type %}">
+<div class="input-group input-group-merge search-bar pb-4">
+    <a href="{% url view_url %}">
+        <button type="button" class="btn-sm btn-warning">reset</button>
+    </a>
+    <input type="text" class="form-control" id="{{ input_id }}" placeholder="Search"
+           aria-label="Search" aria-describedby="topbar-addon" style="max-width: 50%"
+           oninput="{{ autocomplete_function }}()" name="{{ input_name }}" autocomplete="off" value="{{ query }}">
+    <button type="submit" class="input-group-text" id="topbar-addon">
+        <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
+             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+             aria-hidden="true">
+            <path fill-rule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clip-rule="evenodd"></path>
+        </svg>
+    </button>
+</div>
+</form>

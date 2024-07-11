@@ -21,7 +21,7 @@ class GroupManager(models.Manager):
         )
         return group
 
-class Group(models.Model):
+class ProductGroup(models.Model):
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     group_id = models.IntegerField(unique=True,null=True, blank=True)
     group_name = models.CharField(unique=True, max_length=30, null=True, blank=True)
@@ -40,7 +40,7 @@ class Group(models.Model):
 
     class Meta:
         ordering = ['-id']
-        db_table = 'Group'
+        db_table = 'ProductGroup'
 
     def save(self, *args, **kwargs):
         self.last_accessed = now()
@@ -98,7 +98,7 @@ class Product(models.Model):
     mrp = models.DecimalField(decimal_places=2,max_digits=12, null=True, blank=True)
     net_quantity = models.PositiveIntegerField(null=True,blank=True)
     stock_option = models.CharField(choices=STOCK_OPTION_CHOICE, max_length=20, default='quantity_wise')
-    group = models.ForeignKey(Group,on_delete=models.CASCADE,related_name='product_group',null=True,blank=True)
+    group = models.ForeignKey(ProductGroup, on_delete=models.CASCADE, related_name='product_group', null=True, blank=True)
     last_accessed = models.DateTimeField(default=now,null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True,null=True,blank=True)
     def __str__(self):

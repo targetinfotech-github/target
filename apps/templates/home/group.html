@@ -81,104 +81,57 @@
         <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
              aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Select Group</h5>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Select Group</h5>
+            </div>
+            <div style="display: inline-flex; margin: 10px">
+                <div style="display: inline-flex;margin: 10px">
+                    {% include 'home/common_search_template.html' with url_type='group_modal' input_id='top_bar_InputIconLeft' input_name='group_modal_details' query=query autocomplete_function='autocomplete_group' view_url='get_group_modal' query=query %}
                 </div>
-                <div style="display: inline-flex; margin: 10px">
-                    <form method="get" action="{% url 'search_router' 'group_modal' %}">
-                        <div class="input-group input-group-merge search-bar pb-4">
-                            <a href="{% url 'view_customer' %}">
-                                <button type="button" class="btn-sm btn-warning">reset</button>
-                            </a>
-                            <input type="text" class="form-control" id="top_bar_InputIconLeft" placeholder="Search"
-                                   aria-label="Search" aria-describedby="topbar-addon" style="max-width: 50%"
-                                   oninput="autocomplete_group()" name="group_modal_details" autocomplete="off"
-                                   value="{{ query }}">
-                            <button type="submit" class="input-group-text" id="topbar-addon">
-                                <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
-                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                                     aria-hidden="true">
-                                    <path fill-rule="evenodd"
-                                          d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                          clip-rule="evenodd"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
-                    {% if group_data %}
-                        <div class="table-responsive">
-                            <table class="table table-centered table-nowrap mb-0 rounded">
-                                <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Group Id</th>
-                                    <th scope="col">Group Name</th>
-                                    <th scope="col">Print Name</th>
-                                    <th scope="col">Sh Name</th>
-                                    <th scope="col">HSN Code</th>
-                                </tr>
-                                </thead>
-                                <!-- Item -->
-                                <tbody>
-                                {% for group in group_data %}
-                                    <tr id="row-{{ group.id }}"
-                                        onclick="selectGroup('{{ group.id }}','{% if group.product_count > 0 %}1{% else %}0{% endif %}')">
-                                        <th scope="row">{{ forloop.counter }}</th>
-                                        <td>{{ group.group_id }}</td>
-                                        <td>{{ group.group_name }}</td>
-                                        <td>{{ group.print_name }}</td>
-                                        <td>{{ group.sh_name }}</td>
-                                        <td>{{ group.hsn_code }}</td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+                {% if group_data %}
+                    <div class="table-responsive">
+                    <table class="table table-centered table-nowrap mb-0 rounded">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Group Id</th>
+                            <th scope="col">Group Name</th>
+                            <th scope="col">Print Name</th>
+                            <th scope="col">Sh Name</th>
+                            <th scope="col">HSN Code</th>
+                        </tr>
+                        </thead>
+                        <!-- Item -->
+                        <tbody>
+                        {% for group in group_data %}
+                            <tr id="row-{{ group.id }}"
+                                onclick="selectGroup('{{ group.id }}','{% if group.product_count > 0 %}1{% else %}0{% endif %}')">
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td>{{ group.group_id }}</td>
+                                <td>{{ group.group_name }}</td>
+                                <td>{{ group.print_name }}</td>
+                                <td>{{ group.sh_name }}</td>
+                                <td>{{ group.hsn_code }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
 
-                                <!-- End of Item -->
-                            </table>
-                            <div>
-                                <nav aria-label="Page navigation example">
-                                    <ul class="pagination">
-                                        <li class="page-item">
-                                            <a class="page-link" href="?group_modal_details={{ query }}&page=1"
-                                               aria-label="First">
-                                                <span aria-hidden="true">&laquo;</span>
-                                                <span class="sr-only">First</span>
-                                            </a>
-                                        </li>
-                                        {% if page_obj.has_previous %}
-                                            <li class="page-item"><a class="page-link"
-                                                                     href="?group_modal_details={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
-                                            </li>
-                                        {% endif %}
-                                        <li class="page-item active"><a class="page-link"
-                                                                        href="#">{{ page_obj.number }}</a></li>
-                                        {% if page_obj.has_next %}
-                                            <li class="page-item"><a class="page-link"
-                                                                     href="?group_modal_details={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
-                                            </li>
-                                        {% endif %}
-                                        <li class="page-item">
-                                            <a class="page-link"
-                                               href="?group_modal_details={{ query }}&page={{ page_obj.paginator.num_pages }}"
-                                               aria-label="Last">
-                                                <span aria-hidden="true">&raquo;</span>
-                                                <span class="sr-only">Last</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
+                        <!-- End of Item -->
+                    </table>
+                    <div>
+                        {% include 'home/common_pagination.html' with query=query page_location='group_details' page_obj=page_obj %}
+
+                    </div>
+                {% else %}
+                    <div class="d-flex justify-content-center">
+                        <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">
+                            <p class="text-dark mb-0">Group not created!</p>
                         </div>
-                    {% else %}
-                        <div class="d-flex justify-content-center">
-                            <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">
-                                <p class="text-dark mb-0">Group not created!</p>
-                            </div>
-                        </div>
-                    {% endif %}
+                    </div>
+                {% endif %}
                 </div>
 
                 <form method="post" action="{% url 'get_group_modal' %}">
@@ -202,25 +155,9 @@
 
     {% endif %}
     {% if flag == 'view' %}
-        <form method="get" action="{% url 'search_router' 'group' %}">
-            <div class="input-group input-group-merge search-bar pb-4">
-                <a href="{% url 'view_customer' %}">
-                    <button type="button" class="btn-sm btn-warning">reset</button>
-                </a>
-                <input type="text" class="form-control" id="top_bar_InputIconLeft" placeholder="Search"
-                       aria-label="Search" aria-describedby="topbar-addon" style="max-width: 25%"
-                       oninput="autocomplete_group()" name="group_details" autocomplete="off" value="{{ query }}">
-                <button type="submit" class="input-group-text" id="topbar-addon">
-                    <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
-                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                         aria-hidden="true">
-                        <path fill-rule="evenodd"
-                              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                              clip-rule="evenodd"></path>
-                    </svg>
-                </button>
-            </div>
-        </form>
+        <div style="display: inline-flex;margin: 10px">
+            {% include 'home/common_search_template.html' with url_type='group' input_id='top_bar_InputIconLeft' input_name='group_details' query=query autocomplete_function='autocomplete_group' view_url='view_group' query=query %}
+        </div>
         <div class="card border-0 shadow mb-4">
             <div class="card-body">
                 {% if group_data %}
@@ -251,35 +188,7 @@
                         </table>
                     </div>
 
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination">
-                            <li class="page-item">
-                                <a class="page-link" href="?group_details={{ query }}&page=1" aria-label="First">
-                                    <span aria-hidden="true">&laquo;</span>
-                                    <span class="sr-only">First</span>
-                                </a>
-                            </li>
-                            {% if page_obj.has_previous %}
-                                <li class="page-item"><a class="page-link"
-                                                         href="?group_details={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
-                                </li>
-                            {% endif %}
-                            <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
-                            {% if page_obj.has_next %}
-                                <li class="page-item"><a class="page-link"
-                                                         href="?group_details={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
-                                </li>
-                            {% endif %}
-                            <li class="page-item">
-                                <a class="page-link"
-                                   href="?group_details={{ query }}&page={{ page_obj.paginator.num_pages }}"
-                                   aria-label="Last">
-                                    <span aria-hidden="true">&raquo;</span>
-                                    <span class="sr-only">Last</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                    {% include 'home/common_pagination.html' with query=query page_location='group_details' page_obj=page_obj %}
                 {% else %}
                     <div class="d-flex justify-content-center">
                         <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">

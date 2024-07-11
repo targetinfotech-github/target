@@ -76,31 +76,9 @@
     </div>
     {% if flag == 'view' %}
         {% if manufacturer_data %}
-            <form method="get" action="{% url 'search_router' 'manufacturer' %}">
-                <div class="input-group input-group-merge search-bar pb-4">
-                    <a href="{% url 'view_manufacturer' %}">
-                        <button type="button" class="btn-sm btn-warning">reset</button>
-                    </a>
-
-                    {#                <input type="text" class="form-control" id="top_bar_InputIconLeft" placeholder="Search"#}
-                    {#                       aria-label="Search" aria-describedby="topbar-addon" style="max-width: 25%"#}
-                    {#                       oninput="autocomplete_()" name="manufacturer_name" autocomplete="off">#}
-                    <input type="text" class="form-control" id="top_bar_InputIconLeft" placeholder="Search"
-                           aria-label="Search" aria-describedby="topbar-addon" style="max-width: 25%"
-                           oninput="autocomplete_manufacturer()"
-                           name="manufacturer_details" autocomplete="off">
-                    <button type="submit" class="input-group-text" id="topbar-addon">
-                        <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
-                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                             aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                  clip-rule="evenodd"></path>
-                        </svg>
-                    </button>
-
-                </div>
-            </form>
+            <div style="display: inline-flex">
+                {% include 'home/common_search_template.html' with url_type='manufacturer' input_id='top_bar_InputIconLeft' input_name='manufacturer_details' query=query autocomplete_function='autocomplete_manufacturer' view_url='view_manufacturer' query=query %}
+            </div>
             <div class="card border-0 shadow mb-4">
                 <div class="card-body">
                     <div class="table-responsive">
@@ -131,35 +109,8 @@
                             <!-- End of Item -->
                         </table>
                     </div>
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination">
-                            <li class="page-item">
-                                <a class="page-link" href="?manufacturer_details={{ query }}&page=1" aria-label="First">
-                                    <span aria-hidden="true">&laquo;</span>
-                                    <span class="sr-only">First</span>
-                                </a>
-                            </li>
-                            {% if page_obj.has_previous %}
-                                <li class="page-item"><a class="page-link"
-                                                         href="?manufacturer_details={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
-                                </li>
-                            {% endif %}
-                            <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
-                            {% if page_obj.has_next %}
-                                <li class="page-item"><a class="page-link"
-                                                         href="?manufacturer_details={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
-                                </li>
-                            {% endif %}
-                            <li class="page-item">
-                                <a class="page-link"
-                                   href="?manufacturer_details={{ query }}&page={{ page_obj.paginator.num_pages }}"
-                                   aria-label="Last">
-                                    <span aria-hidden="true">&raquo;</span>
-                                    <span class="sr-only">Last</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                    {% include 'home/common_pagination.html' with query=query page_location='manufacturer_details' page_obj=page_obj %}
+
                 </div>
             </div>
         {% else %}
@@ -181,27 +132,7 @@
         <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLongTitle">Select Manufacturer</h5>
             <div style="display: inline-flex">
-                <form method="get" action="{% url 'search_router' 'manufacturer_modal' %}">
-                    <div class="input-group input-group-merge search-bar pb-4">
-                        <a href="{% url 'view_manufacturer' %}">
-                            <button type="button" class="btn-sm btn-warning">reset</button>
-                        </a>
-                        <input type="text" class="form-control" id="top_bar_InputIconLeft" placeholder="Search"
-                               aria-label="Search" aria-describedby="topbar-addon" style="max-width: 50%"
-                               oninput="autocomplete_manufacturer()"
-                               name="manufacturer_modal_details" autocomplete="off">
-                        <button type="submit" class="input-group-text" id="topbar-addon">
-                            <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
-                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                                 aria-hidden="true">
-                                <path fill-rule="evenodd"
-                                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                      clip-rule="evenodd"></path>
-                            </svg>
-                        </button>
-
-                    </div>
-                </form>
+                {% include 'home/common_search_template.html' with url_type='manufacturer_modal' input_id='top_bar_InputIconLeft' input_name='manufacturer_modal_details' query=query autocomplete_function='autocomplete_manufacturer' view_url='get_manufacturer_modal' query=query %}
             </div>
         </div>
         {% if manufacturer_data %}
@@ -236,37 +167,7 @@
                     <!-- End of Item -->
                 </table>
                 <div>
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination">
-                            <li class="page-item">
-                                <a class="page-link" href="?manufacturer_modal_details={{ query }}&page=1"
-                                   aria-label="First">
-                                    <span aria-hidden="true">&laquo;</span>
-                                    <span class="sr-only">First</span>
-                                </a>
-                            </li>
-                            {% if page_obj.has_previous %}
-                                <li class="page-item"><a class="page-link"
-                                                         href="?manufacturer_modal_details={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
-                                </li>
-                            {% endif %}
-                            <li class="page-item active"><a class="page-link"
-                                                            href="#">{{ page_obj.number }}</a></li>
-                            {% if page_obj.has_next %}
-                                <li class="page-item"><a class="page-link"
-                                                         href="?manufacturer_modal_details={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
-                                </li>
-                            {% endif %}
-                            <li class="page-item">
-                                <a class="page-link"
-                                   href="?manufacturer_modal_details={{ query }}&page={{ page_obj.paginator.num_pages }}"
-                                   aria-label="Last">
-                                    <span aria-hidden="true">&raquo;</span>
-                                    <span class="sr-only">Last</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                    {% include 'home/common_pagination.html' with query=query page_location='manufacturer_modal_details' page_obj=page_obj %}
                 </div>
             </div>
         {% else %}
