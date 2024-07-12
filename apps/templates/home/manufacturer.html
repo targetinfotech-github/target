@@ -1,198 +1,73 @@
-{% extends "layouts/base.html" %}
-
-{% block title %} Dashboard {% endblock %}
-
-{% block stylesheets %}
-    <style>
-        table a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .selected-row {
-            background-color: #d3d3d3;
-        }
-
-        .invalid-feedback {
-            color: red;
-            font-size: 0.875em;
-            display: block;
-        }
-
-        .row {
-            padding: 20px;
-        }
-
-        .form-errors .alert {
-            color: #fff;
-            background-color: #dc3545;
-            border-color: #dc3545;
-            padding: 0.75rem 1.25rem;
-            margin-bottom: 1rem;
-        }
-
-        .form-errors .alert p {
-            margin: 0;
-            padding: 0;
-            font-size: 0.875em;
-        }
+{% extends 'home/master_extended.html' %}
 
 
-        #form_submit {
-            display: block;
-            margin-top: 1rem;
-        }
-
-
-    </style>
-{% endblock stylesheets %}
-{% load static %}
-{% block content %}
-
-    <div class="pb-4">
-        <h1>{{ label }}</h1>
-        {% if flag == 'create' %}
-            <a href="{% url 'get_manufacturer_modal' %}">
-                <button class="btn btn-tertiary" type="button">Update</button>
-            </a>
-            <a href="{% url 'view_manufacturer' %}">
-                <button class="btn btn-success" type="button">View</button>
-            </a>
-        {% endif %}
-
-        {% if flag != 'create' %}
-            <a href="{% url 'create_manufacturer' %}">
-                <button class="btn btn-info" type="button">Create</button>
-            </a>
-            <a href="{% url 'get_manufacturer_modal' %}">
-                <button class="btn btn-tertiary" type="button">Update</button>
-            </a>
-            {% if flag != 'view' %}
-                <a href="{% url 'view_manufacturer' %}">
-                    <button class="btn btn-success" type="button">View</button>
-                </a>
-            {% endif %}
-        {% endif %}
+{% block master-view %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Print Name</th>
+                <th scope="col">Short Name</th>
+                <th scope="col">Contact</th>
+            </tr>
+            </thead>
+            <!-- Item -->
+            <tbody>
+            {% for manufacturer in master_data %}
+                <tr id="row-{{ manufacturer.id }}">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>
+                        <a href="{% url update_url manufacturer.id %}">{{ manufacturer.name }}</a>
+                    </td>
+                    <td>{{ manufacturer.print_name }}</td>
+                    <td>{{ manufacturer.sh_name }}</td>
+                    <td>{{ manufacturer.contact }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <!-- End of Item -->
+        </table>
     </div>
-    {% if flag == 'view' %}
-        {% if manufacturer_data %}
-            <div style="display: inline-flex">
-                {% include 'home/common_search_template.html' with url_type='manufacturer' input_id='top_bar_InputIconLeft' input_name='manufacturer_details' query=query autocomplete_function='autocomplete_manufacturer' view_url='view_manufacturer' query=query %}
-            </div>
-            <div class="card border-0 shadow mb-4">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-centered table-nowrap mb-0 rounded">
-                            <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Print Name</th>
-                                <th scope="col">Short Name</th>
-                                <th scope="col">Contact</th>
-                            </tr>
-                            </thead>
-                            <!-- Item -->
-                            <tbody>
-                            {% for manufacturer in manufacturer_data %}
-                                <tr id="row-{{ manufacturer.id }}">
-                                    <th scope="row">{{ forloop.counter }}</th>
-                                    <td>
-                                        <a href="{% url 'update_manufacturer' manufacturer.id %}">{{ manufacturer.name }}</a>
-                                    </td>
-                                    <td>{{ manufacturer.print_name }}</td>
-                                    <td>{{ manufacturer.sh_name }}</td>
-                                    <td>{{ manufacturer.contact }}</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                            <!-- End of Item -->
-                        </table>
-                    </div>
-                    {% include 'home/common_pagination.html' with query=query page_location='manufacturer_details' page_obj=page_obj %}
+{% endblock %}
 
-                </div>
-            </div>
-        {% else %}
-            <div class="d-flex justify-content-center">
-                <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">
-                    <p class="text-dark mb-0">Manufacturer not created!</p>
-                </div>
-            </div>
-        {% endif %}
-    {% endif %}
-    <!-- Button trigger modal -->
-    {% if flag == 'modal' %}
 
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">Select Manufacturer</h5>
-            <div style="display: inline-flex">
-                {% include 'home/common_search_template.html' with url_type='manufacturer_modal' input_id='top_bar_InputIconLeft' input_name='manufacturer_modal_details' query=query autocomplete_function='autocomplete_manufacturer' view_url='get_manufacturer_modal' query=query %}
-            </div>
-        </div>
-        {% if manufacturer_data %}
-            <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+{% block modal_display %}
+    <div class="table-responsive">
+    <table class="table table-centered table-nowrap mb-0 rounded">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">type</th>
+            <th scope="col">Name</th>
+            <th scope="col">Print Name</th>
+            <th scope="col">Sh Name</th>
+        </tr>
+        </thead>
+        <!-- Item -->
+        <tbody>
 
-            <div class="table-responsive">
-                <table class="table table-centered table-nowrap mb-0 rounded">
-                    <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">type</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Print Name</th>
-                        <th scope="col">Sh Name</th>
-                    </tr>
-                    </thead>
-                    <!-- Item -->
-                    <tbody>
+        {% for manufacturer in master_data %}
+            <tr id="row-{{ manufacturer.id }}"
+                onclick="selectManufacturer('{{ manufacturer.id }}',
+                        '{% if manufacturer.product_count > 0 %}1{% else %}0{% endif %}')">
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ manufacturer.type }}</td>
+                <td>{{ manufacturer.name }}</td>
+                <td>{{ manufacturer.print_name }}</td>
+                <td>{{ manufacturer.sh_name }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <!-- End of Item -->
+    </table>
+    <div>
+{% endblock %}
 
-                    {% for manufacturer in manufacturer_data %}
-                        <tr id="row-{{ manufacturer.id }}"
-                            onclick="selectManufacturer('{{ manufacturer.id }}',
-                                    '{% if manufacturer.product_count > 0 %}1{% else %}0{% endif %}')">
-                            <th scope="row">{{ forloop.counter }}</th>
-                            <td>{{ manufacturer.type }}</td>
-                            <td>{{ manufacturer.name }}</td>
-                            <td>{{ manufacturer.print_name }}</td>
-                            <td>{{ manufacturer.sh_name }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                    <!-- End of Item -->
-                </table>
-                <div>
-                    {% include 'home/common_pagination.html' with query=query page_location='manufacturer_modal_details' page_obj=page_obj %}
-                </div>
-            </div>
-        {% else %}
-            <div class="d-flex justify-content-center">
-                <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">
-                    <p class="text-dark mb-0">Manufacturer not created!</p>
-                </div>
-            </div>
-        {% endif %}
-    <form method="post" action="{% url 'get_manufacturer_modal' %}">
-        {% csrf_token %}
-        <div class="modal-footer">
-            <a href="{% url 'create_manufacturer' %}">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </a>
-            <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
-                    name="submit_selected_record" value="" style="display: flex">Update
-            </button>
-            <button type="submit" class="btn btn-danger" id="delete_selected_record"
-                    name="delete_selected_record" value="" style="display: flex">Delete
-            </button>
-        </div>
-    </form>
-    </div>
-    {% endif %}
+
+
+{% block create_form %}
     {% if flag != 'view' and flag != 'modal' %}
         <form method="post">
             {% csrf_token %}
@@ -216,7 +91,6 @@
                     {% endif %}
                 {% endfor %}
             </div>
-            {#            <div class="form-container">#}
             <div class="container">
                 <div class="row">
                     <div class="col">
@@ -250,7 +124,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <div class="row" style="justify-content: center;">
@@ -263,54 +136,3 @@
         </form>
     {% endif %}
 {% endblock %}
-{% block javascripts %}
-    <script src="{% static 'assets/js/master.js' %}"></script>
-
-    <script>
-
-        function autocomplete_dropdown(data, input) {
-            var existingDatalist = document.getElementById("autocomplete-list");
-            if (existingDatalist) {
-                existingDatalist.remove();
-            }
-
-            var datalist = document.createElement("datalist");
-            datalist.id = "autocomplete-list";
-
-            data.forEach(name => {
-                var option_element = document.createElement("option");
-                option_element.value = name;
-                datalist.appendChild(option_element);
-            });
-
-            input.parentNode.appendChild(datalist);
-
-            input.setAttribute("list", "autocomplete-list");
-        }
-
-        function autocomplete_manufacturer() {
-            var input = document.getElementById('top_bar_InputIconLeft');
-
-            if (input.value.length >= 3) {
-                $.ajax({
-                    url: "{% url 'search_router' 'manufacturer' %}",
-                    data: {
-                        'autocomplete_query': input.value
-                    },
-                    success: function (data) {
-                        autocomplete_dropdown(data, input);
-                    },
-                    error: function (error) {
-                        console.error('Error fetching autocomplete suggestions:', error);
-                    }
-                });
-            } else {
-                input.removeAttribute("list");
-                var existingDatalist = document.getElementById("autocomplete-list");
-                if (existingDatalist) {
-                    existingDatalist.remove();
-                }
-            }
-        }
-    </script>
-{% endblock javascripts %}

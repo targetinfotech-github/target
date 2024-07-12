@@ -29,7 +29,7 @@ def login_view(request):
             else:
                 messages.error(request,'Invalid credentials')
         else:
-            messages.error(request,'Error validating the form')
+            messages.error(request,f'Invalid Form: {form.errors}')
 
     return render(request, "accounts/login.html", {"form": form})
 
@@ -48,7 +48,7 @@ def register_user(request):
             messages.success(request, f'User created - please Sign IN.')
 
         else:
-            messages.error(request,'Form is not valid')
+            messages.error(request,f'Invalid Form: {form.errors}')
             return redirect('register')
     else:
         form = SignUpForm()

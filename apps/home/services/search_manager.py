@@ -4,6 +4,7 @@ from django.db.models import Q
 
 from apps.home.models import Product, Manufacturer, Customer, ProductGroup
 from apps.home.services.exceptions import ModelNotFound
+from apps.home.services.resource_manager import SetupContext
 
 
 class SearchService:
@@ -125,41 +126,11 @@ class SearchService:
             page_obj = paginator.page(paginator.num_pages)
         return page_obj
 
-    def get_context(self, page_obj,*args,**kwargs):
-        model_prefix = self.model_search.split('_')[0]
-        context = {
-            'flag': 'view',
-            'label': f'View {self.model_search.title()}',
-            f'{model_prefix}_data': page_obj,
-            'page_obj': page_obj,
-            'query': self.details_query,
-        }
-        if args:
-            for key, value in args:
-                context[key] = value
-        if kwargs:
-            context.update(kwargs)
+
+    def get_context(self,page_obj,operation):
+        context_obj = SetupContext(self.model_search, page_obj,operation=operation)
+        context =  context_obj.get_context()
         return context
-
-
-
-    # def masterSearchEndpoint(self):
-    #     if self.autocomplete_query:
-    #         data = self.get_autocomplete_data()
-    #         print(f'data:: {data}')
-    #         return JsonResponse(data, safe=False)
-    #
-    #     page_obj = self.get_search_results()
-    #     context = self.get_context(page_obj)
-    #     template_map = {
-    #         'products': 'home/products.html',
-    #         'manufacturer': 'home/manufacturer.html',
-    #         'customer': 'home/customer.html',
-    #         'group': 'home/group.html'
-    #     }
-    #     template = template_map.get(self.model_search, 'home/index.html')
-    #     # return template
-    #     return self.request.render(template, context)
 
 class masterSearchEndpoint(SearchService):
     def __init__(self, request, model_search):
@@ -188,7 +159,7 @@ class masterSearchEndpoint(SearchService):
     def detailed_data_views(self):
         if self.details_query:
             page_obj = self.get_search_results()
-            context = self.get_context(page_obj)
+            context = self.get_context(page_obj,operation = 'view')
             template_map = {
                 'product': 'home/products.html',
                 'manufacturer': 'home/manufacturer.html',
@@ -202,7 +173,7 @@ class masterSearchEndpoint(SearchService):
         if self.details_query:
 
             page_obj = self.get_search_results()
-            context = self.get_context(page_obj)
+            context = self.get_context(page_obj,operation = 'modal')
             context['label'] = f'Update {self.model_search}'
             context['flag'] = 'modal'
             template_map = {

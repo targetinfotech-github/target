@@ -1,203 +1,71 @@
-{% extends "layouts/base.html" %}
+{% extends 'home/master_extended.html' %}
 
-{% block title %} Dashboard {% endblock %}
-
-{% block stylesheets %}
-    <style>
-        table a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .selected-row {
-            background-color: #d3d3d3;
-        }
-
-        .invalid-feedback {
-            color: red;
-            font-size: 0.875em;
-            display: block;
-        }
-
-        .row {
-            padding: 20px;
-        }
-
-        .form-errors .alert {
-            color: #fff;
-            background-color: #dc3545;
-            border-color: #dc3545;
-            padding: 0.75rem 1.25rem;
-            margin-bottom: 1rem;
-        }
-
-        .form-errors .alert p {
-            margin: 0;
-            padding: 0;
-            font-size: 0.875em;
-        }
+{% block master-view %}
 
 
-        #form_submit {
-            display: block;
-            margin-top: 1rem;
-        }
-
-
-    </style>
-{% endblock stylesheets %}
-{% load static %}
-{% block content %}
-
-    <div class="pb-4">
-        <h1>{{ label }}</h1>
-        {% if flag == 'create' %}
-            <a href="{% url 'get_customer_modal' %}">
-                <button class="btn btn-tertiary" type="button">Update</button>
-            </a>
-            <a href="{% url 'view_customer' %}">
-                <button class="btn btn-success" type="button">View</button>
-            </a>
-        {% endif %}
-
-        {% if flag != 'create' %}
-            <a href="{% url 'create_customer' %}">
-                <button class="btn btn-info" type="button">Create</button>
-            </a>
-            <a href="{% url 'get_customer_modal' %}">
-                <button class="btn btn-tertiary" type="button">Update</button>
-            </a>
-            {% if flag != 'view' %}
-                <a href="{% url 'view_customer' %}">
-                    <button class="btn btn-success" type="button">View</button>
-                </a>
-            {% endif %}
-        {% endif %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Print Name</th>
+                <th scope="col">Short Name</th>
+                <th scope="col">Contact</th>
+                <th scope="col">Email</th>
+            </tr>
+            </thead>
+            <!-- Item -->
+            <tbody>
+            {% for customer in master_data %}
+                <tr id="row-{{ customer.id }}">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>
+                        <a href="{% url update_url customer.id %}">{{ customer.customer_name }}</a>
+                    </td>
+                    <td>{{ customer.print_name }}</td>
+                    <td>{{ customer.sh_name }}</td>
+                    <td>{{ customer.contact }}</td>
+                    <td>{{ customer.email }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <!-- End of Item -->
+        </table>
     </div>
-    {% if flag == 'view' %}
-        <div style="display: inline-flex;margin: 10px">
-            {% include 'home/common_search_template.html' with url_type='customer' input_id='top_bar_InputIconLeft' input_name='customer_details' query=query autocomplete_function='autocomplete_customer' view_url='view_customer' query=query %}
+{% endblock %}
+{% block modal_display %}
 
-        </div>
-        <div class="card border-0 shadow mb-4">
-            <div class="card-body">
-                {% if customer_data %}
-                    <div class="table-responsive">
-                        <table class="table table-centered table-nowrap mb-0 rounded">
-                            <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Print Name</th>
-                                <th scope="col">Short Name</th>
-                                <th scope="col">Contact</th>
-                                <th scope="col">Email</th>
-                            </tr>
-                            </thead>
-                            <!-- Item -->
-                            <tbody>
-                            {% for customer in customer_data %}
-                                <tr id="row-{{ customer.id }}">
-                                    <th scope="row">{{ forloop.counter }}</th>
-                                    <td>
-                                        <a href="{% url 'update_customer' customer.id %}">{{ customer.customer_name }}</a>
-                                    </td>
-                                    <td>{{ customer.print_name }}</td>
-                                    <td>{{ customer.sh_name }}</td>
-                                    <td>{{ customer.contact }}</td>
-                                    <td>{{ customer.email }}</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                            <!-- End of Item -->
-                        </table>
-                    </div>
-                    {% include 'home/common_pagination.html' with query=query page_location='customer_details' page_obj=page_obj %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Print Name</th>
+                <th scope="col">Sh Name</th>
+                <th scope="col">Email</th>
+            </tr>
+            </thead>
+            <!-- Item -->
+            <tbody>
+            {% for customer in master_data %}
+                <tr id="row-{{ customer.id }}"
+                    onclick="selectCustomer('{{ customer.id }}')">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ customer.customer_name }}</td>
+                    <td>{{ customer.print_name }}</td>
+                    <td>{{ customer.sh_name }}</td>
+                    <td>{{ customer.email }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <!-- End of Item -->
+        </table>
+    </div>
+{% endblock %}
+{% block create_form %}
 
-                {% else %}
-                    <div class="d-flex justify-content-center">
-                        <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">
-                            <p class="text-dark mb-0">Customer not created!</p>
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-
-    {% endif %}
-    <!-- Button trigger modal -->
-    {% if flag == 'modal' %}
-
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Select Customer</h5>
-                    </div>
-                    <div style="display: inline-flex;margin: 10px">
-                        {% include 'home/common_search_template.html' with url_type='customer_modal' input_id='top_bar_InputIconLeft' input_name='customer_modal_details' query=query autocomplete_function='autocomplete_customer' view_url='get_customer_modal' query=query %}
-                    </div>
-                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
-                        {% if customer_data %}
-                            <div class="table-responsive">
-                                <table class="table table-centered table-nowrap mb-0 rounded">
-                                    <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">Name</th>
-                                        <th scope="col">Print Name</th>
-                                        <th scope="col">Sh Name</th>
-                                        <th scope="col">Email</th>
-                                    </tr>
-                                    </thead>
-                                    <!-- Item -->
-                                    <tbody>
-                                    {% for customer in customer_data %}
-                                        <tr id="row-{{ customer.id }}"
-                                            onclick="selectCustomer('{{ customer.id }}')">
-                                            <th scope="row">{{ forloop.counter }}</th>
-                                            <td>{{ customer.customer_name }}</td>
-                                            <td>{{ customer.print_name }}</td>
-                                            <td>{{ customer.sh_name }}</td>
-                                            <td>{{ customer.email }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                    <!-- End of Item -->
-                                </table>
-                            </div>
-                            <div>
-                                {% include 'home/common_pagination.html' with query=query page_location='customer_modal_details' page_obj=page_obj %}
-
-                            </div>
-                        {% else %}
-                            <div class="d-flex justify-content-center">
-                                <div class="col-sm-8 col-md-4 col-xl-4" id="message_id">
-                                    <p class="text-dark mb-0">Customer not created!</p>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
-                    <form method="post" action="{% url 'get_customer_modal' %}">
-                        {% csrf_token %}
-                        <div class="modal-footer">
-                            <a href="{% url 'create_customer' %}">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            </a>
-                            <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
-                                    name="submit_selected_record" value="" style="display: flex">Update
-                            </button>
-                            <button type="submit" class="btn btn-danger" id="delete_selected_record"
-                                    name="delete_selected_record" value="" style="display: flex">Delete
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    {% endif %}
     {% if flag != 'view' and flag != 'modal' %}
         <form method="post">
             {% csrf_token %}
@@ -265,54 +133,3 @@
         </form>
     {% endif %}
 {% endblock %}
-{% block javascripts %}
-    <script src="{% static 'assets/js/master.js' %}"></script>
-
-    <script>
-
-        function autocomplete_dropdown(data, input) {
-            var existingDatalist = document.getElementById("autocomplete-list");
-            if (existingDatalist) {
-                existingDatalist.remove();
-            }
-
-            var datalist = document.createElement("datalist");
-            datalist.id = "autocomplete-list";
-
-            data.forEach(name => {
-                var option_element = document.createElement("option");
-                option_element.value = name;
-                datalist.appendChild(option_element);
-            });
-
-            input.parentNode.appendChild(datalist);
-
-            input.setAttribute("list", "autocomplete-list");
-        }
-
-        function autocomplete_customer() {
-            var input = document.getElementById('top_bar_InputIconLeft');
-
-            if (input.value.length >= 3) {
-                $.ajax({
-                    url: "{% url 'search_router' 'customer' %}",
-                    data: {
-                        'autocomplete_query': input.value
-                    },
-                    success: function (data) {
-                        autocomplete_dropdown(data, input);
-                    },
-                    error: function (error) {
-                        console.error('Error fetching autocomplete suggestions:', error);
-                    }
-                });
-            } else {
-                input.removeAttribute("list");
-                var existingDatalist = document.getElementById("autocomplete-list");
-                if (existingDatalist) {
-                    existingDatalist.remove();
-                }
-            }
-        }
-    </script>
-{% endblock javascripts %}
