@@ -88,7 +88,7 @@ The project is coded using a simple and intuitive structure presented bellow:
    |
    |-- apps/
    |    |
-   |    |-- home/                          # A simple app that serve HTML files
+   |    |-- billing/                          # A simple app that serve HTML files
    |    |    |-- views.py                  # Serve HTML pages for authenticated users
    |    |    |-- urls.py                   # Define some super simple routes  
    |    |
@@ -115,7 +115,7 @@ The project is coded using a simple and intuitive structure presented bellow:
    |         |    |-- login.html            # Login page
    |         |    |-- register.html         # Register page
    |         |
-   |         |-- home/                      # UI Kit Pages
+   |         |-- billing/                      # UI Kit Pages
    |              |-- index.html            # Index page
    |              |-- 404-page.html         # 404 page
    |              |-- *.html                # All other pages

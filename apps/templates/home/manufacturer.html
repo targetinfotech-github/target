@@ -67,7 +67,7 @@
 
 
 {% block create_form %}
-    {% if flag != 'view' and flag != 'modal' and flag != 'delete' %}
+    {% if flag == 'create' %}
         <form method="post">
             {% csrf_token %}
             <div class="form-errors">

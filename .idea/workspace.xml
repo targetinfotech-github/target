@@ -4,14 +4,73 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9b1ddd95-aa22-4abd-a599-5b65f6a4926a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/apps/home/management/commands/populate_model.py" afterDir="false" />
+    <list default="true" id="9b1ddd95-aa22-4abd-a599-5b65f6a4926a" name="Changes" comment="...">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/factories.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/home/factories.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/management/commands/populate_products.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/home/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/templates/layouts/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/layouts/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/authentication/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/authentication/admin.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/authentication/config.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/authentication/django-dashboard-volt-1.0.4 - Shortcut.lnk" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/authentication/forms.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/authentication/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/authentication/migrations/0002_alter_customuser_options_alter_customuser_table.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/authentication/migrations/0003_alter_customuser_table.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/authentication/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/authentication/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/authentication/tests.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/authentication/urls.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/authentication/views.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/form.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/form.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/management/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/management/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/management/commands/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/management/commands/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/management/commands/populate_manufacturers.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/management/commands/populate_manufacturers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/management/commands/populate_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/management/commands/populate_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0002_auto_20240624_1038.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0002_auto_20240624_1038.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0003_customer_product_contact_alter_manufacturer_hsn_code_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0003_customer_product_contact_alter_manufacturer_hsn_code_and_more.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0004_alter_receipt_net_amount.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0004_alter_receipt_net_amount.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0005_alter_receipt_receipt_status.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0005_alter_receipt_receipt_status.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0006_alter_receipt_receipt_status.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0006_alter_receipt_receipt_status.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0007_manufacturer_address_manufacturer_email_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0007_manufacturer_address_manufacturer_email_and_more.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0008_alter_manufacturer_address_alter_manufacturer_email_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0008_alter_manufacturer_address_alter_manufacturer_email_and_more.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0009_group_alter_manufacturer_options_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0009_group_alter_manufacturer_options_and_more.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0010_group_code_name_group_consolidation_code_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0010_group_code_name_group_consolidation_code_and_more.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0011_alter_product_buy_rate_alter_product_mrp_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0011_alter_product_buy_rate_alter_product_mrp_and_more.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0012_remove_manufacturer_hsn_code_alter_manufacturer_name_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0012_remove_manufacturer_hsn_code_alter_manufacturer_name_and_more.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0013_alter_product_group.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0013_alter_product_group.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0014_alter_manufacturer_options_alter_group_group_name.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0014_alter_manufacturer_options_alter_group_group_name.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0015_alter_customer_options_alter_group_options_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0015_alter_customer_options_alter_group_options_and_more.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0016_customer_product.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0016_customer_product.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0017_alter_customer_table_alter_group_table_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0017_alter_customer_table_alter_group_table_and_more.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0018_alter_customer_customer_name.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0018_alter_customer_customer_name.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0019_remove_customer_product.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0019_remove_customer_product.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0020_customer_created_at_customer_last_accessed_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0020_customer_created_at_customer_last_accessed_and_more.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0021_alter_customer_last_accessed_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0021_alter_customer_last_accessed_and_more.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0022_product_net_quantity_remove_receiptproduct_product_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0022_product_net_quantity_remove_receiptproduct_product_and_more.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0023_remove_receiptproduct_product_receiptproduct_product.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0023_remove_receiptproduct_product_receiptproduct_product.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0024_rename_group_productgroup.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0024_rename_group_productgroup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0025_alter_productgroup_table.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0025_alter_productgroup_table.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/migrations/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/services/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/services/decorators.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/decorators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/services/dummy.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/dummy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/services/exceptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/exceptions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/services/factories.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/factories.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/services/resource_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/resource_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/services/search_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/search_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/home/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/manufacturer.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/home/manufacturer.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/master_extended.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/home/master_extended.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/receipt.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/home/receipt.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/staticfiles/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/staticfiles/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/urls.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,9 +124,10 @@
     &quot;Python.dummy.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR_AND_PREVIEW&quot;,
+    &quot;RunOnceActivity.pycharm.django.structure.promotion.once.per.project&quot;: &quot;true&quot;,
+    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/TargetInfotech/target&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/wordpress&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -80,6 +140,9 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\django-dashboard-volt-1.0.4\django-dashboard-volt-1.0.4\core\staticfiles" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\TargetInfotech\target\apps\home\services" />
     </key>
   </component>
   <component name="RunManager" selected="Django Server.target_infotech">
@@ -97,7 +160,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/apps/home/dummy.py" />
+      <option name="SCRIPT_NAME" value="D:\TargetInfotech\target\apps\home\services\dummy.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -131,6 +194,102 @@
       <option name="customRunCommand" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="Python tests for apps.billing.services.dummy" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="target" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/apps/billing" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;apps.billing.services.dummy&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for apps.billing.services.dummy" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="target" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/apps/billing" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;apps.billing.services.dummy&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for apps.billing.services.dummy" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="target" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/apps/billing" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;apps.billing.services.dummy&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for apps.home.services.dummy" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="target" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/apps/home" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;apps.home.services.dummy&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for apps.home.services.dummy" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="target" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/apps/home" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;apps.home.services.dummy&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for apps.home.services.dummy" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="target" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/apps/home" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;apps.home.services.dummy&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
     <configuration name="Python tests for dummy.TestStringMethods" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="target" />
       <option name="ENV_FILES" value="" />
@@ -147,43 +306,11 @@
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests for dummy.TestStringMethods.test_isupper" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
-      <module name="target" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/apps/home" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;dummy.TestStringMethods.test_isupper&quot;" />
-      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Python tests for dummy.TestStringMethods.test_split" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
-      <module name="target" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/apps/home" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;dummy.TestStringMethods.test_split&quot;" />
-      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python tests.Python tests for dummy.TestStringMethods.test_isupper" />
-        <item itemvalue="Python tests.Python tests for dummy.TestStringMethods.test_split" />
-        <item itemvalue="Python tests.Python tests for dummy.TestStringMethods" />
+        <item itemvalue="Python tests.Python tests for apps.billing.services.dummy" />
+        <item itemvalue="Python tests.Python tests for apps.billing.services.dummy" />
+        <item itemvalue="Python tests.Python tests for apps.billing.services.dummy" />
         <item itemvalue="Python.dummy" />
       </list>
     </recent_temporary>
@@ -230,12 +357,137 @@
       <workItem from="1720156721770" duration="1773000" />
       <workItem from="1720158686545" duration="86000" />
       <workItem from="1720159020543" duration="2358000" />
-      <workItem from="1720161432985" duration="5633000" />
+      <workItem from="1720161432985" duration="13006000" />
+      <workItem from="1720240706665" duration="6491000" />
+      <workItem from="1720410589416" duration="14662000" />
+      <workItem from="1720429658190" duration="11165000" />
+      <workItem from="1720496617108" duration="12508000" />
+      <workItem from="1720516009498" duration="1864000" />
+      <workItem from="1720518283351" duration="6904000" />
+      <workItem from="1720582861152" duration="13796000" />
+      <workItem from="1720601693681" duration="12133000" />
+      <workItem from="1720614396420" duration="50000" />
+      <workItem from="1720669303491" duration="15428000" />
+      <workItem from="1720688810191" duration="6531000" />
+      <workItem from="1720695953362" duration="211000" />
+      <workItem from="1720696191399" duration="2806000" />
+      <workItem from="1720756217941" duration="15755000" />
+      <workItem from="1720775315858" duration="11152000" />
+      <workItem from="1720841950715" duration="11013000" />
+      <workItem from="1720860672461" duration="5505000" />
+      <workItem from="1721015370320" duration="2688000" />
+      <workItem from="1721028998511" duration="938000" />
+      <workItem from="1721033303192" duration="11000" />
+      <workItem from="1721034473967" duration="8453000" />
     </task>
+    <task id="LOCAL-00001" summary="testing -- factory creation">
+      <option name="closed" value="true" />
+      <created>1720171400454</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1720171400454</updated>
+    </task>
+    <task id="LOCAL-00002" summary="search optimisation.">
+      <option name="closed" value="true" />
+      <created>1720247253519</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1720247253519</updated>
+    </task>
+    <task id="LOCAL-00003" summary="master view search optimisation.">
+      <option name="closed" value="true" />
+      <created>1720435472932</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1720435472932</updated>
+    </task>
+    <task id="LOCAL-00004" summary="modal search functionality, migration required.">
+      <option name="closed" value="true" />
+      <created>1720509157725</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1720509157725</updated>
+    </task>
+    <task id="LOCAL-00005" summary="..">
+      <option name="closed" value="true" />
+      <created>1720509333872</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1720509333872</updated>
+    </task>
+    <task id="LOCAL-00006" summary="master front-end complete">
+      <option name="closed" value="true" />
+      <created>1720592371251</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1720592371251</updated>
+    </task>
+    <task id="LOCAL-00007" summary="..">
+      <option name="closed" value="true" />
+      <created>1720614426085</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1720614426085</updated>
+    </task>
+    <task id="LOCAL-00008" summary="authentication">
+      <option name="closed" value="true" />
+      <created>1720696698566</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1720696698566</updated>
+    </task>
+    <task id="LOCAL-00009" summary="master optimisation">
+      <option name="closed" value="true" />
+      <created>1720784959709</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1720784959709</updated>
+    </task>
+    <task id="LOCAL-00010" summary="...">
+      <option name="closed" value="true" />
+      <created>1721017828061</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1721017828061</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="testing -- factory creation" />
+    <MESSAGE value="search optimisation." />
+    <MESSAGE value="master view search optimisation." />
+    <MESSAGE value="modal search functionality, migration required." />
+    <MESSAGE value="master front-end complete" />
+    <MESSAGE value=".." />
+    <MESSAGE value="authentication" />
+    <MESSAGE value="master optimisation" />
+    <MESSAGE value="..." />
+    <option name="LAST_COMMIT_MESSAGE" value="..." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/django_dashboard_volt_1_0_4$dummy.coverage" NAME="dummy Coverage Results" MODIFIED="1719377292762" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/apps/home" />
