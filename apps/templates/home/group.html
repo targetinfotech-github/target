@@ -17,7 +17,7 @@
         <tbody>
         {% for group in master_data %}
             <tr id="row-{{ group.id }}"
-                onclick="selectGroup('{{ group.id }}','{% if group.product_count > 0 %}1{% else %}0{% endif %}')">
+                onclick="selectMasterRemovable('{{ group.id }}','{% if group.product_count > 0 %}1{% else %}0{% endif %}')">
                 <th scope="row">{{ forloop.counter }}</th>
                 <td>{{ group.group_id }}</td>
                 <td>{{ group.group_name }}</td>
@@ -63,7 +63,7 @@
 {% endblock %}
 {% block create_form %}
 
-    {% if flag != 'view' and flag != 'modal' %}
+    {% if flag != 'view' and flag != 'modal' and flag != 'delete' %}
 
         <form method="post">
             {% csrf_token %}

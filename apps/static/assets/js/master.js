@@ -10,10 +10,16 @@ document.addEventListener('DOMContentLoaded', function () {
 var input_record = document.getElementById('submit_selected_record');
 var delete_record = document.getElementById('delete_selected_record');
 var selectedRowId = null;
-input_record.style.display = 'none';
-delete_record.style.display = 'none';
+if (input_record) {
+    input_record.style.display = 'none';
 
-function selectManufacturer(id, related) {
+}
+if (delete_record) {
+    delete_record.style.display = 'none';
+
+}
+
+function selectMasterRemovable(id, related) {
     console.log(`id:${id} , related: ${related}`)
     var selectedRow = document.getElementById('row-' + id);
     if (!isNaN(parseInt(related)) & parseInt(related) === 0) {
@@ -22,15 +28,23 @@ function selectManufacturer(id, related) {
         removable = false;
     }
 
-    delete_record.style.display = 'none';
+    if (delete_record) {
+        delete_record.style.display = 'none';
+
+    }
     console.log(id)
     if (selectedRowId === id) {
         // Deselect the row
         selectedRow.classList.remove('selected-row');
-        input_record.value = '';
-        delete_record.value = ''
-        delete_record.style.display = 'none'
-        input_record.style.display = 'none';
+        if (input_record) {
+            input_record.value = '';
+            input_record.style.display = 'none';
+        }
+        if (delete_record) {
+            delete_record.value = ''
+            delete_record.style.display = 'none'
+        }
+
 
         selectedRowId = null;
     } else {
@@ -40,11 +54,15 @@ function selectManufacturer(id, related) {
 
         selectedRow.classList.add('selected-row');
 
-        input_record.value = id;
-        delete_record.value = id;
-        input_record.style.display = '';
-        if (removable) {
-            delete_record.style.display = ''
+        if (input_record) {
+            input_record.value = id;
+            input_record.style.display = '';
+        }
+        if (delete_record) {
+            delete_record.value = id;
+            if (removable) {
+                delete_record.style.display = ''
+            }
         }
 
         selectedRowId = id;
@@ -52,16 +70,20 @@ function selectManufacturer(id, related) {
 }
 
 
-function selectProduct(id) {
+function selectMaster(id) {
     var selectedRow = document.getElementById('row-' + id);
 
     if (selectedRowId === id) {
         // Deselect the row
         selectedRow.classList.remove('selected-row');
-        input_record.value = '';
-        delete_record.value = ''
-        delete_record.style.display = 'none'
-        input_record.style.display = 'none';
+        if (input_record) {
+            input_record.value = '';
+            input_record.style.display = 'none';
+        }
+        if (delete_record) {
+            delete_record.value = ''
+            delete_record.style.display = 'none'
+        }
 
         selectedRowId = null;
     } else {
@@ -70,11 +92,16 @@ function selectProduct(id) {
         }
 
         selectedRow.classList.add('selected-row');
+        if (input_record) {
+            input_record.value = id;
+            input_record.style.display = '';
 
-        input_record.value = id;
-        delete_record.value = id;
-        input_record.style.display = '';
-        delete_record.style.display = ''
+        }
+        if (delete_record) {
+            delete_record.value = id;
+            delete_record.style.display = ''
+        }
+
 
         selectedRowId = id;
     }

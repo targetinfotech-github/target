@@ -51,7 +51,7 @@
             <tbody>
             {% for customer in master_data %}
                 <tr id="row-{{ customer.id }}"
-                    onclick="selectCustomer('{{ customer.id }}')">
+                    onclick="selectMaster('{{ customer.id }}')">
                     <th scope="row">{{ forloop.counter }}</th>
                     <td>{{ customer.customer_name }}</td>
                     <td>{{ customer.print_name }}</td>
@@ -66,7 +66,7 @@
 {% endblock %}
 {% block create_form %}
 
-    {% if flag != 'view' and flag != 'modal' %}
+    {% if flag != 'view' and flag != 'modal' and flag != 'delete' %}
         <form method="post">
             {% csrf_token %}
             <div class="form-errors">

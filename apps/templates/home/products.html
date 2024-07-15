@@ -48,11 +48,11 @@
             <tbody>
             {% for product in master_data %}
                 <tr id="row-{{ product.id }}"
-                    onclick="selectProduct('{{ product.id }}')">
+                    onclick="selectMaster('{{ product.id }}')">
                     <th scope="row">{{ forloop.counter }}</th>
                     <td>{{ product.product_name }}</td>
                     <td>{{ product.product_code }}</td>
-                    <td>{{ product.manufacturer }}</td>
+                    <td>{{ product.manufacturer__name }}</td>
                     <td>{{ product.buy_rate }}</td>
                     <td>{{ product.sell_rate }}</td>
                 </tr>
@@ -64,7 +64,7 @@
 {% endblock %}
 {% block create_form %}
 
-    {% if flag != 'view' and flag != 'modal' %}
+    {% if flag != 'view' and flag != 'modal' and flag != 'delete' %}
         <div>
             <form method="post">
                 {% csrf_token %}

@@ -50,8 +50,7 @@
 
         {% for manufacturer in master_data %}
             <tr id="row-{{ manufacturer.id }}"
-                onclick="selectManufacturer('{{ manufacturer.id }}',
-                        '{% if manufacturer.product_count > 0 %}1{% else %}0{% endif %}')">
+                onclick="selectMasterRemovable('{{ manufacturer.id }}','{% if manufacturer.product_count > 0 %}1{% else %}0{% endif %}')">
                 <th scope="row">{{ forloop.counter }}</th>
                 <td>{{ manufacturer.type }}</td>
                 <td>{{ manufacturer.name }}</td>
@@ -68,7 +67,7 @@
 
 
 {% block create_form %}
-    {% if flag != 'view' and flag != 'modal' %}
+    {% if flag != 'view' and flag != 'modal' and flag != 'delete' %}
         <form method="post">
             {% csrf_token %}
             <div class="form-errors">

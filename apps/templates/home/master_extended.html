@@ -81,12 +81,15 @@
 
     <div class="pb-4">
         <h2 class="h4">{{ label }}</h2>
-        {% if flag == 'create' %}
+        {% if flag == 'create' and master_data %}
             <a href="{% url modal_url %}">
                 <button class="btn btn-tertiary" type="button">Update</button>
             </a>
             <a href="{% url view_url %}">
                 <button class="btn btn-success" type="button">View</button>
+            </a>
+            <a href="{% url delete_url %}">
+                <button class="btn btn-danger" type="button">Delete</button>
             </a>
         {% endif %}
 
@@ -94,12 +97,17 @@
             <a href="{% url create_url %}">
                 <button class="btn btn-info" type="button">Create</button>
             </a>
-            <a href="{% url modal_url %}">
-                <button class="btn btn-tertiary" type="button">Update</button>
-            </a>
-            {% if flag != 'view' %}
-                <a href="{% url view_url %}">
-                    <button class="btn btn-success" type="button">View</button>
+            {% if master_data %}
+                <a href="{% url modal_url %}">
+                    <button class="btn btn-tertiary" type="button">Update</button>
+                </a>
+                {% if flag != 'view' %}
+                    <a href="{% url view_url %}">
+                        <button class="btn btn-success" type="button">View</button>
+                    </a>
+                {% endif %}
+                <a href="{% url delete_url %}">
+                    <button class="btn btn-danger" type="button">Delete</button>
                 </a>
             {% endif %}
         {% endif %}
@@ -115,7 +123,7 @@
             </div>
         {% endfor %}
     {% endif %}
-    {% if flag == 'view' %}
+    {% if flag == 'view' and master_data %}
         <div style="display: inline-flex">
             <form method="get" action="{% url 'search_router' url_type %}">
                 <div class="input-group input-group-merge search-bar pb-4">
@@ -146,37 +154,37 @@
 
                 {% endblock %}
                 <!-- Pagination -->
-
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination">
-                        <li class="page-item">
-                            <a class="page-link" href="?{{ input_name }}={{ query }}&page=1" aria-label="First">
-                                <span aria-hidden="true">&laquo;</span>
-                                <span class="sr-only">First</span>
-                            </a>
-                        </li>
-                        {% if page_obj.has_previous %}
-                            <li class="page-item"><a class="page-link"
-                                                     href="?{{ input_name }}={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                {% if master_data %}
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item">
+                                <a class="page-link" href="?{{ input_name }}={{ query }}&page=1" aria-label="First">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">First</span>
+                                </a>
                             </li>
-                        {% endif %}
-                        <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
-                        {% if page_obj.has_next %}
-                            <li class="page-item"><a class="page-link"
-                                                     href="?{{ input_name }}={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?{{ input_name }}={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                                </li>
+                            {% endif %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?{{ input_name }}={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                                </li>
+                            {% endif %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="?{{ input_name }}={{ query }}&page={{ page_obj.paginator.num_pages }}"
+                                   aria-label="Last">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Last</span>
+                                </a>
                             </li>
-                        {% endif %}
-                        <li class="page-item">
-                            <a class="page-link"
-                               href="?{{ input_name }}={{ query }}&page={{ page_obj.paginator.num_pages }}"
-                               aria-label="Last">
-                                <span aria-hidden="true">&raquo;</span>
-                                <span class="sr-only">Last</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-
+                        </ul>
+                    </nav>
+                {% endif %}
                 {#                    {% include 'home/common_pagination.html' with query=query page_location='manufacturer_details' page_obj=page_obj %}#}
 
             </div>
@@ -184,105 +192,112 @@
 
     {% endif %}
     <!-- Button trigger modal -->
-    {% if flag == 'modal' %}
+    {% if flag == 'modal'  or flag == 'delete' %}
+        {% if master_data %}
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Select</h5>
 
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Select {{ url_type|capfirst }}</h5>
+                            <!-- Search Router -->
 
-                        <!-- Search Router -->
-
-                        <div style="display: inline-flex">
                             <div style="display: inline-flex">
-                                <form method="get" action="{% url 'search_router' url_type %}">
-                                    <div class="input-group input-group-merge search-bar pb-4">
-                                        <a href="{% url modal_url %}">
-                                            <button type="button" class="btn-sm btn-warning">reset</button>
-                                        </a>
-                                        <input type="text" class="form-control" id="master_search" placeholder="Search"
-                                               aria-label="Search" aria-describedby="topbar-addon"
-                                               style="max-width: 50%"
-                                               oninput="autocomplete_master()" name="{{ input_name }}"
-                                               autocomplete="off"
-                                               value="{{ query }}">
-                                        <button type="submit" class="input-group-text" id="topbar-addon">
-                                            <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
-                                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                                 fill="currentColor"
-                                                 aria-hidden="true">
-                                                <path fill-rule="evenodd"
-                                                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                                      clip-rule="evenodd"></path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </form>
+                                <div style="display: inline-flex">
+                                    <form method="get" action="{% url 'search_router' url_type %}">
+                                        <div class="input-group input-group-merge search-bar pb-4">
+                                            <a href="{% url modal_url %}">
+                                                <button type="button" class="btn-sm btn-warning">reset</button>
+                                            </a>
+                                            <input type="text" class="form-control" id="master_search"
+                                                   placeholder="Search"
+                                                   aria-label="Search" aria-describedby="topbar-addon"
+                                                   style="max-width: 50%"
+                                                   oninput="autocomplete_master()" name="{{ input_name }}"
+                                                   autocomplete="off"
+                                                   value="{{ query }}">
+                                            <button type="submit" class="input-group-text" id="topbar-addon">
+                                                <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
+                                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                     fill="currentColor"
+                                                     aria-hidden="true">
+                                                    <path fill-rule="evenodd"
+                                                          d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                                          clip-rule="evenodd"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </form>
 
-                                {#            {% include 'home/common_search_template.html' with url_type='manufacturer_modal' input_id='top_bar_InputIconLeft' input_name='manufacturer_modal_details' query=query autocomplete_function='autocomplete_manufacturer' view_url='get_manufacturer_modal' query=query %}#}
+                                    {#            {% include 'home/common_search_template.html' with url_type='manufacturer_modal' input_id='top_bar_InputIconLeft' input_name='manufacturer_modal_details' query=query autocomplete_function='autocomplete_manufacturer' view_url='get_manufacturer_modal' query=query %}#}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
-                        {% block modal_display %}
+                        <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+                            {% block modal_display %}
 
-                        {% endblock modal_display %}
-                        <!-- Pagination -->
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination">
-                                <li class="page-item">
-                                    <a class="page-link" href="?{{ input_name }}={{ query }}&page=1"
-                                       aria-label="First">
-                                        <span aria-hidden="true">&laquo;</span>
-                                        <span class="sr-only">First</span>
-                                    </a>
-                                </li>
-                                {% if page_obj.has_previous %}
-                                    <li class="page-item"><a class="page-link"
-                                                             href="?{{ input_name }}={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
-                                    </li>
-                                {% endif %}
-                                <li class="page-item active"><a class="page-link"
-                                                                href="#">{{ page_obj.number }}</a>
-                                </li>
-                                {% if page_obj.has_next %}
-                                    <li class="page-item"><a class="page-link"
-                                                             href="?{{ input_name }}={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
-                                    </li>
-                                {% endif %}
-                                <li class="page-item">
-                                    <a class="page-link"
-                                       href="?{{ input_name }}={{ query }}&page={{ page_obj.paginator.num_pages }}"
-                                       aria-label="Last">
-                                        <span aria-hidden="true">&raquo;</span>
-                                        <span class="sr-only">Last</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
+                            {% endblock modal_display %}
+                            <!-- Pagination -->
+                            {% if master_data %}
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination">
+                                        <li class="page-item">
+                                            <a class="page-link" href="?{{ input_name }}={{ query }}&page=1"
+                                               aria-label="First">
+                                                <span aria-hidden="true">&laquo;</span>
+                                                <span class="sr-only">First</span>
+                                            </a>
+                                        </li>
+                                        {% if page_obj.has_previous %}
+                                            <li class="page-item"><a class="page-link"
+                                                                     href="?{{ input_name }}={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                                            </li>
+                                        {% endif %}
+                                        <li class="page-item active"><a class="page-link"
+                                                                        href="#">{{ page_obj.number }}</a>
+                                        </li>
+                                        {% if page_obj.has_next %}
+                                            <li class="page-item"><a class="page-link"
+                                                                     href="?{{ input_name }}={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                                            </li>
+                                        {% endif %}
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="?{{ input_name }}={{ query }}&page={{ page_obj.paginator.num_pages }}"
+                                               aria-label="Last">
+                                                <span aria-hidden="true">&raquo;</span>
+                                                <span class="sr-only">Last</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            {% endif %}
 
-
-                    </div>
-                    <form method="post" action="{% url modal_url %}">
-                        {% csrf_token %}
-                        <div class="modal-footer">
-                            <a href="{% url create_url %}">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            </a>
-                            <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
-                                    name="submit_selected_record" value="" style="display: flex">Update
-                            </button>
-                            <button type="submit" class="btn btn-danger" id="delete_selected_record"
-                                    name="delete_selected_record" value="" style="display: flex">Delete
-                            </button>
                         </div>
-                    </form>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="modal-footer">
+                                <a href="{% url create_url %}">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </a>
+                                {% if flag == 'modal' and flag != 'delete' %}
+                                    <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
+                                            name="submit_selected_record" value="" style="display: flex">Update
+                                    </button>
+                                {% endif %}
+                                {% if flag != 'modal' and flag == 'delete' %}
+                                    <button type="submit" class="btn btn-danger" id="delete_selected_record"
+                                            name="delete_selected_record" value="" style="display: flex">Delete
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
     {% endif %}
     {% block create_form %}
     {% endblock create_form %}

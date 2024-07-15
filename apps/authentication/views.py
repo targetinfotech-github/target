@@ -42,8 +42,12 @@ def register_user(request):
             email = form.cleaned_data.get('email')
             if CustomUser.objects.filter(email__iexact=email).exists():
                 messages.error(request,'Email exists')
+                return redirect('login')
+            try:
+                user = authenticate(username=username, password=raw_password)
+            except Exception as e:
+                messages.error(request, f'Exception occurred: {e}. Kindly register again')
                 return redirect('register')
-            user = authenticate(username=username, password=raw_password)
             form.save()
             messages.success(request, f'User created - please Sign IN.')
 
