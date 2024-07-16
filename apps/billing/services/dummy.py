@@ -34,7 +34,7 @@ def search_router(request, model_search):
 
         context = {'flag': 'view', 'label': 'View Product', 'product_data': page_obj, 'page_obj': page_obj,
                    'query': query}
-        return render(request, 'home/products.html', context)
+        return render(request, 'billing/products.html', context)
 
     elif model_search.strip() in 'manufacturer':
         autocomplete_query = request.GET.get('autocomplete_query', '')
@@ -66,7 +66,7 @@ def search_router(request, model_search):
 
         context = {'flag': 'view', 'label': 'View Manufacturer', 'manufacturer_data': page_obj,
                    'page_obj': page_obj, 'query': query}
-        return render(request, 'home/manufacturer.html', context)
+        return render(request, 'billing/manufacturer.html', context)
 
     elif model_search.strip() in 'customer':
         autocomplete_query = request.GET.get('autocomplete_query', '')
@@ -96,7 +96,7 @@ def search_router(request, model_search):
 
         context = {'flag': 'view', 'label': 'View Customer', 'customer_data': page_obj,
                    'page_obj': page_obj, 'query': query}
-        return render(request, 'home/customer.html', context)
+        return render(request, 'billing/customer.html', context)
 
     elif model_search.strip() in 'group':
         autocomplete_query = request.GET.get('autocomplete_query', '')
@@ -126,4 +126,4 @@ def search_router(request, model_search):
 
         context = {'flag': 'view', 'label': 'View Group', 'group_data': page_obj,
                    'page_obj': page_obj, 'query': query}
-        return render(request, 'home/group.html', context)
+        return render(request, 'billing/group.html', context)

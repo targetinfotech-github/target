@@ -76,10 +76,10 @@ class Account(models.Model):
 
 
 class GroupManager(models.Manager):
-    def get_or_create_general_manufacturer(self):
+    def get_or_create_general_group(self):
         group, created = self.get_or_create(
-            group_name__icontains='General Manufacturer',
-            defaults={'group_name': 'General Manufacturer'}
+            group_name__icontains='General Group',
+            defaults={'group_name': 'General Group'}
         )
         return group
 
@@ -112,6 +112,15 @@ class ProductGroup(models.Model):
         super().save(*args, **kwargs)
 
 
+class ManufacturerManager(models.Manager):
+    def get_or_create_general_manufacturer(self):
+        manufacturer, created = self.get_or_create(
+            name__icontains='General Manufacturer',
+            defaults={'name': 'General Manufacturer'}
+        )
+        return manufacturer
+
+
 class Manufacturer(models.Model):
     TYPE_CHOICES = [
         ('manufacturer', 'Manufacturer'),
@@ -142,7 +151,7 @@ class Manufacturer(models.Model):
     type = models.CharField(choices=TYPE_CHOICES, max_length=20, default='manufacturer',verbose_name='Type')
     address = models.TextField(max_length=255, null=True, blank=True)
     city = models.CharField(max_length=100,null=True,blank=True)
-    postal_code = models.CharField(max_length=20,null=True,blank=True)
+    postal_code = models.PositiveIntegerField(null=True,blank=True)
     gstin = models.CharField(max_length=15, validators=[validate_gstin],null=True,blank=True)
     hsn = models.CharField(max_length=15,null=True,blank=True)
     email = models.EmailField(null=True, blank=True)
@@ -151,9 +160,9 @@ class Manufacturer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     id_no = models.CharField(choices=ID_NO, max_length=30,null=True,blank=True)
     purchase_type = models.CharField(choices=PURCHASE_TYPE, max_length=30,null=True,blank=True)
-    tin = models.CharField(max_length=15)
+    tin = models.CharField(max_length=15,null=True,blank=True)
     gtax_type = models.CharField(choices=GTAX_TYPE, max_length=30,default='gst_registered',null=True,blank=True)
-
+    objects = ManufacturerManager()
 
     def __str__(self):
         return self.name
@@ -174,13 +183,21 @@ class Product(models.Model):
         ('quantity_wise', 'Quantity Wise'),
         ('batch_wise', 'Batch Wise')
     ]
+
     TAX_CHOICE = [
         ('excluded', 'Excluded'),
         ('included', 'Included')
     ]
+
+    UOM = [('centimeter', 'Centimeter'), ('gallon', 'Gallon'), ('liter', 'Liter'),
+           ('meter', 'Meter'), ('metric_ton', 'Metric Ton'), ('milligram', 'Milligram'),
+           ('pound', 'Pound')]
+
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     product_name = models.CharField(max_length=255, null=True, blank=True, unique=True)
     product_code = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    map_code = models.CharField(max_length=15, null=True, blank=True)
+    product_spec = models.CharField(max_length=50, null=True, blank=True)
     print_name = models.CharField(max_length=255, null=True, blank=True)
     contact = models.CharField(max_length=20, null=True, blank=True)
     manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE, related_name='product_manufacturer')
@@ -193,7 +210,9 @@ class Product(models.Model):
                               blank=True)
     last_accessed = models.DateTimeField(default=now, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-
+    unit_of_measurement = models.CharField(choices=UOM, max_length=30, null=True,blank=True)
+    selling_discount = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
+    hsn = models.CharField(max_length=15, null=True, blank=True)
     def __str__(self):
         return f"{self.product_name} ({self.product_code})"
 
@@ -271,7 +290,7 @@ class Receipt(models.Model):
     class Meta:
         db_table = 'Receipt'
 
-
+#store receipt product in the form of json in receipts
 class ReceiptProduct(models.Model):
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE, related_name='receipt_models')

@@ -4,73 +4,46 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9b1ddd95-aa22-4abd-a599-5b65f6a4926a" name="Changes" comment="...">
+    <list default="true" id="9b1ddd95-aa22-4abd-a599-5b65f6a4926a" name="Changes" comment="project updated.15/07/2024">
+      <change afterPath="$PROJECT_DIR$/apps/billing/migrations/0003_alter_manufacturer_postal_code_and_more.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/billing/migrations/0004_product_hsn_product_map_code_product_product_spec_and_more.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/templates/billing/dynamic_table.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/templates/billing/manufacturer.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/authentication/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/authentication/admin.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/authentication/config.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/authentication/django-dashboard-volt-1.0.4 - Shortcut.lnk" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/authentication/forms.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/authentication/migrations/0001_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/authentication/migrations/0002_alter_customuser_options_alter_customuser_table.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/authentication/migrations/0003_alter_customuser_table.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/authentication/migrations/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/authentication/models.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/authentication/tests.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/authentication/urls.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/authentication/views.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/form.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/form.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/management/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/management/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/management/commands/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/management/commands/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/management/commands/populate_manufacturers.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/management/commands/populate_manufacturers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/management/commands/populate_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/management/commands/populate_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0002_auto_20240624_1038.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0002_auto_20240624_1038.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0003_customer_product_contact_alter_manufacturer_hsn_code_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0003_customer_product_contact_alter_manufacturer_hsn_code_and_more.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0004_alter_receipt_net_amount.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0004_alter_receipt_net_amount.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0005_alter_receipt_receipt_status.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0005_alter_receipt_receipt_status.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0006_alter_receipt_receipt_status.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0006_alter_receipt_receipt_status.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0007_manufacturer_address_manufacturer_email_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0007_manufacturer_address_manufacturer_email_and_more.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0008_alter_manufacturer_address_alter_manufacturer_email_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0008_alter_manufacturer_address_alter_manufacturer_email_and_more.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0009_group_alter_manufacturer_options_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0009_group_alter_manufacturer_options_and_more.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0010_group_code_name_group_consolidation_code_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0010_group_code_name_group_consolidation_code_and_more.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0011_alter_product_buy_rate_alter_product_mrp_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0011_alter_product_buy_rate_alter_product_mrp_and_more.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0012_remove_manufacturer_hsn_code_alter_manufacturer_name_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0012_remove_manufacturer_hsn_code_alter_manufacturer_name_and_more.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0013_alter_product_group.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0013_alter_product_group.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0014_alter_manufacturer_options_alter_group_group_name.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0014_alter_manufacturer_options_alter_group_group_name.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0015_alter_customer_options_alter_group_options_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0015_alter_customer_options_alter_group_options_and_more.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0016_customer_product.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0016_customer_product.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0017_alter_customer_table_alter_group_table_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0017_alter_customer_table_alter_group_table_and_more.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0018_alter_customer_customer_name.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0018_alter_customer_customer_name.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0019_remove_customer_product.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0019_remove_customer_product.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0020_customer_created_at_customer_last_accessed_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0020_customer_created_at_customer_last_accessed_and_more.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0021_alter_customer_last_accessed_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0021_alter_customer_last_accessed_and_more.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0022_product_net_quantity_remove_receiptproduct_product_and_more.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0022_product_net_quantity_remove_receiptproduct_product_and_more.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0023_remove_receiptproduct_product_receiptproduct_product.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0023_remove_receiptproduct_product_receiptproduct_product.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0024_rename_group_productgroup.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0024_rename_group_productgroup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/0025_alter_productgroup_table.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/migrations/0025_alter_productgroup_table.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/migrations/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/services/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/services/decorators.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/decorators.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/services/dummy.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/dummy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/services/exceptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/exceptions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/services/factories.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/factories.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/services/resource_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/resource_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/services/search_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/search_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/tests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/home/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/templates/home/manufacturer.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/home/manufacturer.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/templates/home/master_extended.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/home/master_extended.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/templates/home/receipt.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/home/receipt.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/staticfiles/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/staticfiles/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/billing/form.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/form.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/billing/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/billing/services/dummy.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/dummy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/billing/services/resource_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/resource_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/billing/services/search_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/search_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/billing/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/common_pagination.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/common_pagination.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/common_search_template.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/common_search_template.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/components-buttons.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/components-buttons.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/components-forms.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/components-forms.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/components-modals.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/components-modals.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/components-notifications.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/components-notifications.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/components-typography.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/components-typography.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/customer.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/customer.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/dummy.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/dummy.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/group.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/group.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/manufacturer.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/master_extended.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/master_extended.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/page-403.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/page-403.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/page-404.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/page-404.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/page-500.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/page-500.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/page-forgot-password.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/page-forgot-password.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/page-lock.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/page-lock.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/page-reset-password.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/page-reset-password.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/page-sign-in.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/page-sign-in.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/page-sign-up.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/page-sign-up.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/products.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/products.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/receipt.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/receipt.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/settings.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/settings.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/tables-bootstrap-tables.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/tables-bootstrap-tables.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/target.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/target.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/home/transactions.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/transactions.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,8 +57,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JavaScript File" />
-        <option value="HTML File" />
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -378,7 +351,11 @@
       <workItem from="1721015370320" duration="2688000" />
       <workItem from="1721028998511" duration="938000" />
       <workItem from="1721033303192" duration="11000" />
-      <workItem from="1721034473967" duration="8453000" />
+      <workItem from="1721034473967" duration="10523000" />
+      <workItem from="1721101617365" duration="5505000" />
+      <workItem from="1721107740465" duration="8818000" />
+      <workItem from="1721120362681" duration="404000" />
+      <workItem from="1721120841678" duration="11436000" />
     </task>
     <task id="LOCAL-00001" summary="testing -- factory creation">
       <option name="closed" value="true" />
@@ -460,7 +437,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721017828061</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="project updated.15/07/2024">
+      <option name="closed" value="true" />
+      <created>1721043706081</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1721043706081</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -487,7 +472,8 @@
     <MESSAGE value="authentication" />
     <MESSAGE value="master optimisation" />
     <MESSAGE value="..." />
-    <option name="LAST_COMMIT_MESSAGE" value="..." />
+    <MESSAGE value="project updated.15/07/2024" />
+    <option name="LAST_COMMIT_MESSAGE" value="project updated.15/07/2024" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/django_dashboard_volt_1_0_4$dummy.coverage" NAME="dummy Coverage Results" MODIFIED="1719377292762" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/apps/home" />

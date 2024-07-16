@@ -1,0 +1,237 @@
+{% extends 'billing/master_extended.html' %}
+
+{% block master-view %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Product Code</th>
+                <th scope="col">Manufacturer</th>
+                <th scope="col">Buy Rate</th>
+                <th scope="col">Sell Rate</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for product in master_data %}
+                <tr id="row-{{ product.id }}">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td><a href="{% url update_url product.id %}">{{ product.product_name }}</a>
+                    </td>
+                    <td>{{ product.product_code }}</td>
+                    <td>{{ product.manufacturer__name }}</td>
+                    <td>{{ product.buy_rate }}</td>
+                    <td>{{ product.sell_rate }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block modal_display %}
+
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Product Code</th>
+                <th scope="col">Manufacturer</th>
+                <th scope="col">Buy Rate</th>
+                <th scope="col">Sell Rate</th>
+            </tr>
+            </thead>
+            <!-- Item -->
+            <tbody>
+            {% for product in master_data %}
+                <tr id="row-{{ product.id }}"
+                    onclick="selectMaster('{{ product.id }}')">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ product.product_name }}</td>
+                    <td>{{ product.product_code }}</td>
+                    <td>{{ product.manufacturer__name }}</td>
+                    <td>{{ product.buy_rate }}</td>
+                    <td>{{ product.sell_rate }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <!-- End of Item -->
+        </table>
+    </div>
+{% endblock %}
+{% block create_form %}
+
+    {% if flag == 'create' or flag == 'update' %}
+        <form method="post">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    <div class="d-flex justify-content-center">
+                        <div class="alert form-error-alert alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% for field in form %}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <div class="d-flex justify-content-center">
+                            <div class="alert form-error-alert alert-dismissible fade show" role="alert">
+                                <p><u><strong>{{ field.label }}:</strong></u> {{ error }}</p>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <label for="{{ form.manufacturer.id_for_label }}">{{ form.manufacturer.label }}</label>
+                        <select class="form-select" aria-label="Default select example"
+                                name="{{ form.manufacturer.name }}" required>
+                            {% for value, label in form.manufacturer.field.choices %}
+                                <option value="{{ value }}"
+                                        {% if form.manufacturer.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.product_name.id_for_label }}">Product Name</label>
+                        <input type="text" class="form-control" name="{{ form.product_name.name }}"
+                               value="{{ form.product_name.value|default_if_none:''}}"
+                               placeholder="Enter the product name" required>
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.product_code.id_for_label }}">Product Code</label>
+                        <input type="text" class="form-control" name="{{ form.product_code.name }}"
+                               value="{{ form.product_code.value|default_if_none:'' }}"
+                               placeholder="Enter the product code" required>
+                    </div>
+
+                    <div class="col">
+                        <label for="{{ form.print_name.id_for_label }}">Print Name</label>
+                        <input type="text" class="form-control" name="{{ form.print_name.name }}"
+                               value="{{ form.print_name.value|default_if_none:'' }}"
+                               placeholder="Enter the print name">
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col">
+                        <label for="{{ form.group.id_for_label }}">Group</label>
+                        <select class="form-select" aria-label="Default select example"
+                                name="{{ form.group.name }}" required>
+                            {% for value, label in form.group.field.choices %}
+                                <option value="{{ value }}"
+                                        {% if form.group.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.contact.id_for_label }}">Contact Number</label>
+                        <input type="text" class="form-control" name="{{ form.contact.name }}"
+                               value="{{ form.contact.value|default_if_none:'' }}"
+                               placeholder="Enter the contact number">
+                    </div>
+
+                    <div class="col">
+                        <label for="{{ form.buy_rate.id_for_label }}">Buy Price</label>
+                        <input type="number" step="0.01" class="form-control" name="{{ form.buy_rate.name }}"
+                               value="{{ form.buy_rate.value|default_if_none:'' }}"
+                               placeholder="Enter the buy rate" required>
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.sell_rate.id_for_label }}">Sell Price</label>
+                        <input type="number" step="0.01" class="form-control" name="{{ form.sell_rate.name }}"
+                               value="{{ form.sell_rate.value|default_if_none:'' }}"
+                               placeholder="Enter the sell rate" required>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col">
+                        <label for="{{ form.mrp.id_for_label }}">MRP</label>
+                        <input type="number" step="0.01" class="form-control" name="{{ form.mrp.name }}"
+                               value="{{ form.mrp.value|default_if_none:'' }}"
+                               placeholder="Enter the MRP" required>
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.selling_discount.id_for_label }}">Selling Discount</label>
+                        <input type="number" step="0.01" class="form-control" name="{{ form.selling_discount.name }}"
+                               value="{{ form.selling_discount.value|default_if_none:'' }}"
+                               placeholder="Enter the Selling Discount">
+                    </div>
+
+                    <div class="col">
+                        <label for="{{ form.product_spec.id_for_label }}">Product Spec</label>
+                        <input type="text" step="0.01" class="form-control" name="{{ form.product_spec.name }}"
+                               value="{{ form.product_spec.value|default_if_none:'' }}"
+                               placeholder="Enter the Product Specialisation">
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.unit_of_measurement.id_for_label }}">UOM</label>
+                        <select class="form-select" aria-label="Default select example"
+                                name="{{ form.unit_of_measurement.name }}">
+                            {% for value, label in form.unit_of_measurement.field.choices %}
+                                <option value="{{ value }}"
+                                        {% if form.unit_of_measurement.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label for="{{ form.map_code.id_for_label }}">Map Code</label>
+                        <input type="text" step="0.01" class="form-control" name="{{ form.map_code.name }}"
+                               value="{{ form.map_code.value|default_if_none:'' }}"
+                               placeholder="Enter the MAP Code">
+                    </div>
+
+                    <div class="col">
+                        <label for="{{ form.hsn.id_for_label }}">HSN Code</label>
+                        <input type="number" step="0.01" class="form-control" name="{{ form.hsn.name }}"
+                               value="{{ form.hsn.value|default_if_none:'' }}"
+                               placeholder="Enter the HSN Code">
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.stock_option.id_for_label }}">{{ form.stock_option.label }}</label>
+                        <select class="form-select" aria-label="Default select example"
+                                name="{{ form.stock_option.name }}">
+                            {% for value, label in form.stock_option.field.choices %}
+                                <option value="{{ value }}"
+                                        {% if form.stock_option.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row" style="justify-content: center;">
+                <div class="col-auto">
+                    <button class="btn btn-danger" type="submit" name="submit_record" id="form_submit">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </form>
+    {% endif %}
+
+
+{% endblock %}

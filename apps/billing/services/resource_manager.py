@@ -104,8 +104,8 @@ class SetupContext():
             create_url = f'create_{model_prefix}'
             update_url = f'update_{model_prefix}'
             delete_url = f'delete_{model_prefix}'
-            url_type = f'{model_prefix}_modal'
-            input_name = f'{model_prefix}_modal_details'
+            url_type = f'{model_prefix}_delete'
+            input_name = f'{model_prefix}_delete_details'
 
             context = self.get_common_context(url_type=url_type, flag=flag, label=label, modal_url=modal_url,
                                               view_url=view_url, create_url=create_url, delete_url=delete_url,

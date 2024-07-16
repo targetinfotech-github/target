@@ -8,7 +8,14 @@
             color: #007bff;
             text-decoration: none;
         }
+        .no-padding {
+            padding: 0 !important;
+        }
+        .row{
+            padding:0 !important;
+            padding-bottom:3vh !important;
 
+        }
         .selected-row {
             background-color: #d3d3d3;
         }
@@ -41,6 +48,12 @@
         #form_submit {
             display: block;
             margin-top: 1rem;
+        }
+
+        .form-error-alert {
+
+            background-color: #f2dede;
+            color: #a94442;
         }
 
         .text-error {
@@ -78,39 +91,68 @@
 {% load static %}
 {% load humanize %}
 {% block content %}
+    <h2 class="h4">{{ label }}</h2>
+    <div class="row">
+        <div class="col">
 
-    <div class="pb-4">
-        <h2 class="h4">{{ label }}</h2>
-        {% if flag == 'create' and master_data %}
-            <a href="{% url modal_url %}">
-                <button class="btn btn-tertiary" type="button">Update</button>
-            </a>
-            <a href="{% url view_url %}">
-                <button class="btn btn-success" type="button">View</button>
-            </a>
-            <a href="{% url delete_url %}">
-                <button class="btn btn-danger" type="button">Delete</button>
-            </a>
-        {% endif %}
-
-        {% if flag != 'create' %}
-            <a href="{% url create_url %}">
-                <button class="btn btn-info" type="button">Create</button>
-            </a>
-            {% if master_data %}
+            {% if flag == 'create' and master_data %}
                 <a href="{% url modal_url %}">
                     <button class="btn btn-tertiary" type="button">Update</button>
                 </a>
-                {% if flag != 'view' %}
-                    <a href="{% url view_url %}">
-                        <button class="btn btn-success" type="button">View</button>
-                    </a>
-                {% endif %}
+                <a href="{% url view_url %}">
+                    <button class="btn btn-success" type="button">View</button>
+                </a>
                 <a href="{% url delete_url %}">
                     <button class="btn btn-danger" type="button">Delete</button>
                 </a>
             {% endif %}
-        {% endif %}
+
+            {% if flag != 'create' %}
+                <a href="{% url create_url %}">
+                    <button class="btn btn-info" type="button">Create</button>
+                </a>
+                {% if master_data %}
+                    <a href="{% url modal_url %}">
+                        <button class="btn btn-tertiary" type="button">Update</button>
+                    </a>
+                    {% if flag != 'view' %}
+                        <a href="{% url view_url %}">
+                            <button class="btn btn-success" type="button">View</button>
+                        </a>
+                    {% endif %}
+                    <a href="{% url delete_url %}">
+                        <button class="btn btn-danger" type="button">Delete</button>
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="col">
+            {% if flag == 'view' and master_data %}
+
+                <div style="justify-content: end">
+                    <form method="get" action="{% url 'search_router' url_type %}">
+                        <div class="input-group input-group-merge search-bar pb-4">
+                            <a href="{% url view_url %}">
+                                <button type="button" class="btn-sm btn-warning">reset</button>
+                            </a>
+                            <input type="text" class="form-control" id="master_search" placeholder="Search"
+                                   aria-label="Search" aria-describedby="topbar-addon" style="max-width: 50%"
+                                   oninput="autocomplete_master()" name="{{ input_name }}" autocomplete="off"
+                                   value="{{ query }}">
+                            <button type="submit" class="input-group-text" id="topbar-addon">
+                                <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
+                                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                     aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                          d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                          clip-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
     </div>
     {% if messages %}
         {% for message in messages %}
@@ -124,28 +166,7 @@
         {% endfor %}
     {% endif %}
     {% if flag == 'view' and master_data %}
-        <div style="display: inline-flex">
-            <form method="get" action="{% url 'search_router' url_type %}">
-                <div class="input-group input-group-merge search-bar pb-4">
-                    <a href="{% url view_url %}">
-                        <button type="button" class="btn-sm btn-warning">reset</button>
-                    </a>
-                    <input type="text" class="form-control" id="master_search" placeholder="Search"
-                           aria-label="Search" aria-describedby="topbar-addon" style="max-width: 50%"
-                           oninput="autocomplete_master()" name="{{ input_name }}" autocomplete="off"
-                           value="{{ query }}">
-                    <button type="submit" class="input-group-text" id="topbar-addon">
-                        <svg class="icon icon-xs" x-description="Heroicon name: solid/search"
-                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                             aria-hidden="true">
-                            <path fill-rule="evenodd"
-                                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                                  clip-rule="evenodd"></path>
-                        </svg>
-                    </button>
-                </div>
-            </form>
-        </div>
+
         {#                {% include 'billing/common_search_template.html' with url_type='manufacturer' input_id='top_bar_InputIconLeft' input_name='manufacturer_details' query=query autocomplete_function='autocomplete_manufacturer' view_url='view_manufacturer' query=query %}#}
         {#            </div>#}
         <div class="card border-0 shadow mb-4">

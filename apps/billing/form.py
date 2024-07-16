@@ -1,7 +1,9 @@
 from datetime import datetime
-
+from django.utils.translation import gettext_lazy as _
 from django import forms
+import re
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
 
 from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser
 from django import forms
@@ -65,34 +67,49 @@ class SignUpForm(UserCreationForm):
 
 
 class ManufacturerForm(forms.ModelForm):
+    gstin=  forms.CharField(label='GSTIN',widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter GSTIN'}))
     class Meta:
         model = Manufacturer
         # fields = ['type','name', 'print_name', 'sh_name', 'contact','hsn_code','address','email']
-        fields = ['name', 'print_name', 'sh_name', 'type', 'address', 'email', 'contact']
+        fields = ['name', 'print_name', 'sh_name', 'type', 'address', 'email', 'contact','id_no','purchase_type',
+                  'tin','gtax_type','city','hsn','gstin','postal_code']
+
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the name'}),
             'print_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the print name'}),
             'sh_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
             'type': forms.Select(attrs={'class': 'form-control'}),
-            'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter the address', 'rows': 4}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter the address', 'rows': 3}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter the email'}),
             'contact': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the contact number'}),
+            'id_no': forms.Select(attrs={'class': 'form-control'}),
+            'purchase_type': forms.Select(attrs={'class': 'form-control'}),
+            'tin': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the TIN number'}),
+            'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the City'}),
+            'postal_code': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Postal Code'}),
+            'hsn': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter HSN Code'}),
+            'gtax_type': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['name'].required = True
         self.fields['sh_name'].required = True
+        self.fields['gstin'].required = False
+
+
+
+
 
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = ['manufacturer','product_name','product_code','print_name','contact',
-                  'buy_rate','sell_rate','mrp','stock_option','group']
+                  'buy_rate','sell_rate','mrp','stock_option','group','product_spec','map_code','selling_discount','hsn','unit_of_measurement']
 
-
+    # #
     # widgets = {
-    #     'manufacturer': forms.Select(attrs={'class': 'form-control'}),
+    #     'manufacturer': forms.Select(attrs={'class': 'form-select'}),
     #     'product_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the product name'}),
     #     'product_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the product code'}),
     #     'print_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the print name'}),
@@ -154,6 +171,7 @@ class GroupForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['group_name'].required = True
+
 
 
 

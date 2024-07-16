@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Input Table</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h2 class="mt-4">Add Multiple Tax Rows</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Tax Type ID</th>
+                <th scope="col">Description</th>
+                <th scope="col">SGST</th>
+                <th scope="col">CGST</th>
+                <th scope="col">IGST</th>
+            </tr>
+        </thead>
+        <tbody id="taxTableBody">
+            <tr>
+                <th scope="row">1</th>
+                <td><input type="number" class="form-control" name="tax_type_id[]" required></td>
+                <td><input type="text" class="form-control" name="description[]" required></td>
+                <td><input type="number" step="0.01" class="form-control" name="sgst[]" required></td>
+                <td><input type="number" step="0.01" class="form-control" name="cgst[]" required></td>
+                <td><input type="number" step="0.01" class="form-control" name="igst[]" required></td>
+            </tr>
+        </tbody>
+    </table>
+    <button type="button" class="btn btn-primary" onclick="addRow()">Add Row</button>
+    <button type="submit" class="btn btn-success">Submit</button>
+</div>
+
+<script>
+function addRow() {
+    const tableBody = document.getElementById('taxTableBody');
+    const rowCount = tableBody.rows.length + 1;
+    const newRow = document.createElement('tr');
+
+    newRow.innerHTML = `
+        <th scope="row">${rowCount}</th>
+        <td><input type="number" class="form-control" name="tax_type_id[]" required></td>
+        <td><input type="text" class="form-control" name="description[]" required></td>
+        <td><input type="number" step="0.01" class="form-control" name="sgst[]" required></td>
+        <td><input type="number" step="0.01" class="form-control" name="cgst[]" required></td>
+        <td><input type="number" step="0.01" class="form-control" name="igst[]" required></td>
+    `;
+
+    tableBody.appendChild(newRow);
+}
+</script>
+</body>
+</html>

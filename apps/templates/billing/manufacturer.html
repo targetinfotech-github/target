@@ -1,0 +1,174 @@
+{% extends 'billing/master_extended.html' %}
+
+
+{% block master-view %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Print Name</th>
+                <th scope="col">Short Name</th>
+                <th scope="col">Contact</th>
+            </tr>
+            </thead>
+            <!-- Item -->
+            <tbody>
+            {% for manufacturer in master_data %}
+                <tr id="row-{{ manufacturer.id }}">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>
+                        <a href="{% url update_url manufacturer.id %}">{{ manufacturer.name }}</a>
+                    </td>
+                    <td>{{ manufacturer.print_name }}</td>
+                    <td>{{ manufacturer.sh_name }}</td>
+                    <td>{{ manufacturer.contact }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <!-- End of Item -->
+        </table>
+    </div>
+{% endblock %}
+
+
+{% block modal_display %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">type</th>
+                <th scope="col">Name</th>
+                <th scope="col">Print Name</th>
+                <th scope="col">Sh Name</th>
+            </tr>
+            </thead>
+            <!-- Item -->
+            <tbody>
+
+            {% for manufacturer in master_data %}
+                <tr id="row-{{ manufacturer.id }}"
+                    onclick="selectMasterRemovable('{{ manufacturer.id }}','{% if manufacturer.product_count > 0 %}1{% else %}0{% endif %}')">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ manufacturer.type }}</td>
+                    <td>{{ manufacturer.name }}</td>
+                    <td>{{ manufacturer.print_name }}</td>
+                    <td>{{ manufacturer.sh_name }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <!-- End of Item -->
+        </table>
+    </div>
+{% endblock %}
+
+
+
+{% block create_form %}
+    {% if flag == 'create' or flag == 'update' %}
+        <form method="post">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    <div class="d-flex justify-content-center">
+                        <div class="alert form-error-alert alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% for field in form %}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                    <div class="d-flex justify-content-center">
+                        <div class="alert form-error-alert alert-dismissible fade show" role="alert">
+                            <p><u><strong>{{ field.label }}:</strong></u> {{ error }}</p>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <label for="{{ form.type.id_for_label }}">{{ form.type.label }}</label>
+                        {{ form.type }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.print_name.id_for_label }}">{{ form.print_name.label }}</label>
+                        {{ form.print_name }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}</label>
+                        {{ form.sh_name }}
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col">
+                        <label for="{{ form.contact.id_for_label }}">{{ form.contact.label }}</label>
+                        {{ form.contact }}
+                    </div>
+
+                    <div class="col">
+                        <label for="{{ form.purchase_type.id_for_label }}">{{ form.purchase_type.label }}</label>
+                        {{ form.purchase_type }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.id_no.id_for_label }}">{{ form.id_no.label }}</label>
+                        {{ form.id_no }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.tin.id_for_label }}">{{ form.tin.label }}</label>
+                        {{ form.tin }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="{{ form.gtax_type.id_for_label }}">{{ form.gtax_type.label }}</label>
+                        {{ form.gtax_type }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+                        {{ form.city }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.postal_code.id_for_label }}">{{ form.postal_code.label }}</label>
+                        {{ form.postal_code }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.gstin.id_for_label }}">{{ form.gstin.label }}</label>
+                        {{ form.gstin }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 col-sm-5 col-lg-3">
+                        <label for="{{ form.hsn.id_for_label }}">{{ form.hsn.label }}</label>
+                        {{ form.hsn }}
+                    </div>
+                    <div class="col-md-5 col-sm-6 col-lg-5">
+                        <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+                        {{ form.address }}
+                    </div>
+                </div>
+                <div class="row " style="justify-content: center;">
+                    <div class="col-auto">
+                        <button class="btn btn-danger" type="submit" name="submit_record" id="form_submit">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    {% endif %}
+{% endblock %}
