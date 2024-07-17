@@ -69,26 +69,31 @@
     {% if flag != 'view' and flag != 'modal' and flag != 'delete' %}
         <form method="post">
             {% csrf_token %}
-            <div class="form-errors">
-                {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {% for error in form.non_field_errors %}
-                            <p>{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
-            <div class="form-errors">
-                {% for field in form %}
-                    {% if field.errors %}
-                        <div class="alert alert-danger">
-                            {% for error in field.errors %}
-                                <p><strong>{{ field.label }}:</strong> {{ error }}</p>
-                            {% endfor %}
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    <div class="d-flex justify-content-center">
+                        <div class="alert form-error-alert alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
                         </div>
-                    {% endif %}
+                    </div>
                 {% endfor %}
-            </div>
+            {% endif %}
+            {% for field in form %}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <div class="d-flex justify-content-center">
+                            <div class="alert form-error-alert alert-dismissible fade show" role="alert">
+                                <p><u><strong>{{ field.label }}:</strong></u> {{ error }}</p>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
             {#            <div class="form-container">#}
             <div class="container">
                 <div class="row">
@@ -104,20 +109,69 @@
                         <label for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}</label>
                         {{ form.sh_name }}
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 col-sm-8 col-lg-6">
+                    <div class="col">
                         <label for="{{ form.contact.id_for_label }}">{{ form.contact.label }}</label>
                         {{ form.contact }}
                     </div>
-                    <div class="col-md-6 col-sm-8 col-lg-6">
+                </div>
+                <div class="row">
+                    <div class="col">
                         <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
                         {{ form.email }}
                     </div>
+                    <div class="col">
+                        <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+                        {{ form.city }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.postal_code.id_for_label }}">{{ form.postal_code.label }}</label>
+                        {{ form.postal_code }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.state_name.id_for_label }}">{{ form.state_name.label }}</label>
+                        {{ form.state_name }}
+                    </div>
                 </div>
                 <div class="row">
-
-                    <div class="col-md-6 col-sm-8 col-lg-6">
+                    <div class="col">
+                        <label for="{{ form.state.id_for_label }}">{{ form.state.label }}</label>
+                        <select class="form-select" aria-label="Default select example"
+                                name="{{ form.state.name }}" required>
+                            {% for value, label in form.state.field.choices %}
+                                <option value="{{ value }}"
+                                        {% if form.state.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.gstin.id_for_label }}">{{ form.gstin.label }}</label>
+                        {{ form.gstin }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.license1.id_for_label }}">{{ form.license1.label }}</label>
+                        {{ form.license1 }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.license2.id_for_label }}">{{ form.license2.label }}</label>
+                        {{ form.license2 }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="{{ form.sale_type.id_for_label }}">{{ form.sale_type.label }}</label>
+                        {{ form.sale_type }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.id_no.id_for_label }}">{{ form.id_no.label }}</label>
+                        {{ form.id_no }}
+                    </div>
+                    <div class="col">
+                        <label for="{{ form.billing_stat.id_for_label }}">{{ form.billing_stat.label }}</label>
+                        {{ form.billing_stat }}
+                    </div>
+                    <div class="col">
                         <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
                         {{ form.address }}
                     </div>

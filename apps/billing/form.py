@@ -135,7 +135,8 @@ class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
         # fields = ['type','name', 'print_name', 'sh_name', 'contact','hsn_code','address','email']
-        fields = ['customer_name', 'print_name', 'sh_name', 'address', 'email', 'contact']
+        fields = ['customer_name', 'print_name', 'sh_name', 'address', 'email', 'contact','city','postal_code',
+                  'state_name','state','sale_type','id_no','gstin','license1','license2','billing_stat']
         widgets = {
             'customer_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the name'}),
             'print_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the print name'}),
@@ -143,6 +144,16 @@ class CustomerForm(forms.ModelForm):
             'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter the address', 'rows': 4}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter the email'}),
             'contact': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the contact number'}),
+            'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the City'}),
+            'postal_code': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Postal Code'}),
+            'state_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the State Name'}),
+            'gstin': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the GSTIN'}),
+            'license1': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter License1'}),
+            'license2': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter License2'}),
+            'state': forms.Select(attrs={'class': 'form-control'}),
+            'sale_type': forms.Select(attrs={'class': 'form-control'}),
+            'id_no': forms.Select(attrs={'class': 'form-control'}),
+            'billing_stat': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):

@@ -226,6 +226,30 @@ class Product(models.Model):
 
 
 class Customer(models.Model):
+
+    STATE_LIST = [('within_state','Within State'),
+                  ('outside_state','Outside State'),
+                  ('sale_nil_gst','Sale(NIL GST)')]
+
+    SALE_TYPE = [('cash','Cash'),
+                 ('credit','Credit'),
+                 ('cheque','Cheque'),
+                 ('sign_bill','Sign Bill'),
+                 ('bank','Bank'),
+                 ('direct','Direct'),
+                 ('adv_payment','Adv.Pymt')]
+
+    ID_NO = [('cash_paid_to', 'Cash Paid To'),
+             ('cash_received_from', 'Cash Received From'),
+             ('salary_for_the_month', 'Salary For The Month'),
+             ('sale_of_floppy_disks', 'Sale of Floppy Disks'),
+             ('sale_of_keyboards', 'Sale of Keyboards'),
+             ('tour_bills_paid_to', 'Tour Bills Paid To'),
+             ('transfer_from_bank', 'Transfer From Bank')]
+
+    BILLING_STAT = [('active','Active'),
+                    ('on_approval','On Approval'),
+                    ('suspended','Suspended')]
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     customer_name = models.CharField(unique=True, max_length=30, null=True, blank=True)
     print_name = models.CharField(max_length=30, null=True, blank=True)
@@ -235,6 +259,17 @@ class Customer(models.Model):
     email = models.EmailField(null=True, blank=True)
     last_accessed = models.DateTimeField(default=now, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    city = models.CharField(max_length=50, null=True, blank=True)
+    postal_code = models.PositiveIntegerField(null=True, blank=True)
+    state_name = models.CharField(max_length=50, null=True, blank=True)
+    state = models.CharField(choices=STATE_LIST,max_length=50, null=True, blank=True)
+    sale_type = models.CharField(choices=SALE_TYPE,max_length=50, null=True, blank=True)
+    id_no = models.CharField(choices=ID_NO, max_length=30,null=True,blank=True)
+    gstin = models.CharField(max_length=15, validators=[validate_gstin],null=True,blank=True)
+    license1 = models.CharField(max_length=15, null=True,blank=True)
+    license2 = models.CharField(max_length=15, null=True,blank=True)
+    billing_stat = models.CharField(choices=BILLING_STAT,max_length=15, null=True,blank=True)
+
 
     def __str__(self):
         return f"{self.customer_name}_({self.id})"
