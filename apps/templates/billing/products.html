@@ -95,7 +95,7 @@
                 <div class="row">
                     <div class="col">
                         <label for="{{ form.manufacturer.id_for_label }}">{{ form.manufacturer.label }}</label>
-                        <select class="form-select" aria-label="Default select example"
+                        <select class="form-control" aria-label="Default select example"
                                 name="{{ form.manufacturer.name }}" required>
                             {% for value, label in form.manufacturer.field.choices %}
                                 <option value="{{ value }}"
@@ -129,7 +129,7 @@
 
                     <div class="col">
                         <label for="{{ form.group.id_for_label }}">Group</label>
-                        <select class="form-select" aria-label="Default select example"
+                        <select class="form-control" aria-label="Default select example"
                                 name="{{ form.group.name }}" required>
                             {% for value, label in form.group.field.choices %}
                                 <option value="{{ value }}"
@@ -182,15 +182,9 @@
                     </div>
                     <div class="col">
                         <label for="{{ form.unit_of_measurement.id_for_label }}">UOM</label>
-                        <select class="form-select" aria-label="Default select example"
-                                name="{{ form.unit_of_measurement.name }}">
-                            {% for value, label in form.unit_of_measurement.field.choices %}
-                                <option value="{{ value }}"
-                                        {% if form.unit_of_measurement.value == value %}selected{% endif %}>
-                                    {{ label }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                        <input type="text" step="0.01" class="form-control" name="{{ form.unit_of_measurement.name }}"
+                               value="{{ form.unit_of_measurement.value|default_if_none:'' }}"
+                               placeholder="Enter the Unit Of Measurement">
                     </div>
                 </div>
 
@@ -208,17 +202,11 @@
                                value="{{ form.hsn.value|default_if_none:'' }}"
                                placeholder="Enter the HSN Code">
                     </div>
-                    <div class="col">
-                        <label for="{{ form.stock_option.id_for_label }}">{{ form.stock_option.label }}</label>
-                        <select class="form-select" aria-label="Default select example"
-                                name="{{ form.stock_option.name }}">
-                            {% for value, label in form.stock_option.field.choices %}
-                                <option value="{{ value }}"
-                                        {% if form.stock_option.value == value %}selected{% endif %}>
-                                    {{ label }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                <div class="col">
+                        <label for="{{ form.stock_option.id_for_label }}">Stock Option</label>
+                        <input type="text" step="0.01" class="form-control" name="{{ form.stock_option.name }}"
+                               value="{{ form.stock_option.value|default_if_none:'' }}"
+                               placeholder="Enter the Unit Of Measurement">
                     </div>
                 </div>
 

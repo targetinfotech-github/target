@@ -1,240 +1,268 @@
-{% extends "layouts/base.html" %}
+{% extends 'billing/master_extended.html' %}
 
-{% block title %} Dashboard {% endblock %}
-
-<!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}
-    <style>
-        table a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .selected-row {
-            background-color: #d3d3d3;
-        }
-
-        .invalid-feedback {
-            color: red;
-            font-size: 0.875em;
-            display: block;
-        }
-
-        .row {
-            padding: 20px;
-        }
-
-        .form-errors .alert {
-            color: #fff;
-            background-color: #dc3545;
-            border-color: #dc3545;
-            padding: 0.75rem 1.25rem;
-            margin-bottom: 1rem;
-        }
-
-        .form-errors .alert p {
-            margin: 0;
-            padding: 0;
-            font-size: 0.875em;
-        }
+{% block master-view %}
 
 
-        #form_submit {
-            display: block;
-            margin-top: 1rem;
-        }
-
-    </style>
-{% endblock stylesheets %}
-
-{% block content %}
-    {% load static %}
-    <div class="pb-4">
-        <h1>{{ label }}</h1>
-
-        {% if flag == 'create' %}
-            <a href="{% url 'get_group_modal' %}">
-                <button class="btn btn-tertiary" type="button">Update</button>
-            </a>
-            <a href="{% url 'view_group' %}">
-                <button class="btn btn-success" type="button">View</button>
-            </a>
-        {% endif %}
-
-        {% if flag != 'create' %}
-            <a href="{% url 'create_group' %}">
-
-                <button class="btn btn-info" type="button">Create</button>
-            </a>
-            <a href="{% url 'get_group_modal' %}">
-                <button class="btn btn-tertiary" type="button">Update</button>
-            </a>
-            {% if flag != 'view' %}
-                <a href="{% url 'view_group' %}">
-                    <button class="btn btn-success" type="button">View</button>
-                </a>
-            {% endif %}
-        {% endif %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Print Name</th>
+                <th scope="col">Short Name</th>
+                <th scope="col">Contact</th>
+                <th scope="col">Email</th>
+            </tr>
+            </thead>
+            <!-- Item -->
+            <tbody>
+            {% for customer in master_data %}
+                <tr id="row-{{ customer.id }}">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>
+                        <a href="{% url update_url customer.id %}">{{ customer.customer_name }}</a>
+                    </td>
+                    <td>{{ customer.print_name }}</td>
+                    <td>{{ customer.sh_name }}</td>
+                    <td>{{ customer.contact }}</td>
+                    <td>{{ customer.email }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <!-- End of Item -->
+        </table>
     </div>
-    {% if flag == 'modal' %}
-        <form method="post" action="{% url 'get_group_modal' %}">
-            {% csrf_token %}
+{% endblock %}
+{% block modal_display %}
 
-            <!-- Modal -->
-            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLongTitle">Select Group</h5>
-                        </div>
-                        <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
-                            <div class="table-responsive">
-                                <table class="table table-centered table-nowrap mb-0 rounded">
-                                    <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">Group Id</th>
-                                        <th scope="col">Group Name</th>
-                                        <th scope="col">Print Name</th>
-                                        <th scope="col">Sh Name</th>
-                                        <th scope="col">HSN Code</th>
-                                    </tr>
-                                    </thead>
-                                    <!-- Item -->
-                                    <tbody>
-                                    {% for group in group_data %}
-                                        <tr id="row-{{ group.id }}"
-                                        onclick="selectGroup('{{ group.id }}','{{ group.product_group }}')">
-                                            <th scope="row">{{ forloop.counter }}</th>
-                                            <td>{{ group.group_id }}</td>
-                                            <td>{{ group.group_name }}</td>
-                                            <td>{{ group.print_name }}</td>
-                                            <td>{{ group.sh_name }}</td>
-                                            <td>{{ group.hsn_code }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                    </tbody>
-                                    <!-- End of Item -->
-                                </table>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <a href="{% url 'create_group' %}">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            </a>
-                            <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
-                                    name="submit_selected_record" value="" style="display: flex">Update
-                            </button>
-                            <button type="submit" class="btn btn-danger" id="delete_selected_record"
-                                    name="delete_selected_record" value="" style="display: flex">Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-    {% endif %}
-    {% if flag == 'view' %}
-        <div class="card border-0 shadow mb-4">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-centered table-nowrap mb-0 rounded">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Group Id</th>
-                            <th scope="col">Group Name</th>
-                            <th scope="col">Print Name</th>
-                            <th scope="col">Sh Name</th>
-                            <th scope="col">HSN Code</th>
-                        </tr>
-                        </thead>
-                        <!-- Item -->
-                        <tbody>
-                        {% for group in group_data %}
-                            <tr id="row-{{ group.id }}">
-                                <th scope="row">{{ forloop.counter }}</th>
-                                <td>{{ group.group_id }}</td>
-                                <td><a href="#">{{ group.group_name }}</a></td>
-                                <td>{{ group.print_name }}</td>
-                                <td>{{ group.sh_name }}</td>
-                                <td>{{ group.hsn_code }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                        <!-- End of Item -->
-                    </table>
-                </div>
-            </div>
-        </div>
-    {% elif flag == 'create' %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Print Name</th>
+                <th scope="col">Sh Name</th>
+                <th scope="col">Email</th>
+            </tr>
+            </thead>
+            <!-- Item -->
+            <tbody>
+            {% for customer in master_data %}
+                <tr id="row-{{ customer.id }}"
+                    onclick="selectMaster('{{ customer.id }}')">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ customer.customer_name }}</td>
+                    <td>{{ customer.print_name }}</td>
+                    <td>{{ customer.sh_name }}</td>
+                    <td>{{ customer.email }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <!-- End of Item -->
+        </table>
+    </div>
+{% endblock %}
+{% block create_form %}
+
+    {% if flag != 'view' and flag != 'modal' and flag != 'delete' %}
         <form method="post">
             {% csrf_token %}
-            <div class="mb-4">
-                <div class="form-errors">
-                    {% if form.non_field_errors %}
-                        <div class="alert alert-danger">
-                            {% for error in form.non_field_errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                    <div class="d-flex justify-content-center">
+                        <div class="alert form-error-alert alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
                         </div>
-                    {% endif %}
-                </div>
-                <div class="form-errors">
-                    {% for field in form %}
-                        {% if field.errors %}
-                            <div class="alert alert-danger">
-                                {% for error in field.errors %}
-                                    <p><strong>{{ field.label }}:</strong> {{ error }}</p>
-                                {% endfor %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% for field in form %}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <div class="d-flex justify-content-center">
+                            <div class="alert form-error-alert alert-dismissible fade show" role="alert">
+                                <p><u><strong>{{ field.label }}:</strong></u> {{ error }}</p>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
                             </div>
-                        {% endif %}
+                        </div>
                     {% endfor %}
+                {% endif %}
+            {% endfor %}
+            {#            <div class="form-container">#}
+            <div class="container">
+                <div class="row d-inline-flex">
+                    <div class="col">
+                        <label class="form-label"
+                               for="{{ form.customer_name.id_for_label }}">{{ form.customer_name.label }}</label>
+                        {{ form.customer_name }}
+                    </div>
+                    <div class="col">
+                        <label class="form-label"
+                               for="{{ form.print_name.id_for_label }}">{{ form.print_name.label }}</label>
+                        {{ form.print_name }}
+                    </div>
+                    <div class="col">
+                        <label class="form-label" for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}</label>
+                        {{ form.sh_name }}
+                    </div>
+                    <div class="col">
+                        <label class="form-label" for="{{ form.contact.id_for_label }}">{{ form.contact.label }}</label>
+                        {{ form.contact }}
+                    </div>
                 </div>
-                {#            <div class="form-container">#}
-                <div class="container">
-                    <div class="row">
-                        <div class="col">
-                            <label for="{{ form.group_id.id_for_label }}">{{ form.group_id.label }}</label>
-                            {{ form.group_id }}
-                        </div>
-                        <div class="col">
-                            <label for="{{ form.group_name.id_for_label }}">{{ form.group_name.label }}</label>
-                            {{ form.group_name }}
-                        </div>
-                        <div class="col">
-                            <label for="{{ form.print_name.id_for_label }}">{{ form.print_name.label }}</label>
-                            {{ form.print_name }}
-                        </div>
-                    </div>
-                    <div class="row">
 
-                        <div class="col">
-                            <label for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}</label>
-                            {{ form.sh_name }}
+                <hr class="basic-line mb-2">
+
+
+                <div class="row">
+                    <div class="col-md-6 col-lg-6 col-sm-8" style="display: flex;flex-direction: column">
+                        <div class="row">
+                            <div class="form-element">
+                                <label class="form-label" style="padding-right: 18px"
+                                       for="{{ form.address.id_for_label }}">{{ form.address.label }}:</label>
+                                {{ form.address }}
+                            </div>
                         </div>
-                        <div class="col">
-                            <label for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}</label>
-                            {{ form.sh_name }}
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right:40px"
+                                           for="{{ form.city.id_for_label }}">{{ form.city.label }}:</label>
+                                    {{ form.city }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right: 2px"
+                                           for="{{ form.postal_code.id_for_label }}">{{ form.postal_code.label }}:</label>
+                                    {{ form.postal_code }}
+                                </div>
+                            </div>
                         </div>
-                        <div class="col">
-                            <label for="{{ form.code_name.id_for_label }}">{{ form.code_name.label }}</label>
-                            {{ form.code_name }}
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.state_name.id_for_label }}">{{ form.state_name.label }}:</label>
+                                    {{ form.state_name }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-left:40px "
+                                           for="{{ form.state.id_for_label }}">{{ form.state.label }}:</label>
+                                    {{ form.state }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col" style="padding-bottom: 0">
+                                <div class="form-element mb-0">
+                                    <label class="form-label" style="padding-right: 32px"
+                                           for="{{ form.email.id_for_label }}">{{ form.email.label }}:</label>
+                                    {{ form.email }}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col">
-                            <label for="{{ form.consolidation_code.id_for_label }}">{{ form.consolidation_code.label }}</label>
-                            {{ form.consolidation_code }}
+
+                    <div class="col-md-6 col-lg-6 col-sm-8 border-left" style="display: flex;flex-direction: column">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right: 0.9vw"
+                                           for="{{ form.telephone.id_for_label }}">{{ form.telephone.label }}:</label>
+                                    <span class="form-items">
+                                    {{ form.telephone }}
+                                        </span>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-left: 1vw"
+                                           for="{{ form.mobile_number.id_for_label }}">{{ form.mobile_number.label }}:</label>
+
+                                    {{ form.mobile_number }}
+                                </div>
+                            </div>
                         </div>
-                        <div class="col">
-                            <label for="{{ form.hsn_code.id_for_label }}">{{ form.hsn_code.label }}</label>
-                            {{ form.hsn_code }}
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right: 0.2vw"
+                                           for="{{ form.id_no.id_for_label }}">{{ form.id_no.label }}:</label>
+
+                                    {{ form.id_no }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.sale_type.id_for_label }}">{{ form.sale_type.label }}:</label>
+                                    {{ form.sale_type }}
+                                </div>
+                            </div>
                         </div>
-                        <div class="col">
-                            <label for="{{ form.gcr_code.id_for_label }}">{{ form.gcr_code.label }}</label>
-                            {{ form.gcr_code }}
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right: 0.6vw"
+                                           for="{{ form.customer_representative.id_for_label }}">{{ form.customer_representative.label }}:</label>
+                                    {{ form.customer_representative }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right: 0.3vw"
+                                           for="{{ form.area.id_for_label }}">{{ form.area.label }}:</label>
+                                    {{ form.area }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="basic-line mb-2">
+                <div class="row">
+                    <div class="col-md-6 col-lg-6 col-sm-8" style="display: flex;flex-direction: column">
+                        <div class="form-group">
+
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-6 col-sm-8 border-left" style="display: flex;flex-direction: column">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right: 15px"
+                                           for="{{ form.gstin.id_for_label }}">{{ form.gstin.label }}:</label>
+                                    {{ form.gstin }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.license1.id_for_label }}">{{ form.license1.label }}:</label>
+                                    {{ form.license1 }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.license2.id_for_label }}">{{ form.license2.label }}:</label>
+                                    {{ form.license2 }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -249,8 +277,3 @@
         </form>
     {% endif %}
 {% endblock %}
-
-{% block javascripts %}
-    <script src="{% static 'assets/js/master.js' %}"></script>
-
-{% endblock javascripts %}

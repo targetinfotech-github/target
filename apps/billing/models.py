@@ -127,7 +127,7 @@ class Manufacturer(models.Model):
         ('supplier', 'Supplier'),
     ]
 
-    ID_NO = [('cash_paid_to','Cash Paid To'),
+    NARRATION = [('cash_paid_to','Cash Paid To'),
              ('cash_received_from','Cash Received From'),
              ('salary_for_the_month','Salary For The Month'),
              ('sale_of_floppy_disks','Sale of Floppy Disks'),
@@ -158,7 +158,7 @@ class Manufacturer(models.Model):
     contact = models.CharField(max_length=20, null=True, blank=True)
     last_accessed = models.DateTimeField(default=now, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    id_no = models.CharField(choices=ID_NO, max_length=30,null=True,blank=True)
+    id_no = models.CharField(max_length=30,null=True,blank=True)
     purchase_type = models.CharField(choices=PURCHASE_TYPE, max_length=30,null=True,blank=True)
     tin = models.CharField(max_length=15,null=True,blank=True)
     gtax_type = models.CharField(choices=GTAX_TYPE, max_length=30,default='gst_registered',null=True,blank=True)
@@ -213,6 +213,7 @@ class Product(models.Model):
     unit_of_measurement = models.CharField(choices=UOM, max_length=30, null=True,blank=True)
     selling_discount = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
     hsn = models.CharField(max_length=15, null=True, blank=True)
+
     def __str__(self):
         return f"{self.product_name} ({self.product_code})"
 
@@ -239,7 +240,7 @@ class Customer(models.Model):
                  ('direct','Direct'),
                  ('adv_payment','Adv.Pymt')]
 
-    ID_NO = [('cash_paid_to', 'Cash Paid To'),
+    NARRATION = [('cash_paid_to', 'Cash Paid To'),
              ('cash_received_from', 'Cash Received From'),
              ('salary_for_the_month', 'Salary For The Month'),
              ('sale_of_floppy_disks', 'Sale of Floppy Disks'),
@@ -250,11 +251,12 @@ class Customer(models.Model):
     BILLING_STAT = [('active','Active'),
                     ('on_approval','On Approval'),
                     ('suspended','Suspended')]
+
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     customer_name = models.CharField(unique=True, max_length=30, null=True, blank=True)
     print_name = models.CharField(max_length=30, null=True, blank=True)
     sh_name = models.CharField(max_length=30, null=True, blank=True)
-    contact = models.CharField(max_length=20, null=True, blank=True)
+    contact = models.CharField(max_length=15, null=True, blank=True)
     address = models.TextField(max_length=255, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     last_accessed = models.DateTimeField(default=now, null=True, blank=True)
@@ -264,12 +266,18 @@ class Customer(models.Model):
     state_name = models.CharField(max_length=50, null=True, blank=True)
     state = models.CharField(choices=STATE_LIST,max_length=50, null=True, blank=True)
     sale_type = models.CharField(choices=SALE_TYPE,max_length=50, null=True, blank=True)
-    id_no = models.CharField(choices=ID_NO, max_length=30,null=True,blank=True)
-    gstin = models.CharField(max_length=15, validators=[validate_gstin],null=True,blank=True)
+    id_no = models.CharField(max_length=30,null=True,blank=True)
+    gstin = models.CharField(max_length=15, validators=[validate_gstin],null=True,blank=True,verbose_name='GSTIN')
     license1 = models.CharField(max_length=15, null=True,blank=True)
     license2 = models.CharField(max_length=15, null=True,blank=True)
     billing_stat = models.CharField(choices=BILLING_STAT,max_length=15, null=True,blank=True)
-
+    telephone = models.CharField(max_length=15, null=True, blank=True)
+    mobile_number = models.CharField(max_length=15, null=True, blank=True,verbose_name='Mb No')
+    area = models.CharField(max_length=15, null=True, blank=True,verbose_name='Area') #not a charfield, change later
+    customer_representative = models.CharField(max_length=15, null=True, blank=True,verbose_name='Representative') #not a charfield, change later
+    tin = models.CharField(max_length=15, null=True, blank=True,verbose_name='TIn')
+    cst = models.CharField(max_length=15, null=True, blank=True,verbose_name='CST')
+    carrier = models.CharField(max_length=15, null=True, blank=True,verbose_name='Carrier')
 
     def __str__(self):
         return f"{self.customer_name}_({self.id})"

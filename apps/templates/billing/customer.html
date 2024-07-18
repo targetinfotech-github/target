@@ -96,84 +96,174 @@
             {% endfor %}
             {#            <div class="form-container">#}
             <div class="container">
-                <div class="row">
+                <div class="row d-inline-flex">
                     <div class="col">
-                        <label for="{{ form.customer_name.id_for_label }}">{{ form.customer_name.label }}</label>
+                        <label class="form-label"
+                               for="{{ form.customer_name.id_for_label }}">{{ form.customer_name.label }}</label>
                         {{ form.customer_name }}
                     </div>
                     <div class="col">
-                        <label for="{{ form.print_name.id_for_label }}">{{ form.print_name.label }}</label>
+                        <label class="form-label"
+                               for="{{ form.print_name.id_for_label }}">{{ form.print_name.label }}</label>
                         {{ form.print_name }}
                     </div>
                     <div class="col">
-                        <label for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}</label>
+                        <label class="form-label" for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}</label>
                         {{ form.sh_name }}
                     </div>
                     <div class="col">
-                        <label for="{{ form.contact.id_for_label }}">{{ form.contact.label }}</label>
+                        <label class="form-label" for="{{ form.contact.id_for_label }}">{{ form.contact.label }}</label>
                         {{ form.contact }}
                     </div>
                 </div>
+
+                <hr class="basic-line mb-2">
+
+
                 <div class="row">
-                    <div class="col">
-                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
-                        {{ form.email }}
+                    <div class="col-md-6 col-lg-6 col-sm-8" style="display: flex;flex-direction: column">
+                        <div class="row">
+                            <div class="form-element">
+                                <label class="form-label" style="padding-right: 18px"
+                                       for="{{ form.address.id_for_label }}">{{ form.address.label }}:</label>
+                                {{ form.address }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right:40px"
+                                           for="{{ form.city.id_for_label }}">{{ form.city.label }}:</label>
+                                    {{ form.city }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right: 2px"
+                                           for="{{ form.postal_code.id_for_label }}">{{ form.postal_code.label }}:</label>
+                                    {{ form.postal_code }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.state_name.id_for_label }}">{{ form.state_name.label }}:</label>
+                                    {{ form.state_name }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-left:40px "
+                                           for="{{ form.state.id_for_label }}">{{ form.state.label }}:</label>
+                                    {{ form.state }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col" style="padding-bottom: 0">
+                                <div class="form-element mb-0">
+                                    <label class="form-label" style="padding-right: 32px"
+                                           for="{{ form.email.id_for_label }}">{{ form.email.label }}:</label>
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col">
-                        <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
-                        {{ form.city }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.postal_code.id_for_label }}">{{ form.postal_code.label }}</label>
-                        {{ form.postal_code }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.state_name.id_for_label }}">{{ form.state_name.label }}</label>
-                        {{ form.state_name }}
+
+                    <div class="col-md-6 col-lg-6 col-sm-8 border-left" style="display: flex;flex-direction: column">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right: 0.9vw"
+                                           for="{{ form.telephone.id_for_label }}">{{ form.telephone.label }}:</label>
+                                    <span class="form-items">
+                                    {{ form.telephone }}
+                                        </span>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-left: 1vw"
+                                           for="{{ form.mobile_number.id_for_label }}">{{ form.mobile_number.label }}:</label>
+
+                                    {{ form.mobile_number }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right: 0.2vw"
+                                           for="{{ form.id_no.id_for_label }}">{{ form.id_no.label }}:</label>
+
+                                    {{ form.id_no }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.sale_type.id_for_label }}">{{ form.sale_type.label }}:</label>
+                                    {{ form.sale_type }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right: 0.6vw"
+                                           for="{{ form.customer_representative.id_for_label }}">{{ form.customer_representative.label }}:</label>
+                                    {{ form.customer_representative }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right: 0.3vw"
+                                           for="{{ form.area.id_for_label }}">{{ form.area.label }}:</label>
+                                    {{ form.area }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <hr class="basic-line mb-2">
                 <div class="row">
-                    <div class="col">
-                        <label for="{{ form.state.id_for_label }}">{{ form.state.label }}</label>
-                        <select class="form-select" aria-label="Default select example"
-                                name="{{ form.state.name }}" required>
-                            {% for value, label in form.state.field.choices %}
-                                <option value="{{ value }}"
-                                        {% if form.state.value == value %}selected{% endif %}>
-                                    {{ label }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                    <div class="col-md-6 col-lg-6 col-sm-8" style="display: flex;flex-direction: column">
+                        <div class="form-group">
+
+                        </div>
                     </div>
-                    <div class="col">
-                        <label for="{{ form.gstin.id_for_label }}">{{ form.gstin.label }}</label>
-                        {{ form.gstin }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.license1.id_for_label }}">{{ form.license1.label }}</label>
-                        {{ form.license1 }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.license2.id_for_label }}">{{ form.license2.label }}</label>
-                        {{ form.license2 }}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <label for="{{ form.sale_type.id_for_label }}">{{ form.sale_type.label }}</label>
-                        {{ form.sale_type }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.id_no.id_for_label }}">{{ form.id_no.label }}</label>
-                        {{ form.id_no }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.billing_stat.id_for_label }}">{{ form.billing_stat.label }}</label>
-                        {{ form.billing_stat }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
-                        {{ form.address }}
+                    <div class="col-md-6 col-lg-6 col-sm-8 border-left" style="display: flex;flex-direction: column">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="padding-right: 15px"
+                                           for="{{ form.gstin.id_for_label }}">{{ form.gstin.label }}:</label>
+                                    {{ form.gstin }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.license1.id_for_label }}">{{ form.license1.label }}:</label>
+                                    {{ form.license1 }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.license2.id_for_label }}">{{ form.license2.label }}:</label>
+                                    {{ form.license2 }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
