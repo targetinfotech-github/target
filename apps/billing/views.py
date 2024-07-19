@@ -159,7 +159,7 @@ def create_manufacturer(request):
             except Exception as e:
                 if not Manufacturer.objects.filter(name__exact=name).exists():
                     print(e)
-                    messages.error((request,f'Exception submit the form again.'))
+                    messages.error(request,f'Exception submit the form again.')
                     return redirect('create_manufacturer')
             return redirect('create_manufacturer')
 
@@ -189,18 +189,19 @@ def get_manufacturer_modal(request):
     query = ''
     manufacturer_data = Manufacturer.objects.annotate(
         product_count=Count('product_manufacturer')
-    ).values(
-        'id', 'name', 'type', 'sh_name', 'print_name', 'product_count'
-    ).order_by('name')
+    ).values('id', 'name', 'type', 'sh_name', 'print_name', 'product_count').order_by('name')
 
     if request.method == 'POST':
         if 'submit_selected_record' in request.POST:
             id = request.POST['submit_selected_record']
             return redirect('update_manufacturer', int(id))
-        # elif 'delete_selected_record' in request.POST:
-        #     id = request.POST['delete_selected_record']
-        #     return redirect('delete_manufacturer', int(id))
+        elif 'delete_selected_record' in request.POST:
+            id = request.POST['delete_selected_record']
+            model = Manufacturer.objects.get(id=id)
+            delete_models(request, model, name=model.name)
+            return redirect('create_manufacturer')
         else:
+            messages.info(request, 'No operation performed.')
             return redirect('create_manufacturer')
     page_obj = pagination(request, manufacturer_data)
     context_obj = SetupContext(model_search='manufacturer_modal', page_obj=page_obj,operation='modal')
@@ -341,7 +342,13 @@ def get_product_modal(request):
             if 'submit_selected_record' in request.POST:
                 id = request.POST['submit_selected_record']
                 return redirect('update_product', int(id))
+            elif 'delete_selected_record' in request.POST:
+                id = request.POST['delete_selected_record']
+                model = Product.objects.get(id=id)
+                delete_models(request, model, name=model.product_name)
+                return redirect('create_product')
             else:
+                messages.info(request, 'No operation performed.')
                 return redirect('create_product')
         page_obj = pagination(request, product_data)
         context_obj = SetupContext(model_search='product_model', page_obj=page_obj, operation='modal')
@@ -586,7 +593,13 @@ def get_group_modal(request):
             if 'submit_selected_record' in request.POST:
                 id = request.POST['submit_selected_record']
                 return redirect('update_group', int(id))
+            elif 'delete_selected_record' in request.POST:
+                id = request.POST['delete_selected_record']
+                model = ProductGroup.objects.get(id=id)
+                delete_models(request, model, name=model.group_name)
+                return redirect('create_group')
             else:
+                messages.info(request,'No operation performed.')
                 return redirect('create_group')
         page_obj = pagination(request, group_data)
         context_obj = SetupContext(model_search='group', page_obj=page_obj, operation='modal')
@@ -694,7 +707,13 @@ def get_customer_modal(request):
             id = request.POST['submit_selected_record']
             print(id)
             return redirect('update_customer', int(id))
+        elif 'delete_selected_record' in request.POST:
+            id = request.POST['delete_selected_record']
+            model = Customer.objects.get(id=id)
+            delete_models(request, model, name=model.customer_name)
+            return redirect('create_customer')
         else:
+            messages.info(request, 'No operation performed.')
             return redirect('create_customer')
     paginator = Paginator(customer_data, 10)
     page_number = request.GET.get('page')
@@ -796,63 +815,6 @@ def view_customer(request):
 
 @measure_execution_time
 def search_router(request, model_search):
-    if request.POST:
-        if model_search == 'product_modal':
-            if 'submit_selected_record' in request.POST:
-                id = request.POST['submit_selected_record']
-                return redirect('update_product', int(id))
-            else:
-                return redirect('create_product')
-        elif model_search == 'product_delete':
-            if 'delete_selected_record' in request.POST:
-                id = request.POST['delete_selected_record']
-                model = Product.objects.get(id=id)
-                delete_models(request, model, name=model.product_name)
-                return redirect('create_product')
-            else:
-                return redirect('create_product')
-        elif model_search == 'manufacturer_modal':
-            if 'submit_selected_record' in request.POST:
-                id = request.POST['submit_selected_record']
-                return redirect('update_manufacturer', int(id))
-            else:
-                return redirect('create_manufacturer')
-
-        elif model_search == 'manufacturer_delete':
-            if 'delete_selected_record' in request.POST:
-                id = request.POST['delete_selected_record']
-                model = Manufacturer.objects.get(id=id)
-                delete_models(request, model, name=model.name)
-            return redirect('create_manufacturer')
-
-        elif model_search == 'customer_modal':
-            if 'submit_selected_record' in request.POST:
-                id = request.POST['submit_selected_record']
-                return redirect('update_customer', int(id))
-            else:
-                return redirect('create_customer')
-        elif model_search == 'customer_delete':
-            if 'delete_selected_record' in request.POST:
-                id = request.POST['delete_selected_record']
-                model = Customer.objects.get(id=id)
-                delete_models(request, model, name=model.customer_name)
-            return redirect('create_customer')
-
-        elif model_search == 'group_modal':
-            if 'submit_selected_record' in request.POST:
-                id = request.POST['submit_selected_record']
-                return redirect('update_group', int(id))
-            else:
-                return redirect('create_group')
-        elif model_search == 'group_delete':
-            if 'delete_selected_record' in request.POST:
-                id = request.POST['delete_selected_record']
-                model = ProductGroup.objects.get(id=id)
-                delete_models(request, model, name=model.group_name)
-            return redirect('create_group')
-
-        print('post dict:: ')
-        print(request.POST.dict())
     autocomplete_query = request.GET.get('autocomplete_query', '')
     manufacturer_modal_details = request.GET.get('manufacturer_modal_details', '')
     print(f'manufacturer_modal_details ::{manufacturer_modal_details},, modal_search: {model_search}, request:{request}')

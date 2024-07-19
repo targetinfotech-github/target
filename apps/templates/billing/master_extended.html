@@ -55,8 +55,8 @@
         }
 
         .col {
-            padding-bottom: 1vh ;
-            padding-left:1vh;
+            padding-bottom: 1vh;
+            padding-left: 1vh;
             padding-top: 0;
             padding-right: 0;
         }
@@ -343,24 +343,10 @@
                             {% endif %}
 
                         </div>
-                        <form method="post">
-                            {% csrf_token %}
-                            <div class="modal-footer">
-                                <a href="{% url create_url %}">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                </a>
-                                {% if flag == 'modal' and flag != 'delete' %}
-                                    <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
-                                            name="submit_selected_record" value="" style="display: flex">Update
-                                    </button>
-                                {% endif %}
-                                {% if flag != 'modal' and flag == 'delete' %}
-                                    <button type="submit" class="btn btn-danger" id="delete_selected_record"
-                                            name="delete_selected_record" value="" style="display: flex">Delete
-                                    </button>
-                                {% endif %}
-                            </div>
-                        </form>
+                        {% block modal_post_request %}
+
+                        {% endblock modal_post_request %}
+
                     </div>
                 </div>
             </div>

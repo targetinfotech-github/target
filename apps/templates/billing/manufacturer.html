@@ -63,7 +63,26 @@
         </table>
     </div>
 {% endblock %}
-
+{% block modal_post_request %}
+    <form method="post" action="{% url 'get_manufacturer_modal' %}">
+        {% csrf_token %}
+        <div class="modal-footer">
+            <a href="{% url create_url %}">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </a>
+            {% if flag == 'modal' and flag != 'delete' %}
+                <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
+                        name="submit_selected_record" value="" style="display: flex">Update
+                </button>
+            {% endif %}
+            {% if flag != 'modal' and flag == 'delete' %}
+                <button type="submit" class="btn btn-danger" id="delete_selected_record"
+                        name="delete_selected_record" value="" style="display: flex">Delete
+                </button>
+            {% endif %}
+        </div>
+    </form>
+{% endblock modal_post_request %}
 
 
 {% block create_form %}
@@ -84,13 +103,13 @@
             {% for field in form %}
                 {% if field.errors %}
                     {% for error in field.errors %}
-                    <div class="d-flex justify-content-center">
-                        <div class="alert form-error-alert alert-dismissible fade show" role="alert">
-                            <p><u><strong>{{ field.label }}:</strong></u> {{ error }}</p>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
+                        <div class="d-flex justify-content-center">
+                            <div class="alert form-error-alert alert-dismissible fade show" role="alert">
+                                <p><u><strong>{{ field.label }}:</strong></u> {{ error }}</p>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
                         </div>
-                    </div>
                     {% endfor %}
                 {% endif %}
             {% endfor %}

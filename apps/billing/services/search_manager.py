@@ -11,19 +11,19 @@ class SearchService:
     def __init__(self, request, model_search):
         self.request = request
         self.model_search = model_search.strip()
-        print('model search :: ',self.model_search)
+        print('model search :: ', self.model_search)
         self.autocomplete_query = request.GET.get('autocomplete_query', '')
         self.details_query = request.GET.get(f'{self.model_search}_details', '')
-        print('product details query:  ',self.details_query)
+        print('product details query:  ', self.details_query)
 
     def get_autocomplete_data(self):
-        if self.model_search == 'product' or self.model_search == 'product_modal' or self.model_search == 'product_delete':
+        if 'product' in self.model_search:
             return self.get_product_autocomplete()
-        elif self.model_search == 'manufacturer' or self.model_search == 'manufacturer_modal' or self.model_search == 'manufacturer_delete':
+        elif 'manufacturer' in self.model_search:
             return self.get_manufacturer_autocomplete()
-        elif self.model_search == 'customer' or self.model_search == 'customer_modal' or self.model_search == 'customer_delete' :
+        elif 'customer' in self.model_search:
             return self.get_customer_autocomplete()
-        elif self.model_search == 'group' or self.model_search == 'group_modal' or self.model_search == 'group_delete':
+        elif 'group' in self.model_search:
             return self.get_group_autocomplete()
 
     def get_product_autocomplete(self):
@@ -71,13 +71,13 @@ class SearchService:
         return list(groups)
 
     def get_search_results(self):
-        if self.model_search == 'product' or self.model_search == 'product_modal' or self.model_search == 'product_delete':
+        if 'product' in self.model_search:
             return self.get_product_search_results()
-        elif self.model_search == 'manufacturer' or self.model_search == 'manufacturer_modal' or self.model_search == 'manufacturer_delete':
+        elif 'manufacturer' in self.model_search:
             return self.get_manufacturer_search_results()
-        elif self.model_search == 'customer' or self.model_search == 'customer_modal' or self.model_search == 'customer_delete':
+        elif 'customer' in self.model_search:
             return self.get_customer_search_results()
-        elif self.model_search == 'group' or self.model_search == 'group_modal' or self.model_search == 'group_delete':
+        elif 'group' in self.model_search:
             return self.get_group_search_results()
 
     def get_product_search_results(self):
@@ -94,7 +94,7 @@ class SearchService:
             Q(name__icontains=self.details_query) |
             Q(email__icontains=self.details_query)
         ).values(
-            'id', 'name', 'print_name', 'sh_name', 'contact','type'
+            'id', 'name', 'print_name', 'sh_name', 'contact', 'type'
         )
         return self.paginate_results(results)
 
@@ -128,11 +128,11 @@ class SearchService:
             page_obj = paginator.page(paginator.num_pages)
         return page_obj
 
-
-    def get_context(self,page_obj,operation):
-        context_obj = SetupContext(self.model_search, page_obj,operation=operation)
-        context =  context_obj.get_context()
+    def get_context(self, page_obj, operation):
+        context_obj = SetupContext(self.model_search, page_obj, operation=operation)
+        context = context_obj.get_context()
         return context
+
 
 class masterSearchEndpoint(SearchService):
     def __init__(self, request, model_search):
@@ -143,30 +143,28 @@ class masterSearchEndpoint(SearchService):
             data = self.get_autocomplete_data()
             return JsonResponse(data, safe=False)
         else:
-            return JsonResponse('',safe=False)
-
+            return JsonResponse('', safe=False)
 
     def masterSearchRouter(self):
-        masterModal = ['product_modal','manufacturer_modal','customer_modal','group_modal']
-        masterDelete = ['product_delete','manufacturer_delete','customer_delete','group_delete']
-        masterView = ['product','manufacturer','customer','group']
+        masterModal = ['product_modal', 'manufacturer_modal', 'customer_modal', 'group_modal']
+        masterDelete = ['product_delete', 'manufacturer_delete', 'customer_delete', 'group_delete']
+        masterView = ['product', 'manufacturer', 'customer', 'group']
         if self.model_search in masterModal:
-            template,context = self.detailed_data_modal()
-            return template,context
+            template, context = self.detailed_data_modal()
+            return template, context
         elif self.model_search in masterView:
-            template,context = self.detailed_data_views()
+            template, context = self.detailed_data_views()
             return template, context
         elif self.model_search in masterDelete:
-            print('master delete')
-            template,context = self.detailed_data_deletion()
-            return template,context
+            template, context = self.detailed_data_deletion()
+            return template, context
         else:
             raise ModelNotFound()
 
     def detailed_data_views(self):
         if self.details_query:
             page_obj = self.get_search_results()
-            context = self.get_context(page_obj,operation = 'view')
+            context = self.get_context(page_obj, operation='view')
             template_map = {
                 'product': 'billing/products.html',
                 'manufacturer': 'billing/manufacturer.html',
@@ -174,13 +172,12 @@ class masterSearchEndpoint(SearchService):
                 'group': 'billing/group.html'
             }
             template = template_map.get(self.model_search, 'billing/index.html')
-            return template,context
+            return template, context
 
     def detailed_data_modal(self):
         if self.details_query:
-
             page_obj = self.get_search_results()
-            context = self.get_context(page_obj,operation = 'modal')
+            context = self.get_context(page_obj, operation='modal')
             template_map = {
                 'product_modal': 'billing/products.html',
                 'manufacturer_modal': 'billing/manufacturer.html',
@@ -188,16 +185,12 @@ class masterSearchEndpoint(SearchService):
                 'group_modal': 'billing/group.html'
             }
             template = template_map.get(self.model_search, 'billing/index.html')
-            return template,context
+            return template, context
 
     def detailed_data_deletion(self):
-        print('detailed data deleteion')
-        print(self.details_query)
         if self.details_query:
-
             page_obj = self.get_search_results()
-            print(f'pgae object: ',page_obj)
-            context = self.get_context(page_obj,operation = 'delete')
+            context = self.get_context(page_obj, operation='delete')
             template_map = {
                 'product_delete': 'billing/products.html',
                 'manufacturer_delete': 'billing/manufacturer.html',
@@ -205,5 +198,4 @@ class masterSearchEndpoint(SearchService):
                 'group_delete': 'billing/group.html'
             }
             template = template_map.get(self.model_search, 'billing/index.html')
-            print('template:',template)
-            return template,context
+            return template, context
