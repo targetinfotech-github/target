@@ -86,8 +86,10 @@
 
 
 {% block create_form %}
-    {% if flag == 'create' or flag == 'update' %}
+
+    {% if flag != 'view' and flag != 'modal' and flag != 'delete' %}
         <form method="post">
+            {% csrf_token %}
             {% csrf_token %}
             {% if form.non_field_errors %}
                 {% for error in form.non_field_errors %}
@@ -115,77 +117,303 @@
             {% endfor %}
             <div class="container">
                 <div class="row">
-                    <div class="col">
-                        <label for="{{ form.type.id_for_label }}">{{ form.type.label }}</label>
-                        {{ form.type }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
-                        {{ form.name }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.print_name.id_for_label }}">{{ form.print_name.label }}</label>
-                        {{ form.print_name }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}</label>
-                        {{ form.sh_name }}
-                    </div>
-                </div>
-                <div class="row">
+                    <div class="col-md-6 col-lg-6 col-sm-8" style="display: flex;flex-direction: column">
+                        <div class="row justify-content-between">
+                            <div class="col-lg-auto col-md-auto">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 50px"
+                                           for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                                    {{ form.name }}
+                                </div>
+                            </div>
+                            <div class="col-lg-auto col-md-auto ">
+                                <div class="form-element" style="margin-right: 2vw">
+                                    <label class="form-label" style="min-width: 3.2vw"
+                                           for="{{ form.type.id_for_label }}">{{ form.type.label }}:</label>
+                                    <span class="form-items">
+                                    {{ form.type }}
+                                        </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-between">
+                            <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 55px"
+                                           for="{{ form.print_name.id_for_label }}">{{ form.print_name.label }}</label>
+                                    {{ form.print_name }}
+                                </div>
+                            </div>
+                            <div class="col-lg-auto col-md-auto">
+                                <div class="form-element" style="margin-right: 2vw">
+                                    <label class="form-label" style="min-width: 4.1vw"
+                                           for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}:</label>
 
-                    <div class="col">
-                        <label for="{{ form.contact.id_for_label }}">{{ form.contact.label }}</label>
-                        {{ form.contact }}
+                                    {{ form.sh_name }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 4.5vw"
+                                           for="{{ form.city.id_for_label }}">{{ form.sh_name.label }}</label>
+                                    {{ form.sh_name }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 10vw"
+                                           for="{{ form.postal_code.id_for_label }}">{{ form.postal_code.label }}:</label>
+                                    {{ form.postal_code }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-between">
+
+                            <div class="col-md-auto col-lg-auto"
+                                 style="gap: 0;margin: 0;padding:0;justify-content: start">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 4.5vw"
+                                           for="{{ form.contact1.id_for_label }}">{{ form.contact1.label }}:</label>
+                                    {{ form.contact1 }}
+                                </div>
+                            </div>
+                            <div class="col-md-auto col-lg-auto"
+                                 style="gap: 0;margin: 0;padding:0;justify-content: end">
+                                <div class="form-element" style="margin-right: 3vw">
+                                    <label class="form-label" style="min-width: 3vw"
+                                           for="{{ form.contact2.id_for_label }}">{{ form.contact2.label }}:</label>
+                                    {{ form.contact2 }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-between">
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 4.5vw"
+                                           for="{{ form.email.id_for_label }}">{{ form.email.label }}:</label>
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element" style="margin-right: 3vw">
+                                    <label class="form-label" style="min-width: 50px"
+                                           for="{{ form.state_name.id_for_label }}">{{ form.state_name.label }}:</label>
+                                    {{ form.state_name }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element mb-0" style="margin-right: 1.5vw">
+                                    <label class="form-label" style="min-width: 4.8vw"
+                                           for="{{ form.state_code.id_for_label }}">{{ form.state_code.label }}:</label>
+                                    {{ form.state_code }}
+                                </div>
+                            </div>
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element" style="margin-right: 1.5vw">
+                                    <label class="form-label" style="min-width: 4.5vw"
+                                           for="{{ form.sale_state.id_for_label }}">{{ form.sale_state.label }}:</label>
+                                    {{ form.sale_state }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element" style="margin-right: 1vw">
+                                    <label class="form-label" style="min-width: 2vw"
+                                           for="{{ form.city.id_for_label }}">{{ form.city.label }}:</label>
+                                    {{ form.city }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-element">
+                                <label class="form-label" style="min-width: 2.6vw"
+                                       for="{{ form.address.id_for_label }}">{{ form.address.label }}:</label>
+                                {{ form.address }}
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-between">
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 4.5vw"
+                                           for="{{ form.invoice_prefix.id_for_label }}">{{ form.invoice_prefix.label }}:</label>
+                                    {{ form.invoice_prefix }}
+                                </div>
+                            </div>
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element" style="margin-right: 3vw">
+                                    <label class="form-label" style="min-width: 50px"
+                                           for="{{ form.margin_percentage.id_for_label }}">{{ form.margin_percentage.label }}:</label>
+                                    {{ form.margin_percentage }}
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
-                    <div class="col">
-                        <label for="{{ form.purchase_type.id_for_label }}">{{ form.purchase_type.label }}</label>
-                        {{ form.purchase_type }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.id_no.id_for_label }}">{{ form.id_no.label }}</label>
-                        {{ form.id_no }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.tin.id_for_label }}">{{ form.tin.label }}</label>
-                        {{ form.tin }}
+                    <div class="col-md-6 col-lg-6 col-sm-8">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 40px"
+                                           for="{{ form.telephone.id_for_label }}">{{ form.telephone.label }}:</label>
+
+                                    {{ form.telephone }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.mobile_number.id_for_label }}">{{ form.mobile_number.label }}:</label>
+                                    {{ form.mobile_number }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 40px"
+                                           for="{{ form.id_no.id_for_label }}">{{ form.id_no.label }}:</label>
+                                    {{ form.id_no }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.fax.id_for_label }}">{{ form.fax.label }}:</label>
+                                    {{ form.fax }}
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 40px"
+                                           for="{{ form.area.id_for_label }}">{{ form.area.label }}:</label>
+                                    {{ form.area }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.customer_representative.id_for_label }}">{{ form.customer_representative.label }}:</label>
+                                    {{ form.customer_representative }}
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 40px"
+                                           for="{{ form.class_name.id_for_label }}">{{ form.class_name.label }}:</label>
+                                    {{ form.class_name }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.purchase_type.id_for_label }}">{{ form.purchase_type.label }}:</label>
+                                    {{ form.purchase_type }}
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 40px"
+                                           for="{{ form.hsn.id_for_label }}">{{ form.hsn.label }}:</label>
+                                    {{ form.hsn }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.purchase_account.id_for_label }}">{{ form.purchase_account.label }}:</label>
+                                    {{ form.purchase_account }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 40px"
+                                           for="{{ form.gstin.id_for_label }}">{{ form.gstin.label }}:</label>
+                                    {{ form.gstin }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.gtax_type.id_for_label }}">{{ form.gtax_type.label }}:</label>
+                                    {{ form.gtax_type }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 40px"
+                                           for="{{ form.tin.id_for_label }}">{{ form.tin.label }}:</label>
+                                    {{ form.tin }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.cst.id_for_label }}">{{ form.cst.label }}:</label>
+                                    {{ form.cst }}
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 40px"
+                                           for="{{ form.formIR.id_for_label }}">{{ form.formIR.label }}:</label>
+                                    {{ form.formIR }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.std_form.id_for_label }}">{{ form.std_form.label }}:</label>
+                                    {{ form.std_form }}
+                                </div>
+                            </div>
+
+                        </div>
+
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col">
-                        <label for="{{ form.gtax_type.id_for_label }}">{{ form.gtax_type.label }}</label>
-                        {{ form.gtax_type }}
+                    <div class="col-md-6 col-lg-6 col-sm-8" style="display: flex;flex-direction: column">
+                        <div class="form-group">
+
+                        </div>
                     </div>
-                    <div class="col">
-                        <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
-                        {{ form.city }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.postal_code.id_for_label }}">{{ form.postal_code.label }}</label>
-                        {{ form.postal_code }}
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.gstin.id_for_label }}">{{ form.gstin.label }}</label>
-                        {{ form.gstin }}
+                    <div class="col-md-6 col-lg-6 col-sm-8 border-left" style="display: flex;flex-direction: column">
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-3 col-sm-5 col-lg-3">
-                        <label for="{{ form.hsn.id_for_label }}">{{ form.hsn.label }}</label>
-                        {{ form.hsn }}
-                    </div>
-                    <div class="col-md-5 col-sm-6 col-lg-5">
-                        <label for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
-                        {{ form.address }}
-                    </div>
-                </div>
-                <div class="row " style="justify-content: center;">
-                    <div class="col-auto">
-                        <button class="btn btn-danger" type="submit" name="submit_record" id="form_submit">
-                            Save
-                        </button>
-                    </div>
+            </div>
+            <div class="row" style="justify-content: center;">
+                <div class="col-auto">
+                    <button class="btn btn-danger" type="submit" name="submit_record" id="form_submit">
+                        Save
+                    </button>
                 </div>
             </div>
         </form>

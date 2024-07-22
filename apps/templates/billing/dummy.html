@@ -1,39 +1,35 @@
 {% extends 'billing/master_extended.html' %}
 
 {% block master-view %}
-
-
     <div class="table-responsive">
         <table class="table table-centered table-nowrap mb-0 rounded">
             <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Print Name</th>
-                <th scope="col">Short Name</th>
-                <th scope="col">Contact</th>
-                <th scope="col">Email</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Product Code</th>
+                <th scope="col">Manufacturer</th>
+                <th scope="col">Buy Rate</th>
+                <th scope="col">Sell Rate</th>
             </tr>
             </thead>
-            <!-- Item -->
             <tbody>
-            {% for customer in master_data %}
-                <tr id="row-{{ customer.id }}">
+            {% for product in master_data %}
+                <tr id="row-{{ product.id }}">
                     <th scope="row">{{ forloop.counter }}</th>
-                    <td>
-                        <a href="{% url update_url customer.id %}">{{ customer.customer_name }}</a>
+                    <td><a href="{% url update_url product.id %}">{{ product.product_name }}</a>
                     </td>
-                    <td>{{ customer.print_name }}</td>
-                    <td>{{ customer.sh_name }}</td>
-                    <td>{{ customer.contact }}</td>
-                    <td>{{ customer.email }}</td>
+                    <td>{{ product.product_code }}</td>
+                    <td>{{ product.manufacturer__name }}</td>
+                    <td>{{ product.buy_rate }}</td>
+                    <td>{{ product.sell_rate }}</td>
                 </tr>
             {% endfor %}
             </tbody>
-            <!-- End of Item -->
         </table>
     </div>
 {% endblock %}
+
 {% block modal_display %}
 
     <div class="table-responsive">
@@ -41,22 +37,24 @@
             <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Print Name</th>
-                <th scope="col">Sh Name</th>
-                <th scope="col">Email</th>
+                <th scope="col">Product Name</th>
+                <th scope="col">Product Code</th>
+                <th scope="col">Manufacturer</th>
+                <th scope="col">Buy Rate</th>
+                <th scope="col">Sell Rate</th>
             </tr>
             </thead>
             <!-- Item -->
             <tbody>
-            {% for customer in master_data %}
-                <tr id="row-{{ customer.id }}"
-                    onclick="selectMaster('{{ customer.id }}')">
+            {% for product in master_data %}
+                <tr id="row-{{ product.id }}"
+                    onclick="selectMaster('{{ product.id }}')">
                     <th scope="row">{{ forloop.counter }}</th>
-                    <td>{{ customer.customer_name }}</td>
-                    <td>{{ customer.print_name }}</td>
-                    <td>{{ customer.sh_name }}</td>
-                    <td>{{ customer.email }}</td>
+                    <td>{{ product.product_name }}</td>
+                    <td>{{ product.product_code }}</td>
+                    <td>{{ product.manufacturer__name }}</td>
+                    <td>{{ product.buy_rate }}</td>
+                    <td>{{ product.sell_rate }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -64,11 +62,33 @@
         </table>
     </div>
 {% endblock %}
+
+{% block modal_post_request %}
+    <form method="post" action="{% url 'get_product_modal' %}">
+        {% csrf_token %}
+        <div class="modal-footer">
+            <a href="{% url create_url %}">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </a>
+            {% if flag == 'modal' and flag != 'delete' %}
+                <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
+                        name="submit_selected_record" value="" style="display: flex">Update
+                </button>
+            {% endif %}
+            {% if flag != 'modal' and flag == 'delete' %}
+                <button type="submit" class="btn btn-danger" id="delete_selected_record"
+                        name="delete_selected_record" value="" style="display: flex">Delete
+                </button>
+            {% endif %}
+        </div>
+    </form>
+{% endblock modal_post_request %}
+
+
 {% block create_form %}
 
-    {% if flag != 'view' and flag != 'modal' and flag != 'delete' %}
+    {% if flag == 'create' or flag == 'update' %}
         <form method="post">
-            {% csrf_token %}
             {% csrf_token %}
             {% if form.non_field_errors %}
                 {% for error in form.non_field_errors %}
@@ -94,178 +114,9 @@
                     {% endfor %}
                 {% endif %}
             {% endfor %}
-            {#            <div class="form-container">#}
             <div class="container">
-                <div class="row d-inline-flex">
-                    <div class="col">
-                        <label class="form-label"
-                               for="{{ form.customer_name.id_for_label }}">{{ form.customer_name.label }}</label>
-                        {{ form.customer_name }}
-                    </div>
-                    <div class="col">
-                        <label class="form-label"
-                               for="{{ form.print_name.id_for_label }}">{{ form.print_name.label }}</label>
-                        {{ form.print_name }}
-                    </div>
-                    <div class="col">
-                        <label class="form-label" for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}</label>
-                        {{ form.sh_name }}
-                    </div>
-                    <div class="col">
-                        <label class="form-label" for="{{ form.contact.id_for_label }}">{{ form.contact.label }}</label>
-                        {{ form.contact }}
-                    </div>
-                </div>
+               
 
-                <hr class="basic-line mb-2">
-
-
-                <div class="row">
-                    <div class="col-md-6 col-lg-6 col-sm-8" style="display: flex;flex-direction: column">
-                        <div class="row">
-                            <div class="form-element">
-                                <label class="form-label" style="padding-right: 18px"
-                                       for="{{ form.address.id_for_label }}">{{ form.address.label }}:</label>
-                                {{ form.address }}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label" style="padding-right:40px"
-                                           for="{{ form.city.id_for_label }}">{{ form.city.label }}:</label>
-                                    {{ form.city }}
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label" style="padding-right: 2px"
-                                           for="{{ form.postal_code.id_for_label }}">{{ form.postal_code.label }}:</label>
-                                    {{ form.postal_code }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label"
-                                           for="{{ form.state_name.id_for_label }}">{{ form.state_name.label }}:</label>
-                                    {{ form.state_name }}
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label" style="padding-left:40px "
-                                           for="{{ form.state.id_for_label }}">{{ form.state.label }}:</label>
-                                    {{ form.state }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col" style="padding-bottom: 0">
-                                <div class="form-element mb-0">
-                                    <label class="form-label" style="padding-right: 32px"
-                                           for="{{ form.email.id_for_label }}">{{ form.email.label }}:</label>
-                                    {{ form.email }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-6 col-sm-8 border-left" style="display: flex;flex-direction: column">
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label" style="padding-right: 0.9vw"
-                                           for="{{ form.telephone.id_for_label }}">{{ form.telephone.label }}:</label>
-                                    <span class="form-items">
-                                    {{ form.telephone }}
-                                        </span>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label" style="padding-left: 1vw"
-                                           for="{{ form.mobile_number.id_for_label }}">{{ form.mobile_number.label }}:</label>
-
-                                    {{ form.mobile_number }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label" style="padding-right: 0.2vw"
-                                           for="{{ form.id_no.id_for_label }}">{{ form.id_no.label }}:</label>
-
-                                    {{ form.id_no }}
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label"
-                                           for="{{ form.sale_type.id_for_label }}">{{ form.sale_type.label }}:</label>
-                                    {{ form.sale_type }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label" style="padding-right: 0.6vw"
-                                           for="{{ form.customer_representative.id_for_label }}">{{ form.customer_representative.label }}:</label>
-                                    {{ form.customer_representative }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label" style="padding-right: 0.3vw"
-                                           for="{{ form.area.id_for_label }}">{{ form.area.label }}:</label>
-                                    {{ form.area }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <hr class="basic-line mb-2">
-                <div class="row">
-                    <div class="col-md-6 col-lg-6 col-sm-8" style="display: flex;flex-direction: column">
-                        <div class="form-group">
-
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-6 col-sm-8 border-left" style="display: flex;flex-direction: column">
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label" style="padding-right: 15px"
-                                           for="{{ form.gstin.id_for_label }}">{{ form.gstin.label }}:</label>
-                                    {{ form.gstin }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label"
-                                           for="{{ form.license1.id_for_label }}">{{ form.license1.label }}:</label>
-                                    {{ form.license1 }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label"
-                                           for="{{ form.license2.id_for_label }}">{{ form.license2.label }}:</label>
-                                    {{ form.license2 }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="row" style="justify-content: center;">
                 <div class="col-auto">
@@ -276,4 +127,6 @@
             </div>
         </form>
     {% endif %}
+
+
 {% endblock %}

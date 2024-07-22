@@ -9,12 +9,14 @@
             height: 30px;
             padding: 5px;
             font-size: 12px;
+            color: #0a0a0a;
+            font-weight: bold;
         }
 
         .basic-line {
             border: 1px solid #0a0a0a;
             padding: 0;
-            margin: 0;
+            margin-bottom: 10px;
         }
 
         .border-left {
@@ -34,10 +36,6 @@
             font-size: 12px;
         }
 
-        .form-label {
-            font-size: 12px;
-            color: #333;
-        }
 
         table a {
             color: #007bff;
@@ -74,6 +72,12 @@
 
         .row {
             padding: 20px;
+            overflow: auto;
+        }
+
+        .col {
+            margin: 0;
+            padding: 0;
         }
 
         .form-errors .alert {
@@ -97,8 +101,11 @@
         }
 
         .form-error-alert {
-
+            height: 40px;
             background-color: #f2dede;
+            padding-top: 0;
+            padding-bottom: 0;
+
             color: #a94442;
         }
 
@@ -131,6 +138,55 @@
             color: #a94442;
         }
 
+        .form-label {
+            font-size: 12px;
+            color: #333;
+            min-width: 70px;
+            text-align: right;
+            margin: 0;
+        !important
+        }
+
+        #price_table_id {
+            width: 40px;
+        }
+
+        #email-form {
+            width: 12vw;
+        }
+
+        #state-code-form {
+            width: 30px;
+        }
+
+        #postal_code_form {
+            width: 85px;
+        }
+
+        #billing_stat_form {
+            width: 90px;
+        }
+
+        #print_name_form {
+            width: 12vw;
+        }
+
+        #name_form {
+            width: 12vw;
+        }
+
+        #address-form {
+            width: 30vw;
+        }
+
+        #sale_state_form {
+            width: 100px;
+        }
+
+        .form-control::placeholder {
+            color: #aaa;
+            opacity: 1;
+        }
 
     </style>
 {% endblock stylesheets %}
@@ -211,6 +267,7 @@
             </div>
         {% endfor %}
     {% endif %}
+    <hr class="basic-line">
     {% if flag == 'view' and master_data %}
 
         {#                {% include 'billing/common_search_template.html' with url_type='manufacturer' input_id='top_bar_InputIconLeft' input_name='manufacturer_details' query=query autocomplete_function='autocomplete_manufacturer' view_url='view_manufacturer' query=query %}#}
