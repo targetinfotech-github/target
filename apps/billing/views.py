@@ -307,27 +307,27 @@ def view_manufacturer(request):
 @login_required(login_url="/login/")
 @measure_execution_time
 def create_product(request):
-    # try:
-    ProductGroup.objects.get_or_create_general_group()
-    Manufacturer.objects.get_or_create_general_manufacturer()
-    if request.method == 'POST':
-        form = ProductForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data['product_name']
-            form.save()
-            messages.success(request, f'Product {name} created')
-            return redirect('create_product')
-    else:
-        form = ProductForm()
-    product_data = Product.objects.exists()
-    context_obj = SetupContext(model_search='product',page_obj=product_data, operation='create')
-    context = context_obj.get_context()
-    context['form'] = form
-    return render(request, 'billing/dummy.html', context)
-    # except template.TemplateDoesNotExist:
-    #     return render(request, 'billing/page-404.html')
-    # except:
-    #     return render(request, 'billing/page-500.html')
+    try:
+        ProductGroup.objects.get_or_create_general_group()
+        Manufacturer.objects.get_or_create_general_manufacturer()
+        if request.method == 'POST':
+            form = ProductForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data['product_name']
+                form.save()
+                messages.success(request, f'Product {name} created')
+                return redirect('create_product')
+        else:
+            form = ProductForm()
+        product_data = Product.objects.exists()
+        context_obj = SetupContext(model_search='product',page_obj=product_data, operation='create')
+        context = context_obj.get_context()
+        context['form'] = form
+        return render(request, 'billing/products.html', context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
 
 
 @login_required(login_url="/login/")
@@ -470,7 +470,6 @@ def create_receipt(request, pk):
     try:
         try:
             receipt = Receipt.objects.get(id=pk)
-
         except Receipt.DoesNotExist:
             return redirect('get_receipt_modal')
         except Exception as e:

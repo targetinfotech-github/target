@@ -115,55 +115,94 @@
                     {% endfor %}
                 </div>
                 {#            <div class="form-container">#}
+
+
                 <div class="container">
                     <div class="row">
-                        <div class="col">
-                            <label for="{{ form.group_id.id_for_label }}">{{ form.group_id.label }}</label>
-                            {{ form.group_id }}
-                        </div>
-                        <div class="col">
-                            <label for="{{ form.group_name.id_for_label }}">{{ form.group_name.label }}</label>
-                            {{ form.group_name }}
-                        </div>
-                        <div class="col">
-                            <label for="{{ form.print_name.id_for_label }}">{{ form.print_name.label }}</label>
-                            {{ form.print_name }}
-                        </div>
-                    </div>
-                    <div class="row">
+                        <div class="col-md-6 col-lg-6 col-sm-8">
+                            <div class="row justify-content-between">
+                                <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                                    <div class="form-element">
+                                        <label class="form-label" style="min-width: 5.9vw"
+                                               for="{{ form.group_id.id_for_label }}">{{ form.group_id.label }}</label>
+                                        {{ form.group_id }}
+                                    </div>
+                                </div>
+                                <div class="col-lg-auto col-md-auto">
+                                    <div class="form-element" style="margin-right: 2vw">
+                                        <label class="form-label" style="min-width: 3.2vw"
+                                               for="{{ form.group_name.id_for_label }}">{{ form.group_name.label }}:</label>
+                                        <span class="form-items">
+                                    {{ form.group_name }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row justify-content-between">
+                                <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                                    <div class="form-element">
+                                        <label class="form-label" style="min-width: 5.9vw"
+                                               for="{{ form.print_name.id_for_label }}">{{ form.print_name.label }}</label>
+                                        {{ form.print_name }}
+                                    </div>
+                                </div>
+                                <div class="col-lg-auto col-md-auto">
+                                    <div class="form-element" style="margin-right: 2vw">
+                                        <label class="form-label" style="min-width: 4.1vw"
+                                               for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}:</label>
 
-                        <div class="col">
-                            <label for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}</label>
-                            {{ form.sh_name }}
+                                        {{ form.sh_name }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col">
-                            <label for="{{ form.code_name.id_for_label }}">{{ form.code_name.label }}</label>
-                            {{ form.code_name }}
-                        </div>
-                        <div class="col">
-                            <label for="{{ form.consolidation_code.id_for_label }}">{{ form.consolidation_code.label }}</label>
-                            {{ form.consolidation_code }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 col-sm-6 col-lg-4">
-                            <label for="{{ form.hsn_code.id_for_label }}">{{ form.hsn_code.label }}</label>
-                            {{ form.hsn_code }}
-                        </div>
-                        <div class="col-md-4 col-sm-6 col-lg-4">
-                            <label for="{{ form.gcr_code.id_for_label }}">{{ form.gcr_code.label }}</label>
-                            {{ form.gcr_code }}
+                        <div class="col-md-6 col-lg-6 col-sm-8" style="display: flex;flex-direction: column">
+                            <div class="row justify-content-start">
+                                <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                    <div class="form-element">
+                                        <label class="form-label"
+                                               for="{{ form.code_name.id_for_label }}">{{ form.code_name.label }}:</label>
+                                        {{ form.code_name }}
+                                    </div>
+                                </div>
+                                <div class="col-md-auto col-lg-auto">
+                                    <div class="form-element">
+                                        <label class="form-label" style="min-width: 4.1vw"
+                                               for="{{ form.consolidation_status.id_for_label }}">{{ form.consolidation_status.label }}</label>
+                                        {{ form.consolidation_status }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row justify-content-between">
+                                <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                    <div class="form-element">
+                                        <label class="form-label"
+                                               for="{{ form.hsn_code.id_for_label }}">{{ form.hsn_code.label }}:</label>
+                                        {{ form.hsn_code }}
+                                    </div>
+                                </div>
+                                <div class="col-md-auto col-lg-auto">
+                                    <div class="form-element" style="margin-right: 2vw">
+                                        <label class="form-label" style="min-width: 4.1vw"
+                                               for="{{ form.gcr_code.id_for_label }}">{{ form.gcr_code.label }}</label>
+                                        {{ form.gcr_code }}
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row" style="justify-content: center;">
-                <div class="col-auto">
-                    <button class="btn btn-danger" type="submit" name="submit_record" id="form_submit">
-                        Save
-                    </button>
+                <div class="row" style="justify-content: center;">
+                    <div class="col-auto">
+                        <button class="btn btn-danger" type="submit" name="submit_record" id="form_submit">
+                            Save
+                        </button>
+                    </div>
                 </div>
             </div>
         </form>
+
     {% endif %}
 {% endblock %}

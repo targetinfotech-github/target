@@ -85,13 +85,15 @@ class GroupManager(models.Manager):
 
 
 class ProductGroup(models.Model):
+    CONSOLIDATION_STATUS = [('yes','Yes'),
+                            ('no','No')]
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     group_id = models.IntegerField(unique=True, null=True, blank=True)
     group_name = models.CharField(unique=True, max_length=30, null=True, blank=True)
     print_name = models.CharField(max_length=30, null=True, blank=True)
     sh_name = models.CharField(max_length=30, null=True, blank=True)
     code_name = models.CharField(max_length=30, null=True, blank=True)
-    consolidation_code = models.CharField(max_length=30, null=True, blank=True)
+    consolidation_status = models.CharField(choices=CONSOLIDATION_STATUS,max_length=30, null=True, blank=True)
     hsn_code = models.CharField(max_length=30, null=True, blank=True)
     gcr_code = models.CharField(max_length=30, null=True, blank=True)
     last_accessed = models.DateTimeField(default=now, null=True, blank=True)
@@ -188,7 +190,7 @@ class Manufacturer(models.Model):
     cst = models.CharField(max_length=15, null=True, blank=True,verbose_name='CST')
     purchase_account = models.CharField(max_length=50, null=True, blank=True)
     invoice_prefix = models.CharField(max_length=5, null=True, blank=True)
-    margin_percentage = models.PositiveSmallIntegerField(max_length=5, null=True, blank=True)
+    margin_percentage = models.PositiveSmallIntegerField(null=True, blank=True)
 
 
     objects = ManufacturerManager()
@@ -224,7 +226,7 @@ class Product(models.Model):
 
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     product_name = models.CharField(max_length=255, null=True, blank=True, unique=True)
-    product_code = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    sh_name = models.CharField(max_length=255, null=True, blank=True, unique=True)
     map_code = models.CharField(max_length=15, null=True, blank=True)
     bin_loc = models.CharField(max_length=15, null=True, blank=True)
     product_spec = models.CharField(max_length=50, null=True, blank=True)

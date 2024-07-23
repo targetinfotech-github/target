@@ -116,130 +116,183 @@
             {% endfor %}
             <div class="container">
                 <div class="row">
-                    <div class="col">
-                        <label for="{{ form.manufacturer.id_for_label }}">{{ form.manufacturer.label }}</label>
-                        <select class="form-control" aria-label="Default select example"
-                                name="{{ form.manufacturer.name }}" required>
-                            {% for value, label in form.manufacturer.field.choices %}
-                                <option value="{{ value }}"
-                                        {% if form.manufacturer.value == value %}selected{% endif %}>
-                                    {{ label }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.product_name.id_for_label }}">Product Name</label>
-                        <input type="text" class="form-control" name="{{ form.product_name.name }}"
-                               value="{{ form.product_name.value|default_if_none:''}}"
-                               placeholder="Enter the product name" required>
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.product_code.id_for_label }}">Product Code</label>
-                        <input type="text" class="form-control" name="{{ form.product_code.name }}"
-                               value="{{ form.product_code.value|default_if_none:'' }}"
-                               placeholder="Enter the product code" required>
+                    <div class="col-md-6 col-lg-6 col-sm-8" style="display: flex;flex-direction: column">
+                        <div class="row justify-content-between">
+                            <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.product_name.id_for_label }}">{{ form.product_name.label }}</label>
+                                    {{ form.product_name }}
+                                </div>
+                            </div>
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element" style="margin-right: 3vw">
+                                    <label class="form-label"
+                                           for="{{ form.product_spec.id_for_label }}">{{ form.product_spec.label }}:</label>
+                                    {{ form.product_spec }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-between">
+                            <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 5.9vw"
+                                           for="{{ form.print_name.id_for_label }}">{{ form.print_name.label }}</label>
+                                    {{ form.print_name }}
+                                </div>
+                            </div>
+                            <div class="col-lg-auto col-md-auto">
+                                <div class="form-element" style="margin-right: 2vw">
+                                    <label class="form-label" style="min-width: 4.1vw"
+                                           for="{{ form.map_code.id_for_label }}">{{ form.map_code.label }}:</label>
+
+                                    {{ form.map_code }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-between">
+                            <div class="col-lg-auto col-md-auto ">
+                                <div class="form-element" >
+                                    <label class="form-label"
+                                           for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}:</label>
+                                    <span class="form-items">
+                                    {{ form.sh_name }}
+                                        </span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-auto col-lg-auto">
+                                <div class="form-element" style="margin-right: 2vw">
+                                    <label class="form-label" style="min-width: 4.1vw"
+                                           for="{{ form.bin_loc.id_for_label }}">{{ form.bin_loc.label }}</label>
+                                    {{ form.bin_loc }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-between">
+
+                            <div class="col-md-auto col-lg-auto"
+                                 style="gap: 0;margin: 0;padding:0;justify-content: start">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 5.9vw"
+                                           for="{{ form.group.id_for_label }}">{{ form.group.label }}:</label>
+                                    {{ form.group }}
+                                </div>
+                            </div>
+                            <div class="col-md-auto col-lg-auto"
+                                 style="gap: 0;margin: 0;padding:0;justify-content: end">
+                                <div class="form-element" style="margin-right: 2.9vw">
+                                    <label class="form-label" style="min-width: 4.1vw"
+                                           for="{{ form.manufacturer.id_for_label }}">{{ form.manufacturer.label }}:</label>
+                                    {{ form.manufacturer }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-between">
+                            <div class="col-md-auto col-lg-auto"
+                                 style="gap: 0;margin: 0;padding:0;justify-content: start">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 5.9vw"
+                                           for="{{ form.unit_of_measurement.id_for_label }}">{{ form.unit_of_measurement.label }}:</label>
+                                    {{ form.unit_of_measurement }}
+                                </div>
+                            </div>
+                            <div class="col-md-auto col-lg-auto"
+                                 style="gap: 0;margin: 0;padding:0;justify-content: end">
+                                <div class="form-element" style="margin-right: 5.6vw">
+                                    <label class="form-label"
+                                           for="{{ form.stock_option.id_for_label }}">{{ form.stock_option.label }}:</label>
+                                    {{ form.stock_option }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="col">
-                        <label for="{{ form.print_name.id_for_label }}">Print Name</label>
-                        <input type="text" class="form-control" name="{{ form.print_name.name }}"
-                               value="{{ form.print_name.value|default_if_none:'' }}"
-                               placeholder="Enter the print name">
+
+                    <div class="col-md-6 col-lg-6 col-sm-8">
+                        <div class="row">
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element mb-0" style="margin-right: 1.5vw">
+                                    <label class="form-label" style="min-width: 3vw"
+                                           for="{{ form.buy_rate.id_for_label }}">{{ form.buy_rate.label }}:</label>
+                                    {{ form.buy_rate }}
+                                </div>
+                            </div>
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element" style="margin-right: 1vw">
+                                    <label class="form-label" style="min-width: 2vw"
+                                           for="{{ form.sgst.id_for_label }}">{{ form.sgst.label }}:</label>
+                                    {{ form.sgst }}
+                                </div>
+                            </div>
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 7.8vw"
+                                           for="{{ form.taxes_buying_rate.id_for_label }}">{{ form.taxes_buying_rate.label }}:</label>
+                                    {{ form.taxes_buying_rate }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element mb-0" style="margin-right: 1.5vw">
+                                    <label class="form-label" style="min-width: 3vw"
+                                           for="{{ form.sell_rate.id_for_label }}">{{ form.sell_rate.label }}:</label>
+                                    {{ form.sell_rate }}
+                                </div>
+                            </div>
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element" style="margin-right: 1vw">
+                                    <label class="form-label" style="min-width: 2.3vw"
+                                           for="{{ form.igst.id_for_label }}">{{ form.igst.label }}:</label>
+                                    {{ form.igst }}
+                                </div>
+                            </div>
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 7.8vw"
+                                           for="{{ form.taxes_selling_rate.id_for_label }}">{{ form.taxes_selling_rate.label }}:</label>
+                                    {{ form.taxes_selling_rate }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element mb-0" style="margin-right: 1vw">
+                                    <label class="form-label" style="min-width: 2vw"
+                                           for="{{ form.mrp.id_for_label }}">{{ form.mrp.label }}:</label>
+                                    {{ form.mrp }}
+                                </div>
+                            </div>
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element" style="margin-right: 1vw">
+                                    <label class="form-label" style="min-width: 2vw"
+                                           for="{{ form.hsn.id_for_label }}">{{ form.hsn.label }}:</label>
+                                    {{ form.hsn }}
+                                </div>
+                            </div>
+
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element" style="margin-right: 1vw">
+                                    <label class="form-label" style="min-width: 2vw"
+                                           for="{{ form.selling_discount.id_for_label }}">{{ form.selling_discount.label }}:</label>
+                                    {{ form.selling_discount }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="row">
-
-                    <div class="col">
-                        <label for="{{ form.group.id_for_label }}">Group</label>
-                        <select class="form-control" aria-label="Default select example"
-                                name="{{ form.group.name }}" required>
-                            {% for value, label in form.group.field.choices %}
-                                <option value="{{ value }}"
-                                        {% if form.group.value == value %}selected{% endif %}>
-                                    {{ label }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.contact.id_for_label }}">Contact Number</label>
-                        <input type="text" class="form-control" name="{{ form.contact.name }}"
-                               value="{{ form.contact.value|default_if_none:'' }}"
-                               placeholder="Enter the contact number">
-                    </div>
-
-                    <div class="col">
-                        <label for="{{ form.buy_rate.id_for_label }}">Buy Price</label>
-                        <input type="number" step="0.01" class="form-control" name="{{ form.buy_rate.name }}"
-                               value="{{ form.buy_rate.value|default_if_none:'' }}"
-                               placeholder="Enter the buy rate" required>
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.sell_rate.id_for_label }}">Sell Price</label>
-                        <input type="number" step="0.01" class="form-control" name="{{ form.sell_rate.name }}"
-                               value="{{ form.sell_rate.value|default_if_none:'' }}"
-                               placeholder="Enter the sell rate" required>
-                    </div>
-                </div>
-                <div class="row">
-
-                    <div class="col">
-                        <label for="{{ form.mrp.id_for_label }}">MRP</label>
-                        <input type="number" step="0.01" class="form-control" name="{{ form.mrp.name }}"
-                               value="{{ form.mrp.value|default_if_none:'' }}"
-                               placeholder="Enter the MRP" required>
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.selling_discount.id_for_label }}">Selling Discount</label>
-                        <input type="number" step="0.01" class="form-control" name="{{ form.selling_discount.name }}"
-                               value="{{ form.selling_discount.value|default_if_none:'' }}"
-                               placeholder="Enter the Selling Discount">
-                    </div>
-
-                    <div class="col">
-                        <label for="{{ form.product_spec.id_for_label }}">Product Spec</label>
-                        <input type="text" step="0.01" class="form-control" name="{{ form.product_spec.name }}"
-                               value="{{ form.product_spec.value|default_if_none:'' }}"
-                               placeholder="Enter the Product Specialisation">
-                    </div>
-                    <div class="col">
-                        <label for="{{ form.unit_of_measurement.id_for_label }}">UOM</label>
-                        <input type="text" step="0.01" class="form-control" name="{{ form.unit_of_measurement.name }}"
-                               value="{{ form.unit_of_measurement.value|default_if_none:'' }}"
-                               placeholder="Enter the Unit Of Measurement">
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col">
-                        <label for="{{ form.map_code.id_for_label }}">Map Code</label>
-                        <input type="text" step="0.01" class="form-control" name="{{ form.map_code.name }}"
-                               value="{{ form.map_code.value|default_if_none:'' }}"
-                               placeholder="Enter the MAP Code">
-                    </div>
-
-                    <div class="col">
-                        <label for="{{ form.hsn.id_for_label }}">HSN Code</label>
-                        <input type="number" step="0.01" class="form-control" name="{{ form.hsn.name }}"
-                               value="{{ form.hsn.value|default_if_none:'' }}"
-                               placeholder="Enter the HSN Code">
-                    </div>
-                <div class="col">
-                        <label for="{{ form.stock_option.id_for_label }}">Stock Option</label>
-                        <input type="text" step="0.01" class="form-control" name="{{ form.stock_option.name }}"
-                               value="{{ form.stock_option.value|default_if_none:'' }}"
-                               placeholder="Enter the Unit Of Measurement">
-                    </div>
-                </div>
-
-            </div>
-            <div class="row" style="justify-content: center;">
+                <div class="row" style="justify-content: center;">
                 <div class="col-auto">
                     <button class="btn btn-danger" type="submit" name="submit_record" id="form_submit">
                         Save
                     </button>
                 </div>
+            </div>
             </div>
         </form>
     {% endif %}

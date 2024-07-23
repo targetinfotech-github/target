@@ -111,8 +111,6 @@ class SignUpForm(UserCreationForm):
 
 
 class ManufacturerForm(forms.ModelForm):
-
-
     PURCHASE_TYPE = [('within_state','Within State'),
                      ('outside_state','Outside State'),
                      ('sale_in_transit','Sale in Transit'),
@@ -142,6 +140,7 @@ class ManufacturerForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control', 'id': 'purchase_type_form'})
     )
     purchase_account = forms.CharField(label='Purc Acc',widget=(forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Purchase Account'})))
+
     class Meta:
         model = Manufacturer
         fields = '__all__'
@@ -201,33 +200,44 @@ class ManufacturerForm(forms.ModelForm):
 
 
 class ProductForm(forms.ModelForm):
+    unit_of_measurement = forms.CharField(label='UOM',
+                                          widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'UOM'}))
+
     class Meta:
         model = Product
-        fields = ['manufacturer', 'product_name', 'product_code', 'print_name', 'contact',
-                  'buy_rate', 'sell_rate', 'mrp', 'stock_option', 'group', 'product_spec', 'map_code',
-                  'selling_discount', 'hsn', 'unit_of_measurement','purchase_taxes_charges','taxes_buying_rate',
-                  'taxes_selling_rate','bin_loc','sgst','igst']
+        # fields = ['manufacturer', 'product_name', 'product_code', 'print_name', 'contact',
+        #           'buy_rate', 'sell_rate', 'mrp', 'stock_option', 'group', 'product_spec', 'map_code',
+        #           'selling_discount', 'hsn', 'unit_of_measurement','purchase_taxes_charges','taxes_buying_rate',
+        #           'taxes_selling_rate','bin_loc','sgst','igst']
 
-    widgets = {
-        'manufacturer': forms.Select(attrs={'class': 'form-control'}),
-    }    # #
-    # widgets = {
-    #     'manufacturer': forms.Select(attrs={'class': 'form-select'}),
-    #     'product_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the product name'}),
-    #     'product_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the product code'}),
-    #     'print_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the print name'}),
-    #     'contact': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the contact number'}),
-    #     'buy_rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter the buy rate'}),
-    #     'sell_rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter the sell rate'}),
-    #     'mrp': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter the MRP'}),
-    #     'stock_option': forms.Select(attrs={'class': 'form-control'}),
-    #     'group': forms.Select(attrs={'class': 'form-control'}),
-    # }
+        fields = '__all__'
+        widgets = {
+            'manufacturer': forms.Select(attrs={'class': 'form-control'}),
+            'group': forms.Select(attrs={'class': 'form-control'}),
+            'product_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the product name'}),
+            'sh_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Sh Name'}),
+            'map_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Map Code'}),
+            'bin_loc': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Bin Loc'}),
+            'product_spec': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Product Spec'}),
+            'contact': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the contact number'}),
+            'print_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Print Name'}),
+            'hsn': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the HSN'}),
+            'sgst': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'SGST','id':'gst_tax_form'}),
+            'igst': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'IGST','id':'gst_tax_form'}),
+            'purchase_taxes_charges': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Purchase Taxes Charges'}),
+            'taxes_buying_rate': forms.Select(attrs={'class': 'form-control','id':'taxes_rate_form'}),
+            'taxes_selling_rate': forms.Select(attrs={'class': 'form-control','id':'taxes_rate_form'}),
+            'buy_rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '+int','id':'price_rate'}),
+            'sell_rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '+int','id':'price_rate'}),
+            'mrp': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '+int','id':'price_rate'}),
+            'net_quantity': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Net Quantity'}),
+            'selling_discount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '+int%','id':'discount_form'}),
+            'stock_option': forms.Select(attrs={'class': 'form-control','id':'stock_option_forms'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['product_name'].required = True
-        self.fields['product_code'].required = True
         self.fields['buy_rate'].required = True
         self.fields['sell_rate'].required = True
         self.fields['mrp'].required = True
@@ -326,8 +336,7 @@ class GroupForm(forms.ModelForm):
             'print_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Print Name'}),
             'sh_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Sh Name'}),
             'code_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Code Name'}),
-            'consolidation_code': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Enter the Consolidation Code'}),
+            'consolidation_status': forms.Select(attrs={'class': 'form-control','id':'consolidation_status_form'}),
             'hsn_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the HSN Code'}),
             'gcr_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the GCR Code'}),
         }

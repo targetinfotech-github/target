@@ -4,13 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9b1ddd95-aa22-4abd-a599-5b65f6a4926a" name="Changes" comment="customer design1">
+    <list default="true" id="9b1ddd95-aa22-4abd-a599-5b65f6a4926a" name="Changes" comment="customer ,manufactuer -frontend">
+      <change beforePath="$PROJECT_DIR$/.idea/target.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/target.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/billing/services/search_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/search_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/billing/form.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/form.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/billing/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/billing/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/templates/billing/customer.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/customer.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/billing/dummy.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/dummy.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/templates/billing/group.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/group.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/templates/billing/manufacturer.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/manufacturer.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/templates/billing/master_extended.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/master_extended.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/templates/billing/products.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/products.html" afterDir="false" />
     </list>
@@ -42,8 +44,8 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://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@github.com/targetinfotech-github/target.git&quot;,
-    &quot;accountId&quot;: &quot;45ef97d9-8b3f-469c-8d3a-3324ad763128&quot;
+    &quot;url&quot;: &quot;https://github.com/targetinfotech-github/target.git&quot;,
+    &quot;accountId&quot;: &quot;a09c0bb5-4993-460d-92f3-3c3a96df372f&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -55,30 +57,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Django Server.target_infotech.executor": "Run",
-    "Django Server.target_infotech_demo.executor": "Run",
-    "Python tests.Python tests for dummy.TestStringMethods.executor": "Run",
-    "Python tests.Python tests for dummy.TestStringMethods.test_isupper.executor": "Run",
-    "Python tests.Python tests for dummy.TestStringMethods.test_split.executor": "Run",
-    "Python.dummy.executor": "Run",
-    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.pycharm.django.structure.promotion.once.per.project": "true",
-    "django.template.preview.state": "SHOW_EDITOR",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "D:/wordpress",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Django Server.target_infotech.executor&quot;: &quot;Run&quot;,
+    &quot;Django Server.target_infotech_demo.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests for dummy.TestStringMethods.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests for dummy.TestStringMethods.test_isupper.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests for dummy.TestStringMethods.test_split.executor&quot;: &quot;Run&quot;,
+    &quot;Python.dummy.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.pycharm.django.structure.promotion.once.per.project&quot;: &quot;true&quot;,
+    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/TargetInfotech/target&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\django-dashboard-volt-1.0.4\django-dashboard-volt-1.0.4\core\staticfiles" />
@@ -88,6 +90,9 @@
     </key>
   </component>
   <component name="RunManager" selected="Django Server.target_infotech">
+    <configuration name="generated-requests | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/generated-requests.http" requestIdentifier="#1" runType="Run single request">
+      <method v="2" />
+    </configuration>
     <configuration name="dummy" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="target" />
       <option name="ENV_FILES" value="" />
@@ -250,6 +255,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="HTTP Request.generated-requests | #1" />
         <item itemvalue="Python tests.Python tests for apps.billing.services.dummy" />
         <item itemvalue="Python tests.Python tests for apps.billing.services.dummy" />
         <item itemvalue="Python tests.Python tests for apps.billing.services.dummy" />
@@ -260,8 +266,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PY-241.17890.14" />
-        <option value="bundled-python-sdk-5b207ade9991-7e9c3bbb6e34-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.17890.14" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PY-241.18034.82" />
+        <option value="bundled-python-sdk-975db3bf15a3-2767605e8bc2-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-241.18034.82" />
       </set>
     </attachedChunks>
   </component>
@@ -334,6 +340,16 @@
       <workItem from="1721301685607" duration="22000" />
       <workItem from="1721361878424" duration="7798000" />
       <workItem from="1721372045389" duration="121000" />
+      <workItem from="1721462191605" duration="171000" />
+      <workItem from="1721462367959" duration="299000" />
+      <workItem from="1721466282160" duration="6020000" />
+      <workItem from="1721619583455" duration="2971000" />
+      <workItem from="1721623188789" duration="12000000" />
+      <workItem from="1721640112944" duration="383000" />
+      <workItem from="1721642256118" duration="8617000" />
+      <workItem from="1721651016021" duration="91000" />
+      <workItem from="1721651127234" duration="100000" />
+      <workItem from="1721706573826" duration="11317000" />
     </task>
     <task id="LOCAL-00001" summary="testing -- factory creation">
       <option name="closed" value="true" />
@@ -455,7 +471,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721283574572</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="customer ,manufactuer -frontend">
+      <option name="closed" value="true" />
+      <created>1721651205488</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1721651205488</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -486,7 +510,8 @@
     <MESSAGE value=".." />
     <MESSAGE value="customer" />
     <MESSAGE value="customer design1" />
-    <option name="LAST_COMMIT_MESSAGE" value="customer design1" />
+    <MESSAGE value="customer ,manufactuer -frontend" />
+    <option name="LAST_COMMIT_MESSAGE" value="customer ,manufactuer -frontend" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/django_dashboard_volt_1_0_4$dummy.coverage" NAME="dummy Coverage Results" MODIFIED="1719377292762" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/apps/home" />
