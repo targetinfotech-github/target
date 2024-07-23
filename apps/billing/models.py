@@ -74,6 +74,22 @@ class Account(models.Model):
     def __str__(self):
         return f"Account for {self.company.company_name} from {self.account_year_from} to {self.account_year_upto}"
 
+class Location(models.Model):
+    SALE_STATE_LIST = [('within_state', 'Within State'),
+                       ('outside_state', 'Outside State'),
+                       ('sale_nil_gst', 'Sale(NIL GST)')]
+
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    address = models.TextField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
+    postal_code = models.PositiveIntegerField(null=True, blank=True)
+    state_name = models.CharField(max_length=50, null=True, blank=True)
+    sale_state = models.CharField(choices=SALE_STATE_LIST, max_length=50, null=True, blank=True)
+    state_code = models.CharField(max_length=2, null=True, blank=True)
+
+    class Meta:
+        ordering = ['-id']
+        db_table = 'Address'
 
 class GroupManager(models.Manager):
     def get_or_create_general_group(self):
@@ -82,7 +98,6 @@ class GroupManager(models.Manager):
             defaults={'group_name': 'General Group'}
         )
         return group
-
 
 class ProductGroup(models.Model):
     CONSOLIDATION_STATUS = [('yes','Yes'),
@@ -146,9 +161,6 @@ class Manufacturer(models.Model):
                  ('composite_dealer','Composite Dealer'),
                  ('unregistered_dealer','Unregistered Dealer')]
 
-    SALE_STATE_LIST = [('within_state', 'Within State'),
-                       ('outside_state', 'Outside State'),
-                       ('sale_nil_gst', 'Sale(NIL GST)')]
 
     STANDARD_FORM = [('form_c','Form C'),
                      ('form_d','Form D'),
@@ -162,9 +174,7 @@ class Manufacturer(models.Model):
     print_name = models.CharField(max_length=255, null=True, blank=True)
     sh_name = models.CharField(max_length=100, null=True, blank=True)
     type = models.CharField(choices=TYPE_CHOICES, max_length=20, default='manufacturer',verbose_name='Type')
-    address = models.TextField(max_length=255, null=True, blank=True)
-    city = models.CharField(max_length=100,null=True,blank=True)
-    postal_code = models.PositiveIntegerField(null=True,blank=True)
+    location = models.OneToOneField(Location,on_delete=models.PROTECT,related_name='manufacturer_location',null=True,blank=True)
     gstin = models.CharField(max_length=15, validators=[validate_gstin],null=True,blank=True)
     hsn = models.CharField(max_length=15,null=True,blank=True)
     email = models.EmailField(null=True, blank=True)
@@ -181,12 +191,9 @@ class Manufacturer(models.Model):
     mobile_number = models.CharField(max_length=15, null=True, blank=True, verbose_name='Mb No')
     area = models.CharField(max_length=15, null=True, blank=True, verbose_name='Area')
     fax = models.CharField(max_length=20, null=True, blank=True)
-    state_name = models.CharField(max_length=50, null=True, blank=True)
-    sale_state = models.CharField(choices=SALE_STATE_LIST, max_length=50, null=True, blank=True)
     std_form = models.CharField(choices=STANDARD_FORM, max_length=50, null=True, blank=True)
     formIR = models.CharField(choices=FORM_IR, max_length=50, null=True, blank=True)
-    state_code = models.CharField(max_length=2, null=True, blank=True)
-    customer_representative = models.CharField(max_length=15, null=True, blank=True,verbose_name='Representative')
+    customer_representative = models.CharField(max_length=15, null=True, blank=True)
     cst = models.CharField(max_length=15, null=True, blank=True,verbose_name='CST')
     purchase_account = models.CharField(max_length=50, null=True, blank=True)
     invoice_prefix = models.CharField(max_length=5, null=True, blank=True)
@@ -266,10 +273,6 @@ class Product(models.Model):
 
 class Customer(models.Model):
 
-    SALE_STATE_LIST = [('within_state','Within State'),
-                  ('outside_state','Outside State'),
-                  ('sale_nil_gst','Sale(NIL GST)')]
-
     SALE_TYPE = [('cash','Cash'),
                  ('credit','Credit'),
                  ('cheque','Cheque'),
@@ -289,20 +292,24 @@ class Customer(models.Model):
     BILLING_STAT = [('active','Active'),
                     ('on_approval','On Approval'),
                     ('suspended','Suspended')]
+    SALE_STATE_LIST = [('within_state', 'Within State'),
+                       ('outside_state', 'Outside State'),
+                       ('sale_nil_gst', 'Sale(NIL GST)')]
+
+    address = models.TextField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
+    postal_code = models.PositiveIntegerField(null=True, blank=True)
+    state_name = models.CharField(max_length=50, null=True, blank=True)
+    sale_state = models.CharField(choices=SALE_STATE_LIST, max_length=50, null=True, blank=True)
+    state_code = models.CharField(max_length=2, null=True, blank=True)
 
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     customer_name = models.CharField(unique=True, max_length=30, null=True, blank=True)
     print_name = models.CharField(max_length=30, null=True, blank=True)
     sh_name = models.CharField(max_length=30, null=True, blank=True)
-    address = models.TextField(max_length=255, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     last_accessed = models.DateTimeField(default=now, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    city = models.CharField(max_length=50, null=True, blank=True)
-    postal_code = models.PositiveIntegerField(null=True, blank=True)
-    state_name = models.CharField(max_length=50, null=True, blank=True)
-    sale_state = models.CharField(choices=SALE_STATE_LIST, max_length=50, null=True, blank=True)
-    state_code = models.CharField(max_length=2, null=True, blank=True)
     sale_type = models.CharField(choices=SALE_TYPE,max_length=50, null=True, blank=True)
     id_no = models.CharField(max_length=30,null=True,blank=True)
     gstin = models.CharField(max_length=15, validators=[validate_gstin],null=True,blank=True,verbose_name='GSTIN')
@@ -312,10 +319,10 @@ class Customer(models.Model):
     telephone = models.CharField(max_length=15, null=True, blank=True)
     mobile_number = models.CharField(max_length=15, null=True, blank=True,verbose_name='Mb No')
     area = models.CharField(max_length=15, null=True, blank=True,verbose_name='Area') #not a charfield, change later
-    customer_representative = models.CharField(max_length=15, null=True, blank=True,verbose_name='Representative') #not a charfield, change later
-    tin = models.CharField(max_length=15, null=True, blank=True,verbose_name='TIn')
-    cst = models.CharField(max_length=15, null=True, blank=True,verbose_name='CST')
-    carrier = models.CharField(max_length=15, null=True, blank=True,verbose_name='Carrier')
+    customer_representative = models.CharField(max_length=15, null=True, blank=True) #not a charfield, change later
+    tin = models.CharField(max_length=15, null=True, blank=True)
+    cst = models.CharField(max_length=15, null=True, blank=True)
+    carrier = models.CharField(max_length=15, null=True, blank=True)
     contact1 = models.CharField(max_length=15, null=True, blank=True)
     contact2 = models.CharField(max_length=15, null=True, blank=True)
     fax = models.CharField(max_length=20, null=True, blank=True)

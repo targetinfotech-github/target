@@ -8,7 +8,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from icecream import ic
 
-from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser
+from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location
 from django import forms
 from .models import Receipt, ReceiptProduct, Manufacturer, Product
 from django.db import transaction
@@ -110,7 +110,48 @@ class SignUpForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2')
 
 
+
+class LocationForm(forms.ModelForm):
+    postal_code = forms.IntegerField(validators=[MinValueValidator(1)], widget=(
+        forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Postal Code', 'id': 'postal_code_form'})))
+
+    class Meta:
+        model = Location
+        fields = ['address', 'city', 'postal_code', 'state_name', 'sale_state', 'state_code']
+        widgets = {
+            'address': forms.Textarea(
+                attrs={'class': 'form-control custom-address', 'placeholder': 'Enter the address', 'rows': 4,
+                       'id': 'address-form'}),
+            'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the City'}),
+            'state_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the State Name'}),
+            'sale_state': forms.Select(attrs={'class': 'form-control','id':'sale_state_form'}),
+            'state_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '01-97', 'id':'state-code-form'}),
+        }
+
+    STATE_CODES = get_state_code()
+    STATE_NAMES = {v.lower(): k for k, v in STATE_CODES.items()}
+
+    def clean(self):
+        cleaned_data = super().clean()
+        state_name, state_code = None, None
+        if self.cleaned_data['state_name']:
+            state_name = self.cleaned_data['state_name'].lower()
+            if state_name not in self.STATE_NAMES:
+                self.add_error('state_name', f'state name: {state_name} does not exists')
+        if self.cleaned_data['state_code']:
+            state_code = self.cleaned_data['state_code'].lower()
+            if state_code not in self.STATE_CODES:
+                self.add_error('state_code', f'State Code: {state_code} does not exists')
+        if state_name and state_code:
+            if self.STATE_CODES[state_code] != state_name:
+                self.add_error('state_name', 'State name does not match the state code.')
+                self.add_error('state_code', 'State code does not match the state name.')
+        return cleaned_data
+
+
+
 class ManufacturerForm(forms.ModelForm):
+
     PURCHASE_TYPE = [('within_state','Within State'),
                      ('outside_state','Outside State'),
                      ('sale_in_transit','Sale in Transit'),
@@ -129,8 +170,6 @@ class ManufacturerForm(forms.ModelForm):
 
     name = forms.CharField(label='Name', widget=(
         forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the name', 'id': 'name_form'})))
-    postal_code = forms.IntegerField(validators=[MinValueValidator(1)], widget=(
-        forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Postal Code', 'id': 'postal_code_form'})))
 
     class_name = forms.CharField(label='Class',widget=(forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Class Name'})))
 
@@ -148,15 +187,8 @@ class ManufacturerForm(forms.ModelForm):
             'print_name': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Enter the print name', 'id': 'print_name_form'}),
             'sh_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
-            'address': forms.Textarea(
-                attrs={'class': 'form-control custom-address', 'placeholder': 'Enter the address', 'rows': 4,
-                       'id': 'address-form'}),
             'email': forms.EmailInput(
                 attrs={'class': 'form-control', 'placeholder': 'Enter the email', 'id': 'email-form'}),
-            'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the City'}),
-            'state_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the State Name'}),
-            'state_code': forms.TextInput(
-                attrs={'class': 'form-control', 'id': 'state-code-form'}),
             'gstin': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the GSTIN'}),
             'mobile_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mobile Number'}),
             'contact1': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact 1'}),
@@ -165,8 +197,6 @@ class ManufacturerForm(forms.ModelForm):
             'tin': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter TIN'}),
             'cst': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter CST'}),
             'fax': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter FAX'}),
-            'class_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Class Name'}),
-            'sale_state': forms.Select(attrs={'class': 'form-control', 'id': 'sale_state_form'}),
             'formIR': forms.Select(attrs={'class': 'form-control', 'id': 'form_ir'}),
             'std_form': forms.Select(attrs={'class': 'form-control', 'id': 'std_form'}),
             'type': forms.Select(attrs={'class': 'form-control', 'id': 'std_form'}),
@@ -181,22 +211,6 @@ class ManufacturerForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['name'].required = True
         self.fields['sh_name'].required = True
-
-    STATE_CODES = get_state_code()
-    STATE_NAMES = {v.lower(): k for k, v in STATE_CODES.items()}
-
-    def clean(self):
-        cleaned_data = super().clean()
-        state_name = self.cleaned_data['state_name'].lower()
-        state_code = self.cleaned_data['state_code'].lower()
-        if state_name and state_name not in self.STATE_NAMES:
-            self.add_error('state_name', f'state name: {state_name} does not exists')
-        if state_code and state_code not in self.STATE_CODES:
-            self.add_error('state_code', f'State Code: {state_code} does not exists')
-        if self.STATE_CODES['state_code'] != state_name:
-            self.add_error('state_name', 'State name does not match the state code.')
-            self.add_error('state_code', 'State code does not match the state name.')
-        return cleaned_data
 
 
 class ProductForm(forms.ModelForm):

@@ -94,7 +94,7 @@ class SearchService:
             Q(name__icontains=self.details_query) |
             Q(email__icontains=self.details_query)
         ).values(
-            'id', 'name', 'print_name', 'sh_name', 'contact', 'type'
+            'id', 'name', 'print_name', 'sh_name', 'contact1', 'type'
         )
         return self.paginate_results(results)
 
@@ -104,7 +104,7 @@ class SearchService:
             Q(customer_name__icontains=self.details_query) |
             Q(email__icontains=self.details_query)
         ).values(
-            'id', 'customer_name', 'print_name', 'sh_name', 'contact', 'email'
+            'id', 'customer_name', 'print_name', 'sh_name', 'contact1', 'email'
         )
         return self.paginate_results(results)
 
