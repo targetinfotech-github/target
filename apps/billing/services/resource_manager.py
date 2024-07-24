@@ -10,7 +10,7 @@ class SetupContext():
         self.operation = operation
 
     def get_common_context(self, url_type, flag, label, modal_url, view_url, create_url, update_url, delete_url,master_data=None,
-                           input_name=None, query='', page_obj=None, master_header=None, form=None):
+                           input_name=None, query='', page_obj=None, master_header=None):
         context = {
             'url_type': url_type,
             'flag': flag,
@@ -25,7 +25,6 @@ class SetupContext():
             'query': query,
             'page_obj': page_obj,
             'master_header': master_header,
-            'form': form,
         }
         return context
 

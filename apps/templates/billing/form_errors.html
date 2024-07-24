@@ -1,0 +1,23 @@
+{% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}
+        <div class="d-flex justify-content-center">
+            <div class="alert form-error-alert alert-dismissible fade show" role="alert">
+                {{ error }}
+                <button type="button" class="btn-close" style="padding-bottom: 5px" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% for field in form %}
+    {% if field.errors %}
+        {% for error in field.errors %}
+            <div class="d-flex justify-content-center">
+                <div class="alert form-error-alert alert-dismissible fade show" role="alert">
+                    <p><u><strong>{{ field.label }}:</strong></u> {{ error }}</p>
+                    <button type="button" class="btn-close" style="padding-bottom: 5px" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endfor %}

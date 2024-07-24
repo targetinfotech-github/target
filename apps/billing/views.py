@@ -18,7 +18,7 @@ from icecream import ic
 
 from apps.billing.services.decorators import measure_execution_time
 from apps.billing.form import ManufacturerForm, ProductForm, ReceiptForm, GroupForm, CustomerForm, SignUpForm, \
-    LoginForm, LocationForm
+    LoginForm, LocationForm, TaxDetailForm
 from django.shortcuts import render, redirect
 from apps.billing.models import Manufacturer, Product, Receipt, ReceiptProduct, ProductGroup, Customer, CustomUser, \
     Location
@@ -45,10 +45,12 @@ def index(request):
     group = ProductGroup.objects.count()
     product = Product.objects.count()
     customer = Customer.objects.count()
-    print(group)
-    print(manufacturer)
-    print(product)
-    print(customer)
+    location = Location.objects.count()
+    print(f'group: {group}')
+    print(f'manufacturer: {manufacturer}')
+    print(f'product: {product}')
+    print(f'customer: {customer}')
+    print(f'location: {location}')
     html_template = loader.get_template('billing/dashboard.html')
     return HttpResponse(html_template.render(context, request))
 
@@ -59,18 +61,19 @@ def pages(request):
     context = {}
     # All resource paths end in .html.
     # Pick out the html file name from the url. And load that template.
-    try:
-        load_template = request.path.split('/')[-1]
-        if load_template == 'admin':
-            return HttpResponseRedirect(reverse('admin:index'))
-        context['segment'] = load_template
-        html_template = loader.get_template('billing/' + load_template)
-        return HttpResponse(html_template.render(context, request))
+    # try:
+    load_template = request.path.split('/')[-1]
+    if load_template == 'admin':
+        return HttpResponseRedirect(reverse('admin:index'))
+    context['segment'] = load_template
+    ic(context)
+    html_template = loader.get_template('billing/' + load_template)
+    return HttpResponse(html_template.render(context, request))
 
-    except template.TemplateDoesNotExist:
-        return render(request, 'billing/page-404.html')
-    except:
-        return render(request, 'billing/page-500.html')
+    # except template.TemplateDoesNotExist:
+    #     return render(request, 'billing/page-404.html')
+    # except:
+    #     return render(request, 'billing/page-500.html')
 
 
 def pagination(request, queryset):
@@ -131,12 +134,12 @@ def register_user(request):
 
     return render(request, "accounts/register.html", {"form": form})
 
+
 @login_required(login_url='login')
 def Logout(request):
     logout(request)
     messages.success(request, '✅ Successfully Logged Out!')
     return redirect(reverse('login'))
-
 
 
 def delete_models(request,model,name=None):
@@ -147,39 +150,43 @@ def delete_models(request,model,name=None):
         if model:
             messages.error(request, f'Exception occurred: {e}. {name} not Deleted')
 
-@login_required(login_url="/login/")
-@measure_execution_time
+
 def create_manufacturer(request):
-    # try:
-    manufacturer_form = ManufacturerForm()
-    location_form = LocationForm()
     if request.method == 'POST':
         manufacturer_form = ManufacturerForm(request.POST)
         location_form = LocationForm(request.POST)
+
         if location_form.is_valid():
             try:
                 location_instance = location_form.save()
             except Exception as e:
-                location_instance=None
-                messages.error(request,f'Exception occurred while creating the location, submit the form again.')
-            if manufacturer_form.is_valid():
-                ic(location_instance)
-                ic(location_instance.id)
-                name = manufacturer_form.cleaned_data['name']
-                try:
-                    if location_instance:
-                        manufacturer = manufacturer_form.save(commit=False)
-                        manufacturer.location_id = location_instance.id
-                        manufacturer.save()
-                    else:
-                        manufacturer_form.save()
-                    messages.success(request, f'Manufacturer {name} created')
-                except Exception as e:
-                    if not Manufacturer.objects.filter(name__exact=name).exists():
-                        print(e)
-                        messages.error(request, f'Exception submit the form again.')
+                print(e)
+                location_instance = None
+                messages.error(request, 'Exception occurred while creating the location. Please submit the form again.')
+        else:
+            location_instance = None
+        if manufacturer_form.is_valid() and location_instance is not None:
+            name = manufacturer_form.cleaned_data['name']
+            try:
+                manufacturer = manufacturer_form.save(commit=False)
+                manufacturer.location = location_instance
+                manufacturer.save()
+                messages.success(request, f'Manufacturer {name} created successfully.')
                 return redirect('create_manufacturer')
-
+            except Exception as e:
+                if not Manufacturer.objects.filter(name=name).exists():
+                    try:
+                        Location.objects.get(id=location_instance.id).delete()
+                    except:
+                        pass
+                    print(e)
+                    messages.error(request,
+                                   'Exception occurred while creating the manufacturer. Please submit the form again.')
+        else:
+            print('invalid form')
+    else:
+        manufacturer_form = ManufacturerForm()
+        location_form = LocationForm()
 
     master_data = Manufacturer.objects.exists()
     if not master_data:
@@ -203,7 +210,6 @@ def create_manufacturer(request):
 @measure_execution_time
 def get_manufacturer_modal(request):
     # try:
-    query = ''
     manufacturer_data = Manufacturer.objects.annotate(
         product_count=Count('product_manufacturer')
     ).values('id', 'name', 'type', 'sh_name', 'print_name', 'product_count').order_by('name')
@@ -237,44 +243,55 @@ def get_manufacturer_modal(request):
 @login_required(login_url="/login/")
 @measure_execution_time
 def update_manufacturer(request, pk):
-    # try:
-    manufacturer_data = Manufacturer.objects.get(id=pk)
-    location_data=Location.objects.get(manufacturer_location__id=pk)
-    manufacturer_form = ManufacturerForm(instance=manufacturer_data)
-    location_form = LocationForm(instance=location_data)
+    try:
+        manufacturer_data = Manufacturer.objects.get(id=pk)
+    except Manufacturer.DoesNotExist:
+        return render(request,'billing/page-404.html')
+    location_data, created = Location.objects.get_or_create(manufacturer_location__id=pk)
+
+    if manufacturer_data.location is None:
+        manufacturer_data.location = location_data
+        manufacturer_data.save()
+
     if request.method == 'POST':
         manufacturer_form = ManufacturerForm(request.POST, instance=manufacturer_data)
         location_form = LocationForm(request.POST, instance=location_data)
+
         if location_form.is_valid():
             try:
+                # Save the location form to get the Location instance
                 location_instance = location_form.save()
             except Exception as e:
                 location_instance = None
-                messages.error(request, f'Exception occurred while creating the location, submit the form again.')
-            if manufacturer_form.is_valid():
-                ic(location_instance)
-                ic(location_instance.id)
-                name = manufacturer_form.cleaned_data['name']
-                try:
-                    if location_instance:
-                        manufacturer = manufacturer_form.save(commit=False)
-                        manufacturer.location_id = location_instance.id
-                        manufacturer.save()
-                    else:
-                        manufacturer_form.save()
-                    messages.success(request, f'Manufacturer {name} created')
-                except Exception as e:
-                    if not Manufacturer.objects.filter(name__exact=name).exists():
-                        print(e)
-                        messages.error(request, f'Exception submit the form again.')
-                return redirect('create_manufacturer')
+                messages.error(request, 'Exception occurred while creating the location. Please submit the form again.')
         else:
-            ic('location form is not valid')
+            location_instance = None
+
+        if manufacturer_form.is_valid() and location_instance is not None:
+            name = manufacturer_form.cleaned_data['name']
+            try:
+                manufacturer = manufacturer_form.save(commit=False)
+                manufacturer.location = location_instance  # Assign Location instance
+                manufacturer.save()
+                messages.success(request, f'Manufacturer {name} updated successfully.')
+                return redirect('create_manufacturer')
+            except Exception as e:
+                # Rollback the location save if manufacturer save fails
+                if not Manufacturer.objects.filter(name=name).exists():
+                    try:
+                        Location.objects.filter(id=location_instance.id).delete()
+                    except:
+                        pass
+                messages.error(request,
+                               'Exception occurred while creating the manufacturer. Please submit the form again.')
+                print(e)
+    else:
+        manufacturer_form = ManufacturerForm(instance=manufacturer_data)
+        location_form = LocationForm(instance=location_data)
     context_obj = SetupContext(model_search='manufacturer',page_obj=manufacturer_data, operation='update')
     context = context_obj.get_context()
     context['manufacturer_form'] = manufacturer_form
     context['location_form'] = location_form
-    ic(location_form.errors)
     return render(request, 'billing/manufacturer.html', context=context)
     # except template.TemplateDoesNotExist:
     #     return render(request, 'billing/page-404.html')
@@ -717,22 +734,44 @@ def delete_group(request):
 def create_customer(request):
     # try:
     if request.method == 'POST':
-        form = CustomerForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data['customer_name']
-            form.save()
-            messages.success(request, f'Customer {name} created')
-            return redirect('create_customer')
+        location_form = LocationForm(request.POST)
+        customer_form = CustomerForm(request.POST)
+        if location_form.is_valid():
+            try:
+                location_instance = location_form.save()
+            except Exception as e:
+                print(e)
+                location_instance = None
+                messages.error(request, 'Exception occurred while creating the location. Please submit the form again.')
         else:
-            # Form is not valid, it will fall through to re-render the form with errors
-            messages.error(request, 'Please correct the errors below.')
+            location_instance = None
+        ic(location_instance)
+        if customer_form.is_valid() and location_instance:
+            name = customer_form.cleaned_data['customer_name']
+            try:
+                customer = customer_form.save(commit=True)
+                customer.location = location_instance
+                customer.save()
+                messages.success(request, f'Customer {name} successfully created')
+                return redirect('create_customer')
+            except Exception as e:
+                if not Customer.objects.filter(customer_name=name).exists():
+                    try:
+                        Location.objects.get(id=location_instance.id).delete()
+                    except:
+                        pass
+                    messages.error(request,
+                                   'Exception occurred while creating the customer. Please submit the form again.')
+        else:
+            ic('form not valid')
     else:
-        form = CustomerForm()
-    print('after form not valid')
+        customer_form = CustomerForm()
+        location_form = LocationForm()
     customer_data = Customer.objects.exists()
     context_obj = SetupContext(model_search='customer',page_obj=customer_data, operation='create')
     context = context_obj.get_context()
-    context['form'] = form
+    context['customer_form'] = customer_form
+    context['location_form'] = location_form
     return render(request, 'billing/customer.html', context)
     # except template.TemplateDoesNotExist:
     #     return render(request, 'billing/page-404.html')
@@ -779,19 +818,54 @@ def get_customer_modal(request):
 @measure_execution_time
 def update_customer(request, pk):
     try:
-        customer_data = Customer.objects.get(id=pk)
+        try:
+            customer_data = Customer.objects.get(id=pk)
+        except Exception as e:
+            print(e)
+            return render(request,'billing/page-404.html')
+
+        location_data, created = Location.objects.get_or_create(customer_location__id=pk)
+        if customer_data.location is None:
+            customer_data.location = location_data
+            customer_data.save()
         if request.method == 'POST':
-            form = CustomerForm(request.POST, instance=customer_data)
-            if form.is_valid():
-                name = form.cleaned_data['customer_name']
-                form.save()
-                messages.success(request, f'Customer {name} updated')
-                return redirect('create_customer')
+            location_form = LocationForm(request.POST,instance=location_data)
+            customer_form = CustomerForm(request.POST,instance=customer_data)
+            if location_form.is_valid():
+                try:
+                    location_instance = location_form.save()
+                except Exception as e:
+                    print(e)
+                    location_instance = None
+                    messages.error(request,
+                                   'Exception occurred while creating the location. Please submit the form again.')
+            else:
+                location_instance = None
+            if customer_form.is_valid() and location_instance:
+                name = customer_form.cleaned_data['customer_name']
+                try:
+                    customer = customer_form.save(commit=False)
+                    customer.location = location_instance
+                    customer.save()
+                    messages.info(request, f'Customer {name} updated.')
+                    return redirect('create_customer')
+                except Exception as e:
+                    if not Customer.objects.filter(customer_name=name).exists():
+                        try:
+                            Location.objects.get(id=location_instance.id).delete()
+                        except:
+                            pass
+                    print(e)
+                    messages.error(request,
+                                   'Exception occurred while creating the manufacturer. Please submit the form again.')
         else:
-            form = CustomerForm(instance=customer_data)
+            location_form = LocationForm(instance=location_data)
+            customer_form = CustomerForm(instance=customer_data)
+
         context_obj = SetupContext(model_search='customer',page_obj=customer_data, operation='update')
         context = context_obj.get_context()
-        context['form'] = form
+        context['location_form'] = location_form
+        context['customer_form'] = customer_form
         return render(request, 'billing/customer.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
@@ -857,6 +931,15 @@ def view_customer(request):
     #     return render(request, 'billing/page-500.html')
 
 
+
+def tax_structure(request):
+    form = TaxDetailForm()
+    # generate unique tax id
+    context = {'form':form}
+    return render(request, 'billing/tax_structure.html',context=context)
+
+
+
 @measure_execution_time
 def search_router(request, model_search):
     autocomplete_query = request.GET.get('autocomplete_query', '')
@@ -870,3 +953,5 @@ def search_router(request, model_search):
     else:
         template, context = masterSearchObject.masterSearchRouter()
         return render(request, template, context)
+
+

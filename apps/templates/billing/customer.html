@@ -86,40 +86,14 @@
     </form>
 {% endblock modal_post_request %}
 
-
 {% block create_form %}
 
     {% if flag != 'view' and flag != 'modal' and flag != 'delete' %}
         <form method="post">
             {% csrf_token %}
-            {% csrf_token %}
-            {% if form.non_field_errors %}
-                {% for error in form.non_field_errors %}
-                    <div class="d-flex justify-content-center">
-                        <div class="alert form-error-alert alert-dismissible fade show" role="alert">
-                            {{ error }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
-            {% for field in form %}
-                {% if field.errors %}
-                    {% for error in field.errors %}
-                        <div class="d-flex justify-content-center">
-                            <div class="alert form-error-alert alert-dismissible fade show" role="alert">
-                                <p><u><strong>{{ field.label }}:</strong></u> {{ error }}</p>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                        aria-label="Close"></button>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endfor %}
-            {#            <div class="form-container">#}
+            {% include 'billing/form_errors.html' with form=customer_form %}
+            {% include 'billing/form_errors.html' with form=location_form %}
             <div class="container">
-                {#                <hr class="basic-line mb-2">#}
 
                 <div class="row">
                     <div class="col-md-6 col-lg-6 col-sm-8" style="display: flex;flex-direction: column">
@@ -127,35 +101,35 @@
                             <div class="col">
                                 <div class="form-element">
                                     <label class="form-label" style="min-width: 60px"
-                                           for="{{ form.customer_name.id_for_label }}">{{ form.customer_name.label }}</label>
-                                    {{ form.customer_name }}
+                                           for="{{ customer_form.customer_name.id_for_label }}">{{ customer_form.customer_name.label }}</label>
+                                    {{ customer_form.customer_name }}
                                 </div>
                             </div>
                             <div class="col-lg-auto col-md-auto ">
                                 <div class="form-element" style="margin-right: 2vw">
                                     <label class="form-label" style="min-width: 3.2vw"
-                                           for="{{ form.telephone.id_for_label }}">{{ form.telephone.label }}:</label>
+                                           for="{{ customer_form.telephone.id_for_label }}">{{ customer_form.telephone.label }}:</label>
                                     <span class="form-items">
-                                    {{ form.telephone }}
+                                    {{ customer_form.telephone }}
                                         </span>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row justify-content-between">
                             <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
                                 <div class="form-element">
                                     <label class="form-label" style="min-width: 55px"
-                                           for="{{ form.print_name.id_for_label }}">{{ form.print_name.label }}</label>
-                                    {{ form.print_name }}
+                                           for="{{ customer_form.print_name.id_for_label }}">{{ customer_form.print_name.label }}</label>
+                                    {{ customer_form.print_name }}
                                 </div>
                             </div>
                             <div class="col-lg-auto col-md-auto">
                                 <div class="form-element" style="margin-right: 2vw">
                                     <label class="form-label" style="min-width: 4.1vw"
-                                           for="{{ form.mobile_number.id_for_label }}">{{ form.mobile_number.label }}:</label>
+                                           for="{{ customer_form.mobile_number.id_for_label }}">{{ customer_form.mobile_number.label }}:</label>
 
-                                    {{ form.mobile_number }}
+                                    {{ customer_form.mobile_number }}
                                 </div>
                             </div>
                         </div>
@@ -164,16 +138,16 @@
                             <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
                                 <div class="form-element">
                                     <label class="form-label" style="min-width: 4.5vw"
-                                           for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}</label>
-                                    {{ form.sh_name }}
+                                           for="{{ customer_form.sh_name.id_for_label }}">{{ customer_form.sh_name.label }}</label>
+                                    {{ customer_form.sh_name }}
                                 </div>
                             </div>
 
                             <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
                                 <div class="form-element">
                                     <label class="form-label" style="min-width: 10vw"
-                                           for="{{ form.postal_code.id_for_label }}">{{ form.postal_code.label }}:</label>
-                                    {{ form.postal_code }}
+                                           for="{{ location_form.postal_code.id_for_label }}">{{ location_form.postal_code.label }}:</label>
+                                    {{ location_form.postal_code }}
                                 </div>
                             </div>
                         </div>
@@ -183,16 +157,16 @@
                                  style="gap: 0;margin: 0;padding:0;justify-content: start">
                                 <div class="form-element">
                                     <label class="form-label" style="min-width: 4.5vw"
-                                           for="{{ form.contact1.id_for_label }}">{{ form.contact1.label }}:</label>
-                                    {{ form.contact1 }}
+                                           for="{{ customer_form.contact1.id_for_label }}">{{ customer_form.contact1.label }}:</label>
+                                    {{ customer_form.contact1 }}
                                 </div>
                             </div>
                             <div class="col-md-auto col-lg-auto"
                                  style="gap: 0;margin: 0;padding:0;justify-content: end">
                                 <div class="form-element" style="margin-right: 3vw">
                                     <label class="form-label" style="min-width: 3vw"
-                                           for="{{ form.contact2.id_for_label }}">{{ form.contact2.label }}:</label>
-                                    {{ form.contact2 }}
+                                           for="{{ customer_form.contact2.id_for_label }}">{{ customer_form.contact2.label }}:</label>
+                                    {{ customer_form.contact2 }}
                                 </div>
                             </div>
                         </div>
@@ -201,15 +175,15 @@
                             <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
                                 <div class="form-element">
                                     <label class="form-label" style="min-width: 4.5vw"
-                                           for="{{ form.email.id_for_label }}">{{ form.email.label }}:</label>
-                                    {{ form.email }}
+                                           for="{{ customer_form.email.id_for_label }}">{{ customer_form.email.label }}:</label>
+                                    {{ customer_form.email }}
                                 </div>
                             </div>
                             <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
                                 <div class="form-element" style="margin-right: 3vw">
                                     <label class="form-label" style="min-width: 50px"
-                                           for="{{ form.state_name.id_for_label }}">{{ form.state_name.label }}:</label>
-                                    {{ form.state_name }}
+                                           for="{{ location_form.state_name.id_for_label }}">{{ location_form.state_name.label }}:</label>
+                                    {{ location_form.state_name }}
                                 </div>
                             </div>
                         </div>
@@ -218,23 +192,23 @@
                             <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
                                 <div class="form-element mb-0" style="margin-right: 1.5vw">
                                     <label class="form-label" style="min-width: 4.8vw"
-                                           for="{{ form.state_code.id_for_label }}">{{ form.state_code.label }}:</label>
-                                    {{ form.state_code }}
+                                           for="{{ location_form.state_code.id_for_label }}">{{ location_form.state_code.label }}:</label>
+                                    {{ location_form.state_code }}
                                 </div>
                             </div>
                             <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
                                 <div class="form-element" style="margin-right: 1.5vw">
                                     <label class="form-label" style="min-width: 4.5vw"
-                                           for="{{ form.sale_state.id_for_label }}">{{ form.sale_state.label }}:</label>
-                                    {{ form.sale_state }}
+                                           for="{{ location_form.sale_state.id_for_label }}">{{ location_form.sale_state.label }}:</label>
+                                    {{ location_form.sale_state }}
                                 </div>
                             </div>
 
                             <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
                                 <div class="form-element" style="margin-right: 1vw">
                                     <label class="form-label" style="min-width: 2vw"
-                                           for="{{ form.city.id_for_label }}">{{ form.city.label }}:</label>
-                                    {{ form.city }}
+                                           for="{{ location_form.city.id_for_label }}">{{ location_form.city.label }}:</label>
+                                    {{ location_form.city }}
                                 </div>
                             </div>
                         </div>
@@ -242,8 +216,8 @@
                         <div class="row">
                             <div class="form-element">
                                 <label class="form-label" style="min-width: 2.6vw"
-                                       for="{{ form.address.id_for_label }}">{{ form.address.label }}:</label>
-                                {{ form.address }}
+                                       for="{{ location_form.address.id_for_label }}">{{ location_form.address.label }}:</label>
+                                {{ location_form.address }}
                             </div>
                         </div>
                     </div>
@@ -253,16 +227,16 @@
                             <div class="col">
                                 <div class="form-element">
                                     <label class="form-label" style="min-width: 40px"
-                                           for="{{ form.id_no.id_for_label }}">{{ form.id_no.label }}:</label>
+                                           for="{{ customer_form.id_no.id_for_label }}">{{ customer_form.id_no.label }}:</label>
 
-                                    {{ form.id_no }}
+                                    {{ customer_form.id_no }}
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-element">
                                     <label class="form-label"
-                                           for="{{ form.sale_type.id_for_label }}">{{ form.sale_type.label }}:</label>
-                                    {{ form.sale_type }}
+                                           for="{{ customer_form.sale_type.id_for_label }}">{{ customer_form.sale_type.label }}:</label>
+                                    {{ customer_form.sale_type }}
                                 </div>
                             </div>
                         </div>
@@ -270,33 +244,15 @@
                             <div class="col">
                                 <div class="form-element">
                                     <label class="form-label" style="min-width: 40px"
-                                           for="{{ form.customer_representative.id_for_label }}">{{ form.customer_representative.label }}:</label>
-                                    {{ form.customer_representative }}
+                                           for="{{ customer_form.customer_representative.id_for_label }}">{{ customer_form.customer_representative.label }}:</label>
+                                    {{ customer_form.customer_representative }}
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-element">
                                     <label class="form-label"
-                                           for="{{ form.fax.id_for_label }}">{{ form.fax.label }}:</label>
-                                    {{ form.fax }}
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label" style="min-width: 40px"
-                                           for="{{ form.area.id_for_label }}">{{ form.area.label }}:</label>
-                                    {{ form.area }}
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-element">
-                                    <label class="form-label"
-                                           for="{{ form.carrier.id_for_label }}">{{ form.carrier.label }}:</label>
-                                    {{ form.carrier }}
+                                           for="{{ customer_form.fax.id_for_label }}">{{ customer_form.fax.label }}:</label>
+                                    {{ customer_form.fax }}
                                 </div>
                             </div>
 
@@ -306,15 +262,33 @@
                             <div class="col">
                                 <div class="form-element">
                                     <label class="form-label" style="min-width: 40px"
-                                           for="{{ form.gstin.id_for_label }}">{{ form.gstin.label }}:</label>
-                                    {{ form.gstin }}
+                                           for="{{ customer_form.area.id_for_label }}">{{ customer_form.area.label }}:</label>
+                                    {{ customer_form.area }}
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-element">
                                     <label class="form-label"
-                                           for="{{ form.license1.id_for_label }}">{{ form.license1.label }}:</label>
-                                    {{ form.license1 }}
+                                           for="{{ customer_form.carrier.id_for_label }}">{{ customer_form.carrier.label }}:</label>
+                                    {{ customer_form.carrier }}
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 40px"
+                                           for="{{ customer_form.gstin.id_for_label }}">{{ customer_form.gstin.label }}:</label>
+                                    {{ customer_form.gstin }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ customer_form.license1.id_for_label }}">{{ customer_form.license1.label }}:</label>
+                                    {{ customer_form.license1 }}
                                 </div>
                             </div>
                         </div>
@@ -322,15 +296,15 @@
                             <div class="col">
                                 <div class="form-element">
                                     <label class="form-label" style="min-width: 40px"
-                                           for="{{ form.tin.id_for_label }}">{{ form.tin.label }}:</label>
-                                    {{ form.tin }}
+                                           for="{{ customer_form.tin.id_for_label }}">{{ customer_form.tin.label }}:</label>
+                                    {{ customer_form.tin }}
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-element">
                                     <label class="form-label"
-                                           for="{{ form.license2.id_for_label }}">{{ form.license2.label }}:</label>
-                                    {{ form.license2 }}
+                                           for="{{ customer_form.license2.id_for_label }}">{{ customer_form.license2.label }}:</label>
+                                    {{ customer_form.license2 }}
                                 </div>
                             </div>
 
@@ -339,8 +313,8 @@
                             <div class="col-auto">
                                 <div class="form-element" style="margin-right: 2.8vw">
                                     <label class="form-label"
-                                           for="{{ form.class_name.id_for_label }}">{{ form.class_name.label }}:</label>
-                                    {{ form.class_name }}
+                                           for="{{ customer_form.class_name.id_for_label }}">{{ customer_form.class_name.label }}:</label>
+                                    {{ customer_form.class_name }}
                                 </div>
                             </div>
 
@@ -351,22 +325,22 @@
                             <div class="col">
                                 <div class="form-element" style="gap: 0">
                                     <label class="form-label" style="min-width: 40px;"
-                                           for="{{ form.price_table.id_for_label }}">{{ form.price_table.label }}:</label>
-                                    {{ form.price_table }}
+                                           for="{{ customer_form.price_table.id_for_label }}">{{ customer_form.price_table.label }}:</label>
+                                    {{ customer_form.price_table }}
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-element" style="gap: 0">
                                     <label class="form-label" style="min-width:70px;"
-                                           for="{{ form.billing_stat.id_for_label }}">{{ form.billing_stat.label }}:</label>
-                                    {{ form.billing_stat }}
+                                           for="{{ customer_form.billing_stat.id_for_label }}">{{ customer_form.billing_stat.label }}:</label>
+                                    {{ customer_form.billing_stat }}
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-element" style="gap: 0">
                                     <label class="form-label" style="min-width: 20px;"
-                                           for="{{ form.price_option.id_for_label }}">{{ form.price_option.label }}:</label>
-                                    {{ form.price_option }}
+                                           for="{{ customer_form.price_option.id_for_label }}">{{ customer_form.price_option.label }}:</label>
+                                    {{ customer_form.price_option }}
                                 </div>
                             </div>
                         </div>

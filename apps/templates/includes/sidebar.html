@@ -89,24 +89,29 @@
                 <div class="multi-level collapse {% if 'tables-bootstrap-' in segment %} show {% endif %}"
                      role="list" id="setup-master" aria-expanded="false">
                     <ul class="flex-column nav">
-                        <li class="nav-item {% if 'bootstrap-tables' in segment %} active {% endif %}">
+                        <li class="nav-item {% if 'manufacturer' in segment %} active {% endif %}">
                             <a class="nav-link" href="{% url 'create_manufacturer' %}">
                                 <span class="sidebar-text">Manufacturer</span>
                             </a>
                         </li>
-                        <li class="nav-item {% if 'bootstrap-tables' in segment %} active {% endif %}">
+                        <li class="nav-item {% if 'create_product' in segment %} active {% endif %}">
                             <a class="nav-link" href="{% url 'create_product' %}">
                                 <span class="sidebar-text">Product</span>
                             </a>
                         </li>
-                        <li class="nav-item {% if 'bootstrap-tables' in segment %} active {% endif %}">
+                        <li class="nav-item {% if 'create_customer' in segment %} active {% endif %}">
                             <a class="nav-link" href="{% url 'create_customer' %}">
                                 <span class="sidebar-text">Customer</span>
                             </a>
                         </li>
-                        <li class="nav-item {% if 'bootstrap-tables' in segment %} active {% endif %}">
+                        <li class="nav-item {% if 'create_group' in segment %} active {% endif %}">
                             <a class="nav-link" href="{% url 'create_group' %}">
                                 <span class="sidebar-text">Group</span>
+                            </a>
+                        </li>
+                        <li class="nav-item {% if 'tax_structure' in segment %} active {% endif %}">
+                            <a class="nav-link" href="{% url 'tax_structure' %}">
+                                <span class="sidebar-text">Tax Structure</span>
                             </a>
                         </li>
                     </ul>

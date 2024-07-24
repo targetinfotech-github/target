@@ -8,7 +8,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from icecream import ic
 
-from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location
+from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxDetail, TaxStructure
 from django import forms
 from .models import Receipt, ReceiptProduct, Manufacturer, Product
 from django.db import transaction
@@ -57,6 +57,7 @@ def get_state_code():
         "97": "Other Territory"
     }
     return STATE_CODES
+
 
 class LoginForm(forms.Form):
     username = forms.CharField(
@@ -110,9 +111,8 @@ class SignUpForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2')
 
 
-
 class LocationForm(forms.ModelForm):
-    postal_code = forms.IntegerField(validators=[MinValueValidator(1)], widget=(
+    postal_code = forms.IntegerField(validators=[MinValueValidator(1)], required=False, widget=(
         forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Postal Code', 'id': 'postal_code_form'})))
 
     class Meta:
@@ -120,12 +120,13 @@ class LocationForm(forms.ModelForm):
         fields = ['address', 'city', 'postal_code', 'state_name', 'sale_state', 'state_code']
         widgets = {
             'address': forms.Textarea(
-                attrs={'class': 'form-control custom-address', 'placeholder': 'Enter the address', 'rows': 4,
+                attrs={'class': 'form-control custom-address', 'placeholder': 'Enter the address',
                        'id': 'address-form'}),
             'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the City'}),
             'state_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the State Name'}),
-            'sale_state': forms.Select(attrs={'class': 'form-control','id':'sale_state_form'}),
-            'state_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '01-97', 'id':'state-code-form'}),
+            'sale_state': forms.Select(attrs={'class': 'form-control', 'id': 'sale_state_form'}),
+            'state_code': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': '01-97', 'id': 'state-code-form'}),
         }
 
     STATE_CODES = get_state_code()
@@ -148,37 +149,59 @@ class LocationForm(forms.ModelForm):
                 self.add_error('state_code', 'State code does not match the state name.')
         return cleaned_data
 
+    def save(self, commit=True):
+        state_name = None
+        state_code = None
+        if self.cleaned_data['state_name']:
+            state_name = self.cleaned_data['state_name'].lower()
+        if self.cleaned_data['state_code']:
+            state_code = self.cleaned_data['state_code'].lower()
+        if state_name and not state_code:
+            for key,value in self.STATE_CODES.items():
+                if value.lower() == state_name:
+                    state_code = key
+        elif state_code and not state_name:
+            state_name = self.STATE_CODES[state_code]
+        instance = super().save(commit=False)
+        instance.state_name = state_name
+        instance.state_code = state_code
+        if commit:
+            print(f'commit: {commit}')
+            instance.save()
+        return instance
+
 
 
 class ManufacturerForm(forms.ModelForm):
-
-    PURCHASE_TYPE = [('within_state','Within State'),
-                     ('outside_state','Outside State'),
-                     ('sale_in_transit','Sale in Transit'),
-                     ('import','Import')]
+    PURCHASE_TYPE = [('within_state', 'Within State'),
+                     ('outside_state', 'Outside State'),
+                     ('sale_in_transit', 'Sale in Transit'),
+                     ('import', 'Import')]
     customer_representative = forms.CharField(
-        label='Rep',
+        label='Rep', required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Enter REP'
         })
     )
     telephone = forms.CharField(
-        label='Tel',
+        label='Tel', required=False,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telephone Number'})
     )
 
     name = forms.CharField(label='Name', widget=(
         forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the name', 'id': 'name_form'})))
 
-    class_name = forms.CharField(label='Class',widget=(forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Class Name'})))
+    class_name = forms.CharField(label='Class', required=False,
+                                 widget=(forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Class Name'})))
 
     purchase_type = forms.ChoiceField(
         choices=PURCHASE_TYPE,
-        label='Purc Type',
+        label='Purc Type', required=False,
         widget=forms.Select(attrs={'class': 'form-control', 'id': 'purchase_type_form'})
     )
-    purchase_account = forms.CharField(label='Purc Acc',widget=(forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Purchase Account'})))
+    purchase_account = forms.CharField(label='Purc Acc', required=False, widget=(
+        forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Purchase Account'})))
 
     class Meta:
         model = Manufacturer
@@ -219,10 +242,6 @@ class ProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        # fields = ['manufacturer', 'product_name', 'product_code', 'print_name', 'contact',
-        #           'buy_rate', 'sell_rate', 'mrp', 'stock_option', 'group', 'product_spec', 'map_code',
-        #           'selling_discount', 'hsn', 'unit_of_measurement','purchase_taxes_charges','taxes_buying_rate',
-        #           'taxes_selling_rate','bin_loc','sgst','igst']
 
         fields = '__all__'
         widgets = {
@@ -236,17 +255,19 @@ class ProductForm(forms.ModelForm):
             'contact': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the contact number'}),
             'print_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Print Name'}),
             'hsn': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the HSN'}),
-            'sgst': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'SGST','id':'gst_tax_form'}),
-            'igst': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'IGST','id':'gst_tax_form'}),
-            'purchase_taxes_charges': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Purchase Taxes Charges'}),
-            'taxes_buying_rate': forms.Select(attrs={'class': 'form-control','id':'taxes_rate_form'}),
-            'taxes_selling_rate': forms.Select(attrs={'class': 'form-control','id':'taxes_rate_form'}),
-            'buy_rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '+int','id':'price_rate'}),
-            'sell_rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '+int','id':'price_rate'}),
-            'mrp': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '+int','id':'price_rate'}),
+            'sgst': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'SGST', 'id': 'gst_tax_form'}),
+            'igst': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'IGST', 'id': 'gst_tax_form'}),
+            'purchase_taxes_charges': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Purchase Taxes Charges'}),
+            'taxes_buying_rate': forms.Select(attrs={'class': 'form-control', 'id': 'taxes_rate_form'}),
+            'taxes_selling_rate': forms.Select(attrs={'class': 'form-control', 'id': 'taxes_rate_form'}),
+            'buy_rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '+int', 'id': 'price_rate'}),
+            'sell_rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '+int', 'id': 'price_rate'}),
+            'mrp': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '+int', 'id': 'price_rate'}),
             'net_quantity': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Net Quantity'}),
-            'selling_discount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '+int%','id':'discount_form'}),
-            'stock_option': forms.Select(attrs={'class': 'form-control','id':'stock_option_forms'}),
+            'selling_discount': forms.NumberInput(
+                attrs={'class': 'form-control', 'placeholder': '+int%', 'id': 'discount_form'}),
+            'stock_option': forms.Select(attrs={'class': 'form-control', 'id': 'stock_option_forms'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -257,24 +278,24 @@ class ProductForm(forms.ModelForm):
         self.fields['mrp'].required = True
 
 
-
 class CustomerForm(forms.ModelForm):
     customer_representative = forms.CharField(
-        label='Rep',
+        label='Rep', required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Enter REP'
         })
     )
     telephone = forms.CharField(
-        label='Tel',
+        label='Tel', required=False,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telephone Number'})
     )
 
+    price_option = forms.CharField(label='PO', required=False, widget=(
+        forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Price Option'})))
+    customer_name = forms.CharField(label='Name', widget=(
+        forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the name', 'id': 'name_form'})))
 
-    price_option = forms.CharField(label='PO',widget=(forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Price Option'})))
-    customer_name = forms.CharField(label='Name' ,widget=(forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the name','id':'name_form'})))
-    postal_code = forms.IntegerField(validators=[MinValueValidator(1)],widget=(forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Postal Code','id':'postal_code_form'})))
     class Meta:
         model = Customer
         # fields = ['type','name', 'print_name', 'sh_name', 'contact','hsn_code','address','email']
@@ -284,14 +305,11 @@ class CustomerForm(forms.ModelForm):
         #           'contact1','contact2','fax','price_option','']
         fields = '__all__'
         widgets = {
-            'print_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the print name','id':'print_name_form'}),
+            'print_name': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Enter the print name', 'id': 'print_name_form'}),
             'sh_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
-            'address': forms.Textarea(
-                attrs={'class': 'form-control custom-address', 'placeholder': 'Enter the address', 'rows': 4,'id':'address-form'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter the email', 'id':'email-form'}),
-            'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the City'}),
-            'state_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the State Name'}),
-            'state_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '01-97', 'id':'state-code-form'}),
+            'email': forms.EmailInput(
+                attrs={'class': 'form-control', 'placeholder': 'Enter the email', 'id': 'email-form'}),
             'gstin': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the GSTIN'}),
             'license1': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter License1'}),
             'license2': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter License2'}),
@@ -303,40 +321,18 @@ class CustomerForm(forms.ModelForm):
             'cst': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter CST'}),
             'fax': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter FAX'}),
             'carrier': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Carrier'}),
-            'price_table': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '0-9','id':'price_table_id'}),
+            'price_table': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': '0-9', 'id': 'price_table_id'}),
             'class_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Class Name'}),
-            'sale_state': forms.Select(attrs={'class': 'form-control','id':'sale_state_form'}),
             'sale_type': forms.Select(attrs={'class': 'form-control'}),
             'id_no': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter ID NO'}),
-            'billing_stat': forms.Select(attrs={'class': 'form-control','id':'billing_stat_form'}),
+            'billing_stat': forms.Select(attrs={'class': 'form-control', 'id': 'billing_stat_form'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['customer_name'].required = True
         self.fields['sh_name'].required = True
-    STATE_CODES = get_state_code()
-
-
-    STATE_NAMES = {v.lower(): k for k, v in STATE_CODES.items()}
-
-    def clean(self):
-        cleaned_data = super().clean()
-        state_name,state_code=None,None
-        if self.cleaned_data['state_name']:
-            state_name = self.cleaned_data['state_name'].lower()
-            if state_name not in self.STATE_NAMES:
-                self.add_error('state_name', f'state name: {state_name} does not exists')
-        if self.cleaned_data['state_code']:
-            state_code = self.cleaned_data['state_code'].lower()
-            if state_code not in self.STATE_CODES:
-                self.add_error('state_code',f'State Code: {state_code} does not exists')
-        if state_name and state_code:
-            if self.STATE_CODES[state_code] != state_name:
-
-                self.add_error('state_name', 'State name does not match the state code.')
-                self.add_error('state_code', 'State code does not match the state name.')
-        return cleaned_data
 
 
 class GroupForm(forms.ModelForm):
@@ -350,7 +346,7 @@ class GroupForm(forms.ModelForm):
             'print_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Print Name'}),
             'sh_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Sh Name'}),
             'code_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Code Name'}),
-            'consolidation_status': forms.Select(attrs={'class': 'form-control','id':'consolidation_status_form'}),
+            'consolidation_status': forms.Select(attrs={'class': 'form-control', 'id': 'consolidation_status_form'}),
             'hsn_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the HSN Code'}),
             'gcr_code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the GCR Code'}),
         }
@@ -359,101 +355,6 @@ class GroupForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['group_name'].required = True
 
-
-# class CustomReceiptForm(forms.Form):
-#     receipt_type = [('purchases', 'Purchases'),
-#                     ('adjustments', 'Adjustments'),
-#                     ('opening_stock', 'Opening Stock')]
-#
-#     receipt_status = [('received', 'Received'),
-#                       ('transit', 'Transit'),
-#                       ('approved', 'Approved'),
-#                       ('suspense', 'Suspense')]
-#     receipt_type = forms.ChoiceField(choices=receipt_type, initial='purchases',label='receipt type')
-#     receipt_status = forms.ChoiceField(choices=receipt_status, initial='received')
-#     date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), initial=datetime.today())
-#     manufacturer = forms.ModelChoiceField(queryset=Manufacturer.objects.all())
-#     # product_name = forms.ModelChoiceField(queryset=)
-#     quantity = forms.IntegerField(initial=1)
-#     discount = forms.FloatField(initial=0.0)
-#
-#     def clean(self):
-#         cleaned_data = super().clean()
-#         manufacturer = cleaned_data.get('manufacturer')
-#         product_name = cleaned_data.get('product_name')
-#
-#         if manufacturer and product_name:
-#             try:
-#                 product = Product.objects.get(manufacturer=manufacturer, product_name=product_name)
-#             except Product.DoesNotExist:
-#                 raise forms.ValidationError("Invalid product name for selected manufacturer.")
-#
-#         return cleaned_data
-#
-#     def save(self,commit=True):
-#         manufacturer = self.cleaned_data['manufacturer']
-#         product_name = self.cleaned_data['product_name']
-#         product = Product.objects.get(manufacturer=manufacturer, product_name=product_name)
-#
-#         receipt_data = {
-#             'receipt_type': self.cleaned_data['receipt_type'],
-#             'receipt_status': self.cleaned_data['receipt_status'],
-#             'date': self.cleaned_data['date'],
-#             'manufacturer': manufacturer,
-#             'net_amount': self.cleaned_data['net_amount'],
-#         }
-#
-#         if commit:
-#             with transaction.atomic():
-#                 receipt = Receipt.objects.create(**receipt_data)
-#
-#                 receipt_product_data = {
-#                     'receipt': receipt,
-#                     'product': product,
-#                     'quantity': self.cleaned_data['quantity'],
-#                     'discount': self.cleaned_data['discount'],
-#                 }
-#                 ReceiptProduct.objects.create(**receipt_product_data)
-#         else:
-#             receipt = Receipt(**receipt_data)
-#             receipt_product = ReceiptProduct(
-#                 receipt=receipt,
-#                 product=product,
-#                 quantity=self.cleaned_data['quantity'],
-#                 discount=self.cleaned_data['discount'],
-#             )
-#         return receipt, receipt_product
-
-
-#
-# class ReceiptForm(forms.Form):
-#     receipt_type_choice = [
-#         ('purchases', 'Purchases'),
-#         ('adjustments', 'Adjustments'),
-#         ('opening_stock', 'Opening Stock')
-#     ]
-#
-#     receipt_status_choice = [
-#         ('purchases', [
-#             ('received', 'Received'),
-#             ('transit', 'Transit'),
-#             ('approved', 'Approved'),
-#             ('suspense', 'Suspense')
-#         ]),
-#         ('adjustments', [
-#             ('adjustment', 'Adjustment'),
-#             ('transfer', 'Transfer'),
-#             ('suspense', 'Suspense')
-#         ]),
-#         ('opening_stock', [
-#             ('none', 'None')
-#         ])
-#     ]
-#
-#     receipt_type = forms.ChoiceField(choices=receipt_type_choice, label='Receipt Type')
-#     receipt_status = forms.ChoiceField(choices=receipt_status_choice, label='Receipt Status')
-#     date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), initial=datetime.today())
-#     manufacturer = Manufacturer.objects.all()
 
 class ReceiptForm(forms.ModelForm):
     receipt_type_choice = [
@@ -486,3 +387,16 @@ class ReceiptForm(forms.ModelForm):
     class Meta:
         model = Receipt
         fields = ['receipt_type', 'receipt_status', 'date', 'manufacturer']
+
+
+class TaxDetailForm(forms.ModelForm):
+    class Meta:
+        model = TaxDetail
+        fields = ['tax_category_and_type','sgst','cgst','igst','description']
+
+
+class TaxStructureForm(forms.ModelForm):
+
+    class Meta:
+        model= TaxStructure
+        fields = '__all__'

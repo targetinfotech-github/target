@@ -12,6 +12,7 @@ urlpatterns = [
     # The billing page
     path('', views.index, name='billing'),
 
+
     # authentication
     path('login/', login_view, name="login"),
     path('register/', register_user, name="register"),
@@ -50,6 +51,9 @@ urlpatterns = [
     path('update_customer/<int:pk>', views.update_customer, name="update_customer"),
     path('delete_customer/', views.delete_customer, name="delete_customer"),
     path('search_router/<str:model_search>', views.search_router, name="search_router"),
+
+    # tax Structure
+    path('tax_structure', views.tax_structure, name="tax_structure"),
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 

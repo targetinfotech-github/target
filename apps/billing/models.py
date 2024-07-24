@@ -4,6 +4,7 @@ from datetime import date
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.text import slugify
 
 # Create your models here.
 from django.utils.translation import gettext_lazy as _
@@ -89,7 +90,7 @@ class Location(models.Model):
 
     class Meta:
         ordering = ['-id']
-        db_table = 'Address'
+        db_table = 'Location'
 
 class GroupManager(models.Manager):
     def get_or_create_general_group(self):
@@ -215,6 +216,12 @@ class Manufacturer(models.Model):
             self.print_name = self.name
         super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        if self.location:
+            self.location.delete()
+
+
 
 class Product(models.Model):
     STOCK_OPTION_CHOICE = [
@@ -296,14 +303,9 @@ class Customer(models.Model):
                        ('outside_state', 'Outside State'),
                        ('sale_nil_gst', 'Sale(NIL GST)')]
 
-    address = models.TextField(max_length=255, null=True, blank=True)
-    city = models.CharField(max_length=100, null=True, blank=True)
-    postal_code = models.PositiveIntegerField(null=True, blank=True)
-    state_name = models.CharField(max_length=50, null=True, blank=True)
-    sale_state = models.CharField(choices=SALE_STATE_LIST, max_length=50, null=True, blank=True)
-    state_code = models.CharField(max_length=2, null=True, blank=True)
 
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    location = models.OneToOneField(Location,on_delete=models.PROTECT,related_name='customer_location',null=True,blank=True)
     customer_name = models.CharField(unique=True, max_length=30, null=True, blank=True)
     print_name = models.CharField(max_length=30, null=True, blank=True)
     sh_name = models.CharField(max_length=30, null=True, blank=True)
@@ -343,6 +345,10 @@ class Customer(models.Model):
             self.print_name = self.customer_name
         super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        if self.location:
+            self.location.delete()
 
 class Receipt(models.Model):
     receipt_type = [('purchases', 'Purchases'),
@@ -407,3 +413,27 @@ class ReceiptProduct(models.Model):
     #     self.discount = round(self.discount, 2)
     #     self.full_clean()
     #     super().save(*args,**kwargs)
+
+
+class TaxStructure(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    TAX_CATEGORY = [('sales_taxes','Sales Taxes'),
+                ('purchase_taxes','Purchase Taxes')]
+    TAX_TYPE = [('sgst_cgst','SGST/CGST (Intrastate Sales)'),
+                ('igst','IGST (InterState Sales)')]
+    tax_category = models.CharField(max_length=25,choices=TAX_CATEGORY,null=True,blank=True)
+    tax_type = models.CharField(max_length=25,choices=TAX_TYPE,null=True,blank=True)
+
+
+class TaxDetail(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    tax_category_and_type = models.ForeignKey(TaxStructure, on_delete=models.CASCADE, related_name='tax_details')
+    tax_id = models.CharField(max_length=20, blank=True, unique=True)
+    sgst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
+    cgst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
+    igst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
+    description = models.CharField(max_length=50, null=True, blank=True)
+
+
+    def __str__(self):
+        return f"{self.tax_id}"
