@@ -90,7 +90,6 @@
     {% if flag != 'view' and flag != 'modal' and flag != 'delete' %}
         <form method="post">
             {% csrf_token %}
-            {% csrf_token %}
             {% include 'billing/form_errors.html' with form=manufacturer_form %}
             {% include 'billing/form_errors.html' with form=location_form %}
 

@@ -53,7 +53,11 @@ urlpatterns = [
     path('search_router/<str:model_search>', views.search_router, name="search_router"),
 
     # tax Structure
-    path('tax_structure', views.tax_structure, name="tax_structure"),
+    path('setup_tax_structure/', views.setup_tax_structure, name="setup_tax_structure"),
+    path('view_tax_structure/', views.view_tax_structure, name="view_tax_structure"),
+    path('update_tax_structure/<int:pk>', views.update_tax_structure, name="update_tax_structure"),
+
+
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 

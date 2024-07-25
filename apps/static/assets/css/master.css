@@ -168,24 +168,19 @@ table a {
     width: 30vw;
 }
 
-#sale_state_form {
-    width: 100px;
-}
 
 .form-control::placeholder {
     color: #aaa;
     opacity: 1;
 }
 
+#sale_state_form,
 #stock_option_forms {
     width: 100px;
 }
 
+#gst_tax_form ,
 #taxes_rate_form {
-    width: 75px;
-}
-
-#gst_tax_form {
     width: 75px;
 }
 

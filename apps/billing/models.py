@@ -427,7 +427,7 @@ class TaxStructure(models.Model):
 
 class TaxDetail(models.Model):
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    tax_category_and_type = models.ForeignKey(TaxStructure, on_delete=models.CASCADE, related_name='tax_details')
+    tax_structure = models.ForeignKey(TaxStructure, on_delete=models.CASCADE, related_name='tax_details')
     tax_id = models.CharField(max_length=20, blank=True, unique=True)
     sgst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
     cgst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)

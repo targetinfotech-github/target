@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Dashboard {% endblock %}
+{% block title %} Master {% endblock %}
 {% load static %}
 {% block stylesheets %}
     <link rel="stylesheet" href="{% static 'assets/css/master.css' %}">
@@ -13,31 +13,31 @@
 
             {% if flag == 'create' and master_data %}
                 <a href="{% url modal_url %}">
-                    <button class="btn btn-tertiary" type="button">Update</button>
+                    <button class="btn btn-sm btn-tertiary" type="button">Update</button>
                 </a>
                 <a href="{% url view_url %}">
-                    <button class="btn btn-success" type="button">View</button>
+                    <button class="btn btn-sm btn-success" type="button">View</button>
                 </a>
                 <a href="{% url delete_url %}">
-                    <button class="btn btn-danger" type="button">Delete</button>
+                    <button class="btn btn-sm btn-danger" type="button">Delete</button>
                 </a>
             {% endif %}
 
             {% if flag != 'create' %}
                 <a href="{% url create_url %}">
-                    <button class="btn btn-info" type="button">Create</button>
+                    <button class="btn btn-sm btn-info" type="button">Create</button>
                 </a>
                 {% if master_data %}
                     <a href="{% url modal_url %}">
-                        <button class="btn btn-tertiary" type="button">Update</button>
+                        <button class="btn btn-sm btn-tertiary" type="button">Update</button>
                     </a>
                     {% if flag != 'view' %}
                         <a href="{% url view_url %}">
-                            <button class="btn btn-success" type="button">View</button>
+                            <button class="btn btn-sm btn-success" type="button">View</button>
                         </a>
                     {% endif %}
                     <a href="{% url delete_url %}">
-                        <button class="btn btn-danger" type="button">Delete</button>
+                        <button class="btn btn-sm btn-danger" type="button">Delete</button>
                     </a>
                 {% endif %}
             {% endif %}

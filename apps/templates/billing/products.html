@@ -90,30 +90,7 @@
     {% if flag == 'create' or flag == 'update' %}
         <form method="post">
             {% csrf_token %}
-            {% if form.non_field_errors %}
-                {% for error in form.non_field_errors %}
-                    <div class="d-flex justify-content-center">
-                        <div class="alert form-error-alert alert-dismissible fade show" role="alert">
-                            {{ error }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
-            {% for field in form %}
-                {% if field.errors %}
-                    {% for error in field.errors %}
-                        <div class="d-flex justify-content-center">
-                            <div class="alert form-error-alert alert-dismissible fade show" role="alert">
-                                <p><u><strong>{{ field.label }}:</strong></u> {{ error }}</p>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                        aria-label="Close"></button>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endfor %}
+            {% include 'billing/form_errors.html' with form=form %}
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 col-lg-6 col-sm-8" style="display: flex;flex-direction: column">

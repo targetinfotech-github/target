@@ -390,13 +390,32 @@ class ReceiptForm(forms.ModelForm):
 
 
 class TaxDetailForm(forms.ModelForm):
+    sgst = forms.FloatField(label='SGST',widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Enter SGST%'}))
+    cgst = forms.FloatField(label='CGST',widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Enter CGST%'}))
+    igst = forms.FloatField(label='IGST',widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Enter IGST%'}))
+    description = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Enter Description','id':'description_form'}))
     class Meta:
         model = TaxDetail
-        fields = ['tax_category_and_type','sgst','cgst','igst','description']
+        fields = ['sgst','cgst','igst','description']
 
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        if 'igst' in self.fields:
+            self.fields['igst'].required = False
+        if 'cgst' in self.fields:
+            self.fields['cgst'].required = False
+        if 'sgst' in self.fields:
+            self.fields['sgst'].required = False
+        if 'description' in self.fields:
+            self.fields['description'].required = False
 
 class TaxStructureForm(forms.ModelForm):
-
+    TAX_CATEGORY = [('sales_taxes', 'Sales Taxes'),
+                    ('purchase_taxes', 'Purchase Taxes')]
+    TAX_TYPE = [('sgst_cgst', 'SGST/CGST (Intrastate Sales)'),
+                ('igst', 'IGST (InterState Sales)')]
+    tax_category = forms.ChoiceField(choices=TAX_CATEGORY,label='Tax Category',widget=forms.Select(attrs={'class': 'form-control','id':'tax_category_form'}),required=True)
+    tax_type = forms.ChoiceField(choices=TAX_TYPE,label='Tax Type',widget=forms.Select(attrs={'class': 'form-control','id':'tax_type_form'}),required=True)
     class Meta:
         model= TaxStructure
         fields = '__all__'
