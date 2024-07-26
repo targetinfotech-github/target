@@ -92,6 +92,15 @@ class Location(models.Model):
         ordering = ['-id']
         db_table = 'Location'
 
+#add this manager after creation of company profile- no need for give select_related on every queryset
+#give BaseManager for objects in model
+# so that i can use objects manager and by default it fetches select_related..
+class BaseManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related('company_profile')
+
+
+
 class GroupManager(models.Manager):
     def get_or_create_general_group(self):
         group, created = self.get_or_create(
@@ -417,18 +426,22 @@ class ReceiptProduct(models.Model):
 
 class TaxStructure(models.Model):
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    TAX_CATEGORY = [('sales_taxes','Sales Taxes'),
+    TAX_TYPE = [('sales_taxes','Sales Taxes'),
                 ('purchase_taxes','Purchase Taxes')]
-    TAX_TYPE = [('sgst_cgst','SGST/CGST (Intrastate Sales)'),
-                ('igst','IGST (InterState Sales)')]
-    tax_category = models.CharField(max_length=25,choices=TAX_CATEGORY,null=True,blank=True)
-    tax_type = models.CharField(max_length=25,choices=TAX_TYPE,null=True,blank=True)
 
+    tax_type = models.CharField(max_length=25,choices=TAX_TYPE,null=True,blank=True)
+    tax_id = models.CharField(max_length=20, blank=True,null=True, unique=True)
+    sgst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
+    cgst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
+    igst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
+    description = models.CharField(max_length=50, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.tax_type}-{self.tax_id}'
 
 class TaxDetail(models.Model):
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    tax_structure = models.ForeignKey(TaxStructure, on_delete=models.CASCADE, related_name='tax_details')
-    tax_id = models.CharField(max_length=20, blank=True, unique=True)
+    tax_id = models.CharField(max_length=20, blank=True)
     sgst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
     cgst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
     igst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)

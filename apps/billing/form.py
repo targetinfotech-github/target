@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.core.validators import MinValueValidator
+from django.forms import formset_factory
 from django.utils.translation import gettext_lazy as _
 from django import forms
 import re
@@ -157,7 +158,7 @@ class LocationForm(forms.ModelForm):
         if self.cleaned_data['state_code']:
             state_code = self.cleaned_data['state_code'].lower()
         if state_name and not state_code:
-            for key,value in self.STATE_CODES.items():
+            for key, value in self.STATE_CODES.items():
                 if value.lower() == state_name:
                     state_code = key
         elif state_code and not state_name:
@@ -169,7 +170,6 @@ class LocationForm(forms.ModelForm):
             print(f'commit: {commit}')
             instance.save()
         return instance
-
 
 
 class ManufacturerForm(forms.ModelForm):
@@ -389,17 +389,51 @@ class ReceiptForm(forms.ModelForm):
         fields = ['receipt_type', 'receipt_status', 'date', 'manufacturer']
 
 
+
 class TaxDetailForm(forms.ModelForm):
-    sgst = forms.FloatField(label='SGST',widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Enter SGST%'}))
-    cgst = forms.FloatField(label='CGST',widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Enter CGST%'}))
-    igst = forms.FloatField(label='IGST',widget=forms.NumberInput(attrs={'class':'form-control', 'placeholder':'Enter IGST%'}))
-    description = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Enter Description','id':'description_form'}))
+    sgst = forms.FloatField(label='SGST',
+                            widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter SGST%'}))
+    cgst = forms.FloatField(label='CGST',
+                            widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter CGST%'}))
+    igst = forms.FloatField(label='IGST',
+                            widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter IGST%'}))
+    description = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Enter Description', 'id': 'description_form'}))
+
     class Meta:
         model = TaxDetail
+        fields = ['sgst', 'cgst', 'igst', 'description']
+
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     if 'igst' in self.fields:
+    #         self.fields['igst'].required = False
+    #     if 'cgst' in self.fields:
+    #         self.fields['cgst'].required = False
+    #     if 'sgst' in self.fields:
+    #         self.fields['sgst'].required = False
+    #     if 'description' in self.fields:
+    #         self.fields['description'].required = False
+
+
+class TaxStructureForm(forms.ModelForm):
+    tax_id = description = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control','readonly':'readonly'}))
+    sgst = forms.FloatField(label='SGST',
+                            widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'SGST %','id': 'tax_form'}))
+    cgst = forms.FloatField(label='CGST',
+                            widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'CGST %','id': 'tax_form'}))
+    igst = forms.FloatField(label='IGST',
+                            widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'IGST %','id': 'tax_form'}))
+    description = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': 'Enter Description', 'id': 'description_form'}))
+    class Meta:
+        model = TaxStructure
         fields = ['sgst','cgst','igst','description']
 
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         if 'igst' in self.fields:
             self.fields['igst'].required = False
         if 'cgst' in self.fields:
@@ -408,14 +442,4 @@ class TaxDetailForm(forms.ModelForm):
             self.fields['sgst'].required = False
         if 'description' in self.fields:
             self.fields['description'].required = False
-
-class TaxStructureForm(forms.ModelForm):
-    TAX_CATEGORY = [('sales_taxes', 'Sales Taxes'),
-                    ('purchase_taxes', 'Purchase Taxes')]
-    TAX_TYPE = [('sgst_cgst', 'SGST/CGST (Intrastate Sales)'),
-                ('igst', 'IGST (InterState Sales)')]
-    tax_category = forms.ChoiceField(choices=TAX_CATEGORY,label='Tax Category',widget=forms.Select(attrs={'class': 'form-control','id':'tax_category_form'}),required=True)
-    tax_type = forms.ChoiceField(choices=TAX_TYPE,label='Tax Type',widget=forms.Select(attrs={'class': 'form-control','id':'tax_type_form'}),required=True)
-    class Meta:
-        model= TaxStructure
-        fields = '__all__'
+TaxStructureFormSet = formset_factory(TaxStructureForm)

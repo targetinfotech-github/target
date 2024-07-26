@@ -18,7 +18,7 @@ from icecream import ic
 
 from apps.billing.services.decorators import measure_execution_time
 from apps.billing.form import ManufacturerForm, ProductForm, ReceiptForm, GroupForm, CustomerForm, SignUpForm, \
-    LoginForm, LocationForm, TaxDetailForm, TaxStructureForm
+    LoginForm, LocationForm, TaxDetailForm, TaxStructureForm, TaxStructureFormSet
 from django.shortcuts import render, redirect
 from apps.billing.models import Manufacturer, Product, Receipt, ReceiptProduct, ProductGroup, Customer, CustomUser, \
     Location, TaxDetail, TaxStructure
@@ -746,7 +746,8 @@ def create_customer(request):
                 except Exception as e:
                     print(e)
                     location_instance = None
-                    messages.error(request, 'Exception occurred while creating the location. Please submit the form again.')
+                    messages.error(request,
+                                   'Exception occurred while creating the location. Please submit the form again.')
             else:
                 location_instance = None
             if location_instance:
@@ -939,170 +940,77 @@ def view_customer(request):
     except:
         return render(request, 'billing/page-500.html')
 
+
 @login_required(login_url="/login/")
 @measure_execution_time
 def setup_tax_structure(request):
     try:
-        tax_structure_form = TaxStructureForm()
+        tax_structure_formset = TaxStructureFormSet()
         flag = False
-        new_tax_id = ''
-        if request.method == 'POST':
-            tax_structure_form = TaxStructureForm(request.POST)
-            tax_details_form = TaxDetailForm(request.POST)
-            flag=True
-            new_tax_id = request.POST.get('new_tax_id','')
-            if tax_structure_form.is_valid():
+        if request.method == 'GET':
+            tax_type = request.GET.get('tax_type', '')
+            if tax_type:
+                tax_structure = TaxStructure.objects.filter(tax_type=tax_type).order_by('tax_id')
+                if tax_structure.count() < 10:
+                    tax_dictionary = {}
+                    tax_id = ['' for _ in range(10)]
+                    tax_desc = ['' for _ in range(10)]
+
+                    if tax_type == 'sales_taxes':
+                        for i in range(10):
+                            tax_id[i] = f'GST-S{i+1:02}'
+                            tax_desc[i] = f'SGST-{i+1:02}-SGST/CGST/IGST'
+                    else:
+                        for i in range(10):
+                            tax_id[i] = f'GST-P{i+1:02}'
+                            tax_desc[i] = f'PGST-{i+1:02}-SGST/CGST/IGST'
+
+                    for i in range(10):
+                        tax_dictionary[i] = {'tax_type': tax_type, 'tax_id': tax_id[i], 'description': tax_desc[i]}
+                    bulk_tax_structure= [TaxStructure(**items) for items in tax_dictionary.values()]
+                    bulk_create = TaxStructure.objects.bulk_create(bulk_tax_structure)
+                    tax_structure_instance = TaxStructure.objects.filter(tax_type=tax_type)
+                    tax_structure_formset = TaxStructureFormSet(initial=tax_structure_instance.values())
+                else:
+                    ic('else executed')
+                    tax_structure_queryset = TaxStructure.objects.filter(tax_type=tax_type)
+                    tax_structure_formset = TaxStructureFormSet(initial=tax_structure_queryset.values())
+                ic(tax_structure_formset)
+                flag = True
+        elif request.method == 'POST':
+            tax_type = request.GET.get('tax_type', '')
+            tax_structure_formset = TaxStructureFormSet(request.POST)
+            if tax_structure_formset.is_valid():
                 try:
-                    tax_structure_instance = tax_structure_form.save()
-                    ic(tax_structure_instance)
+                    with transaction.atomic():
+                        for i in range(10):
+                            tax_id = request.POST.get(f'form-{i}-tax_id')
+                            if tax_id:
+                                tax_structure_instance = TaxStructure.objects.get(tax_id=tax_id)
+                                sgst = request.POST.get(f'form-{i}-sgst')
+                                cgst = request.POST.get(f'form-{i}-cgst')
+                                igst = request.POST.get(f'form-{i}-igst')
+                                description = request.POST.get(f'form-{i}-description')
+
+                                tax_structure_instance.sgst = float(sgst) if sgst else None
+                                tax_structure_instance.cgst = float(cgst) if cgst else None
+                                tax_structure_instance.igst = float(igst) if igst else None
+                                tax_structure_instance.description = description
+                                tax_structure_instance.save()
+                    messages.success(request, 'Tax Structure successfully updated.')
                 except Exception as e:
                     print(e)
-                    tax_structure_instance = None
-                    messages.error(request, 'Exception occurred while creating the Tax Structure. Please submit the form again.')
+                    messages.error(request, 'Unable to update Tax Structure. Kindly contact support.')
             else:
-                tax_structure_instance = None
-            if tax_structure_instance:
-                if tax_details_form.is_valid():
-                    try:
-                        tax_details = tax_details_form.save(commit=False)
-                        tax_details.tax_structure = tax_structure_instance
-                        tax_details.tax_id = new_tax_id
-                        if not tax_details.description:
-                            tax_details.description = new_tax_id
-                        tax_details.save()
-                        messages.success(request,f'Tax Structure {tax_details.tax_id} Successfully Created')
-                        return redirect('setup_tax_structure')
-                    except IntegrityError:
-                        messages.error(request, f'A record with {new_tax_id} Tax ID already exists,Kindly delete the existing Tax ID')
-                        if not TaxDetail.objects.filter(tax_id=new_tax_id).exists():
-                            try:
-                                tax_structure_instance.delete()
-                            except:
-                                pass
-                        return redirect('setup_tax_structure')
-                    except Exception as e:
-                        print(e)
-                        if not TaxDetail.objects.filter(tax_id=new_tax_id).exists():
-                            try:
-                                tax_structure_instance.delete()
-                            except:
-                                pass
-                            messages.error(request,
-                                           'Exception occurred while creating the Tax Details. Please submit the form again.')
-                            redirect('setup_tax_structure')
-                else:
-                    TaxStructure.objects.get(id=tax_structure_instance.id).delete()
-                    print('invalid form')
+                messages.error(request, 'Please correct the errors below.')
+            flag = True
 
-
-        elif request.method == 'GET':
-            tax_category = request.GET.get('tax_category', '')
-            tax_type = request.GET.get('tax_type', '')
-            if tax_category and tax_type:
-                tax_structure_form = TaxStructureForm(request.GET)
-                last_tax = (TaxDetail.objects.filter(Q(tax_structure__tax_type=tax_type) & Q(tax_structure__tax_category=tax_category))
-                            .order_by('-id').first())
-                prefix = 'SGST' if 'sgst' in tax_type else 'IGST'
-                if last_tax:
-                    tax_id = last_tax.tax_id
-                    if tax_id:
-                        if tax_category == 'sales_taxes':
-                            sl_no = tax_id.split('-S')[1]
-                            suffix = int(sl_no) + 1
-                            if suffix <=9:
-                                new_tax_id = f'{prefix.strip()}-S0{suffix}'
-                            else:
-                                new_tax_id = f'{prefix.strip()}-S{suffix}'
-                        else:
-                            sl_no = tax_id.split('-P')[1]
-                            suffix = int(sl_no) + 1
-                            if suffix <=9:
-                                new_tax_id = f'{prefix.strip()}-P0{suffix}'
-                            else:
-                                new_tax_id = f'{prefix.strip()}-P{suffix}'
-                    else:
-                        messages.error(request,'Remove previously created TAX Structure')
-                else:
-                    if tax_category == 'sales_taxes':
-                        new_tax_id = f'{prefix.strip()}-S01'
-                    else:
-                        new_tax_id = f'{prefix.strip()}-P01'
-                flag = True
-        initial_data = {'description': new_tax_id}
-        tax_details_form = TaxDetailForm(initial=initial_data)
-        context = {'tax_details_form': tax_details_form, 'tax_structure_form': tax_structure_form, 'flag': flag,
-                   'new_tax_id': new_tax_id, 'label': 'Setup Tax Structure','operation':'create'}
+        context = {'tax_structure_formset': tax_structure_formset,'flag':flag,'label':'Setup Tax Structure','tax_type':tax_type}
         return render(request, 'billing/tax_structure.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
     except:
         return render(request, 'billing/page-500.html')
-
-@login_required(login_url="/login/")
-@measure_execution_time
-def view_tax_structure(request):
-    try:
-        tax_structure_form = TaxStructureForm()
-        if request.method == 'GET':
-            tax_category = request.GET.get('tax_category', '')
-            tax_type = request.GET.get('tax_type', '')
-
-            if tax_category and tax_type:
-                tax_structure_form = TaxStructureForm(request.GET)
-                tax_structures = TaxStructure.objects.prefetch_related('tax_details').filter(
-                    Q(tax_category=tax_category) & Q(tax_type=tax_type)).order_by('-id')
-            else:
-                tax_structures = TaxStructure.objects.prefetch_related('tax_details').order_by('tax_details__tax_id')
-        else:
-            tax_structures = TaxStructure.objects.prefetch_related('tax_details').order_by('tax_details__tax_id')
-
-        tax_structures = tax_structures
-        context = {'tax_structures':tax_structures,'tax_structure_form':tax_structure_form,'label':'View Tax Structure','operation':'view'}
-        if not tax_structures:
-            messages.info(request, 'Records not found')
-            return render(request, 'billing/tax_structure.html', context=context)
-        else:
-            return render(request, 'billing/tax_structure.html', context=context)
-    except template.TemplateDoesNotExist:
-        return render(request, 'billing/page-404.html')
-    except:
-        return render(request, 'billing/page-500.html')
-
-
-@login_required(login_url="/login/")
-@measure_execution_time
-def update_tax_structure(request,pk):
-    # try:
-    tax_details = TaxDetail.objects.get(id=pk)
-    tax_details_form = TaxDetailForm(instance=tax_details)
-    tax_structures = TaxStructure.objects.get(id=tax_details.tax_structure.id)
-    if request.method == 'POST':
-        tax_details_form = TaxDetailForm(request.POST,instance=tax_details)
-        if tax_details_form.is_valid():
-            try:
-                tax_details = tax_details_form.save()
-                messages.success(request, f'Tax Structure {tax_details.tax_id} Successfully Updated')
-                return redirect('view_tax_structure')
-            except Exception as e:
-                print(e)
-                messages.error(request,
-                               'Exception occurred while update the Tax Details.TAX Not Updated')
-                redirect('setup_tax_structure')
-        else:
-            print('invalid form')
-    context = {'tax_structures': tax_structures, 'tax_details_form': tax_details_form,'flag':True,
-               'label': 'Update Tax Structure', 'operation': 'update','new_tax_id':tax_details.tax_id}
-
-    if not tax_structures:
-        messages.info(request, 'Records not found')
-        return render(request, 'billing/tax_structure.html', context=context)
-    else:
-        return render(request, 'billing/tax_structure.html', context=context)
-
-    # except template.TemplateDoesNotExist:
-    #     return render(request, 'billing/page-404.html')
-    # except:
-    #     return render(request, 'billing/page-500.html')
 
 
 @measure_execution_time

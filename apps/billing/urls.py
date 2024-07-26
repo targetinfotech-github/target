@@ -54,8 +54,7 @@ urlpatterns = [
 
     # tax Structure
     path('setup_tax_structure/', views.setup_tax_structure, name="setup_tax_structure"),
-    path('view_tax_structure/', views.view_tax_structure, name="view_tax_structure"),
-    path('update_tax_structure/<int:pk>', views.update_tax_structure, name="update_tax_structure"),
+
 
 
     # Matches any html file
