@@ -9,7 +9,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from icecream import ic
 
-from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxDetail, TaxStructure
+from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxStructure
 from django import forms
 from .models import Receipt, ReceiptProduct, Manufacturer, Product
 from django.db import transaction
@@ -389,33 +389,6 @@ class ReceiptForm(forms.ModelForm):
         fields = ['receipt_type', 'receipt_status', 'date', 'manufacturer']
 
 
-
-class TaxDetailForm(forms.ModelForm):
-    sgst = forms.FloatField(label='SGST',
-                            widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter SGST%'}))
-    cgst = forms.FloatField(label='CGST',
-                            widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter CGST%'}))
-    igst = forms.FloatField(label='IGST',
-                            widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter IGST%'}))
-    description = forms.CharField(widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Enter Description', 'id': 'description_form'}))
-
-    class Meta:
-        model = TaxDetail
-        fields = ['sgst', 'cgst', 'igst', 'description']
-
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     if 'igst' in self.fields:
-    #         self.fields['igst'].required = False
-    #     if 'cgst' in self.fields:
-    #         self.fields['cgst'].required = False
-    #     if 'sgst' in self.fields:
-    #         self.fields['sgst'].required = False
-    #     if 'description' in self.fields:
-    #         self.fields['description'].required = False
-
-
 class TaxStructureForm(forms.ModelForm):
     tax_id = description = forms.CharField(widget=forms.TextInput(
         attrs={'class': 'form-control','readonly':'readonly'}))
@@ -442,4 +415,5 @@ class TaxStructureForm(forms.ModelForm):
             self.fields['sgst'].required = False
         if 'description' in self.fields:
             self.fields['description'].required = False
+
 TaxStructureFormSet = formset_factory(TaxStructureForm)

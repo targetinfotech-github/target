@@ -18,10 +18,10 @@ from icecream import ic
 
 from apps.billing.services.decorators import measure_execution_time
 from apps.billing.form import ManufacturerForm, ProductForm, ReceiptForm, GroupForm, CustomerForm, SignUpForm, \
-    LoginForm, LocationForm, TaxDetailForm, TaxStructureForm, TaxStructureFormSet
+    LoginForm, LocationForm,  TaxStructureForm, TaxStructureFormSet
 from django.shortcuts import render, redirect
 from apps.billing.models import Manufacturer, Product, Receipt, ReceiptProduct, ProductGroup, Customer, CustomUser, \
-    Location, TaxDetail, TaxStructure
+    Location, TaxStructure
 import json
 
 # views.py or any module
@@ -51,7 +51,7 @@ def index(request):
     print(f'product: {product}')
     print(f'customer: {customer}')
     print(f'location: {location}')
-    print(f'TaxDetail:{TaxDetail.objects.count()}, TaxStructure: {TaxStructure.objects.count()}')
+    print(f'TaxStructure: {TaxStructure.objects.count()}')
     html_template = loader.get_template('billing/dashboard.html')
     return HttpResponse(html_template.render(context, request))
 
@@ -64,10 +64,10 @@ def pages(request):
     # Pick out the html file name from the url. And load that template.
     # try:
     load_template = request.path.split('/')[-1]
+    ic(load_template)
     if load_template == 'admin':
         return HttpResponseRedirect(reverse('admin:index'))
     context['segment'] = load_template
-    ic(context)
     html_template = loader.get_template('billing/' + load_template)
     return HttpResponse(html_template.render(context, request))
 
@@ -202,6 +202,7 @@ def create_manufacturer(request):
     context = context_obj.get_context()
     context['manufacturer_form'] = manufacturer_form
     context['location_form'] = location_form
+    context['segment'] = 'setup-master-manufacturer'
     return render(request, 'billing/manufacturer.html', context)
     # except template.TemplateDoesNotExist:
     #     return render(request, 'billing/page-404.html')
@@ -232,6 +233,7 @@ def get_manufacturer_modal(request):
     page_obj = pagination(request, manufacturer_data)
     context_obj = SetupContext(model_search='manufacturer_modal', page_obj=page_obj, operation='modal')
     context = context_obj.get_context()
+    context['segment'] = 'setup-master-manufacturer'
 
     if not manufacturer_data:
         messages.info(request, 'Records not found')
@@ -247,123 +249,130 @@ def get_manufacturer_modal(request):
 @measure_execution_time
 def update_manufacturer(request, pk):
     try:
-        manufacturer_data = Manufacturer.objects.get(id=pk)
-    except Manufacturer.DoesNotExist:
-        return render(request, 'billing/page-404.html')
-    location_data, created = Location.objects.get_or_create(manufacturer_location__id=pk)
+        try:
+            manufacturer_data = Manufacturer.objects.get(id=pk)
+        except Manufacturer.DoesNotExist:
+            return render(request, 'billing/page-404.html')
+        location_data, created = Location.objects.get_or_create(manufacturer_location__id=pk)
 
-    if manufacturer_data.location is None:
-        manufacturer_data.location = location_data
-        manufacturer_data.save()
+        if manufacturer_data.location is None:
+            manufacturer_data.location = location_data
+            manufacturer_data.save()
 
-    if request.method == 'POST':
-        manufacturer_form = ManufacturerForm(request.POST, instance=manufacturer_data)
-        location_form = LocationForm(request.POST, instance=location_data)
+        if request.method == 'POST':
+            manufacturer_form = ManufacturerForm(request.POST, instance=manufacturer_data)
+            location_form = LocationForm(request.POST, instance=location_data)
 
-        if location_form.is_valid():
-            try:
-                # Save the location form to get the Location instance
-                location_instance = location_form.save()
-            except Exception as e:
-                location_instance = None
-                messages.error(request, 'Exception occurred while creating the location. Please submit the form again.')
-        else:
-            location_instance = None
-        if location_instance:
-            if manufacturer_form.is_valid():
-                name = manufacturer_form.cleaned_data['name']
+            if location_form.is_valid():
                 try:
-                    manufacturer = manufacturer_form.save(commit=False)
-                    manufacturer.location = location_instance  # Assign Location instance
-                    manufacturer.save()
-                    messages.success(request, f'Manufacturer {name} updated successfully.')
-                    return redirect('create_manufacturer')
+                    # Save the location form to get the Location instance
+                    location_instance = location_form.save()
                 except Exception as e:
-                    if not Manufacturer.objects.filter(name=name).exists():
-                        try:
-                            Location.objects.filter(id=location_instance.id).delete()
-                        except:
-                            pass
-                    messages.error(request,
-                                   'Exception occurred while creating the manufacturer. Please submit the form again.')
+                    location_instance = None
+                    messages.error(request, 'Exception occurred while creating the location. Please submit the form again.')
             else:
-                Location.objects.get(id=location_instance.id).delete()
-                print('invalid form')
-    else:
-        manufacturer_form = ManufacturerForm(instance=manufacturer_data)
-        location_form = LocationForm(instance=location_data)
-    context_obj = SetupContext(model_search='manufacturer', page_obj=manufacturer_data, operation='update')
-    context = context_obj.get_context()
-    context['manufacturer_form'] = manufacturer_form
-    context['location_form'] = location_form
-    return render(request, 'billing/manufacturer.html', context=context)
-    # except template.TemplateDoesNotExist:
-    #     return render(request, 'billing/page-404.html')
-    # except:
-    #     return render(request, 'billing/page-500.html')
+                location_instance = None
+            if location_instance:
+                if manufacturer_form.is_valid():
+                    name = manufacturer_form.cleaned_data['name']
+                    try:
+                        manufacturer = manufacturer_form.save(commit=False)
+                        manufacturer.location = location_instance  # Assign Location instance
+                        manufacturer.save()
+                        messages.success(request, f'Manufacturer {name} updated successfully.')
+                        return redirect('create_manufacturer')
+                    except Exception as e:
+                        if not Manufacturer.objects.filter(name=name).exists():
+                            try:
+                                Location.objects.filter(id=location_instance.id).delete()
+                            except:
+                                pass
+                        messages.error(request,
+                                       'Exception occurred while creating the manufacturer. Please submit the form again.')
+                else:
+                    Location.objects.get(id=location_instance.id).delete()
+                    print('invalid form')
+        else:
+            manufacturer_form = ManufacturerForm(instance=manufacturer_data)
+            location_form = LocationForm(instance=location_data)
+        context_obj = SetupContext(model_search='manufacturer', page_obj=manufacturer_data, operation='update')
+        context = context_obj.get_context()
+        context['manufacturer_form'] = manufacturer_form
+        context['location_form'] = location_form
+        context['segment'] = 'setup-master-manufacturer'
+
+        return render(request, 'billing/manufacturer.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
 
 
 @login_required(login_url="/login/")
 @measure_execution_time
 def delete_manufacturer(request):
-    # try:
-    manufacturer_data = Manufacturer.objects.annotate(
-        product_count=Count('product_manufacturer')
-    ).values(
-        'id', 'name', 'type', 'sh_name', 'print_name', 'product_count'
-    ).order_by('name')
-    if request.method == 'POST':
-        if 'delete_selected_record' in request.POST:
-            pk = request.POST['delete_selected_record']
-            manufacturer = Manufacturer.objects.get(id=pk)
-            name = manufacturer.name
-            delete_models(request, manufacturer, name)
-            return redirect('create_manufacturer')
+    try:
+        manufacturer_data = Manufacturer.objects.annotate(
+            product_count=Count('product_manufacturer')
+        ).values(
+            'id', 'name', 'type', 'sh_name', 'print_name', 'product_count'
+        ).order_by('name')
+        if request.method == 'POST':
+            if 'delete_selected_record' in request.POST:
+                pk = request.POST['delete_selected_record']
+                manufacturer = Manufacturer.objects.get(id=pk)
+                name = manufacturer.name
+                delete_models(request, manufacturer, name)
+                return redirect('create_manufacturer')
+            else:
+                messages.error(request, 'Selected record does not exist in Database')
+                return redirect('delete_manufacturer')
+        page_obj = pagination(request, manufacturer_data)
+        context_obj = SetupContext(model_search='manufacturer_modal', page_obj=page_obj, operation='delete')
+        context = context_obj.get_context()
+        context['segment'] = 'setup-master-manufacturer'
+
+        if not manufacturer_data:
+            messages.info(request, 'Records not found')
+            return render(request, 'billing/manufacturer.html', context=context)
         else:
-            messages.error(request, 'Selected record does not exist in Database')
-            return redirect('delete_manufacturer')
-    page_obj = pagination(request, manufacturer_data)
-    context_obj = SetupContext(model_search='manufacturer_modal', page_obj=page_obj, operation='delete')
-    context = context_obj.get_context()
-    if not manufacturer_data:
-        messages.info(request, 'Records not found')
-        return render(request, 'billing/manufacturer.html', context=context)
-    else:
-        return render(request, 'billing/manufacturer.html', context=context)
-    # except template.TemplateDoesNotExist:
-    #     return render(request, 'billing/page-404.html')
-    # except:
-    #     return render(request, 'billing/page-500.html')
+            return render(request, 'billing/manufacturer.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
 
 
 @login_required(login_url="/login/")
 @measure_execution_time
 def view_manufacturer(request):
-    # try:
-    query = ''
-    if request.method == 'POST':
-        manufacturer_name = request.POST.get('manufacturer_name')
-        if manufacturer_name:
-            manufacturer_data = Manufacturer.objects.filter(name__icontains=manufacturer_name). \
-                values('id', 'name', 'print_name', 'sh_name', 'contact1').order_by('name')
+    try:
+        query = ''
+        if request.method == 'POST':
+            manufacturer_name = request.POST.get('manufacturer_name')
+            if manufacturer_name:
+                manufacturer_data = Manufacturer.objects.filter(name__icontains=manufacturer_name). \
+                    values('id', 'name', 'print_name', 'sh_name', 'contact1').order_by('name')
+            else:
+                manufacturer_data = Manufacturer.objects.all().values('id', 'name', 'print_name', 'sh_name', 'contact1') \
+                    .order_by('name')
         else:
             manufacturer_data = Manufacturer.objects.all().values('id', 'name', 'print_name', 'sh_name', 'contact1') \
                 .order_by('name')
-    else:
-        manufacturer_data = Manufacturer.objects.all().values('id', 'name', 'print_name', 'sh_name', 'contact1') \
-            .order_by('name')
-    page_obj = pagination(request, manufacturer_data)
-    context_obj = SetupContext(model_search='manufacturer', page_obj=page_obj, operation='view')
-    context = context_obj.get_context()
-    if not manufacturer_data:
-        messages.info(request, 'Records not found')
-        return render(request, 'billing/manufacturer.html', context=context)
-    else:
-        return render(request, 'billing/manufacturer.html', context=context)
-    # except template.TemplateDoesNotExist:
-    #     return render(request, 'billing/page-404.html')
-    # except:
-    #     return render(request, 'billing/page-500.html')
+        page_obj = pagination(request, manufacturer_data)
+        context_obj = SetupContext(model_search='manufacturer', page_obj=page_obj, operation='view')
+        context = context_obj.get_context()
+        context['segment'] = 'setup-master-manufacturer'
+
+        if not manufacturer_data:
+            messages.info(request, 'Records not found')
+            return render(request, 'billing/manufacturer.html', context=context)
+        else:
+            return render(request, 'billing/manufacturer.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
 
 
 @login_required(login_url="/login/")
@@ -385,6 +394,8 @@ def create_product(request):
         context_obj = SetupContext(model_search='product', page_obj=product_data, operation='create')
         context = context_obj.get_context()
         context['form'] = form
+        context['segment'] = 'setup-master-product'
+
         return render(request, 'billing/products.html', context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
@@ -415,6 +426,8 @@ def get_product_modal(request):
         page_obj = pagination(request, product_data)
         context_obj = SetupContext(model_search='product_model', page_obj=page_obj, operation='modal')
         context = context_obj.get_context()
+        context['segment'] = 'setup-master-product'
+
         if not product_data:
             messages.info(request, 'Records not found')
             return render(request, 'billing/products.html', context=context)
@@ -446,7 +459,7 @@ def delete_product(request):
         page_obj = pagination(request, product_data)
         context_obj = SetupContext(model_search='product_modal', page_obj=page_obj, operation='delete')
         context = context_obj.get_context()
-        print('context:', context)
+        context['segment'] = 'setup-master-product'
         if not product_data:
             messages.info(request, 'Records not found')
             return render(request, 'billing/products.html', context=context)
@@ -461,25 +474,27 @@ def delete_product(request):
 @login_required(login_url="/login/")
 @measure_execution_time
 def update_product(request, pk):
-    # try:
-    product_data = Product.objects.get(id=pk)
-    if request.method == 'POST':
-        form = ProductForm(request.POST, instance=product_data)
-        if form.is_valid():
-            name = form.cleaned_data['product_name']
-            form.save()
-            messages.success(request, f'Product {name} updated')
-            return redirect('create_product')
-    else:
-        form = ProductForm(instance=product_data)
-    context_obj = SetupContext(model_search='product', page_obj=product_data, operation='update')
-    context = context_obj.get_context()
-    context['form'] = form
-    return render(request, 'billing/products.html', context=context)
-    # except template.TemplateDoesNotExist:
-    #     return render(request, 'billing/page-404.html')
-    # except:
-    #     return render(request, 'billing/page-500.html')
+    try:
+        product_data = Product.objects.get(id=pk)
+        if request.method == 'POST':
+            form = ProductForm(request.POST, instance=product_data)
+            if form.is_valid():
+                name = form.cleaned_data['product_name']
+                form.save()
+                messages.success(request, f'Product {name} updated')
+                return redirect('create_product')
+        else:
+            form = ProductForm(instance=product_data)
+        context_obj = SetupContext(model_search='product', page_obj=product_data, operation='update')
+        context = context_obj.get_context()
+        context['form'] = form
+        context['segment'] = 'setup-master-product'
+
+        return render(request, 'billing/products.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
 
 
 @login_required(login_url="/login/")
@@ -493,6 +508,8 @@ def view_product(request):
         page_obj = pagination(request, results)
         context_obj = SetupContext(model_search='product', page_obj=page_obj, operation='view')
         context = context_obj.get_context()
+        context['segment'] = 'product'
+
         if not results:
             messages.info(request, 'Records not found')
             return render(request, 'billing/products.html', context=context)
@@ -517,7 +534,7 @@ def get_receipt_modal(request):
         else:
             form = ReceiptForm()
 
-        context = {'form': form, 'flag': 'modal'}
+        context = {'form': form, 'flag': 'modal','segment':'receipt'}
         return render(request, 'billing/receipt.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
@@ -608,6 +625,7 @@ def create_group(request):
         context_obj = SetupContext(model_search='group', page_obj=group_data, operation='create')
         context = context_obj.get_context()
         context['form'] = form
+        context['segment'] = 'setup-master-group'
         return render(request, 'billing/group.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
@@ -630,6 +648,7 @@ def view_group(request):
         page_obj = pagination(request, group_data)
         context_obj = SetupContext(model_search='group', page_obj=page_obj, operation='view')
         context = context_obj.get_context()
+        context['segment'] = 'setup-master-group'
         if not group_data:
             messages.info(request, 'Records not found')
             return render(request, 'billing/group.html', context=context)
@@ -665,6 +684,7 @@ def get_group_modal(request):
         page_obj = pagination(request, group_data)
         context_obj = SetupContext(model_search='group', page_obj=page_obj, operation='modal')
         context = context_obj.get_context()
+        context['segment'] = 'setup-master-group'
         if not group_data:
             messages.info(request, 'Records not found')
             return render(request, 'billing/group.html', context=context)
@@ -694,6 +714,7 @@ def update_group(request, pk):
         context_obj = SetupContext(model_search='group', page_obj=group_data, operation='update')
         context = context_obj.get_context()
         context['form'] = form
+        context['segment'] = 'setup-master-group'
         return render(request, 'billing/group.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
@@ -722,6 +743,7 @@ def delete_group(request):
         page_obj = pagination(request, group_data)
         context_obj = SetupContext(model_search='group_modal', page_obj=page_obj, operation='delete')
         context = context_obj.get_context()
+        context['segment'] = 'setup-master-group'
         if not group_data:
             messages.info(request, 'Records not found')
             return render(request, 'billing/group.html', context=context)
@@ -778,6 +800,7 @@ def create_customer(request):
         context = context_obj.get_context()
         context['customer_form'] = customer_form
         context['location_form'] = location_form
+        context['segment'] = 'setup-master-customer'
         return render(request, 'billing/customer.html', context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
@@ -809,6 +832,7 @@ def get_customer_modal(request):
         page_obj = paginator.get_page(page_number)
         context_obj = SetupContext(model_search='customer', page_obj=page_obj, operation='modal')
         context = context_obj.get_context()
+        context['segment'] = 'setup-master-customer'
         if not customer_data:
             messages.info(request, 'Records not found')
             return render(request, 'billing/customer.html', context=context)
@@ -876,6 +900,7 @@ def update_customer(request, pk):
         context = context_obj.get_context()
         context['location_form'] = location_form
         context['customer_form'] = customer_form
+        context['segment'] = 'setup-master-customer'
         return render(request, 'billing/customer.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
@@ -902,6 +927,7 @@ def delete_customer(request):
         page_obj = pagination(request, customer_data)
         context_obj = SetupContext(model_search='customer_modal', page_obj=page_obj, operation='delete')
         context = context_obj.get_context()
+        context['segment'] = 'setup-master-customer'
         if not customer_data:
             messages.info(request, 'Records not found')
             return render(request, 'billing/customer.html', context=context)
@@ -930,6 +956,7 @@ def view_customer(request):
 
         context_obj = SetupContext(model_search='customer', page_obj=page_obj, operation='view')
         context = context_obj.get_context()
+        context['segment'] = 'setup-master-customer'
         if not customer_data:
             messages.info(request, 'Records not found')
             return render(request, 'billing/customer.html', context=context)
@@ -945,6 +972,7 @@ def view_customer(request):
 @measure_execution_time
 def setup_tax_structure(request):
     try:
+        tax_type = 'sales_taxes'
         tax_structure_formset = TaxStructureFormSet()
         if request.method == 'GET':
             tax_type = request.GET.get('tax_type', '')
@@ -994,6 +1022,7 @@ def setup_tax_structure(request):
                                 tax_structure_instance.sgst = float(sgst) if sgst else None
                                 tax_structure_instance.cgst = float(cgst) if cgst else None
                                 tax_structure_instance.igst = float(igst) if igst else None
+                                tax_structure_instance.igst = float(igst) if igst else None
                                 tax_structure_instance.description = description
                                 tax_structure_instance.save()
                     messages.success(request, 'Tax Structure successfully updated.')
@@ -1003,7 +1032,8 @@ def setup_tax_structure(request):
             else:
                 messages.error(request, 'Please correct the errors below.')
 
-        context = {'tax_structure_formset': tax_structure_formset,'label':'Setup Tax Structure','tax_type':tax_type}
+        context = {'tax_structure_formset': tax_structure_formset,'label':'Setup Tax Structure','tax_type':tax_type,
+                   'segment':'setup-master-tax_structure'}
         return render(request, 'billing/tax_structure.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
