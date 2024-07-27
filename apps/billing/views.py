@@ -950,31 +950,32 @@ def setup_tax_structure(request):
             tax_type = request.GET.get('tax_type', '')
             if tax_type:
                 tax_structure = TaxStructure.objects.filter(tax_type=tax_type).order_by('tax_id')
-                if tax_structure.count() < 10:
-                    tax_dictionary = {}
-                    tax_id = ['' for _ in range(10)]
-                    tax_desc = ['' for _ in range(10)]
+            else:
+                tax_structure = TaxStructure.objects.filter(tax_type='sales_taxes').order_by('tax_id')
+                ic(tax_structure)
+            if tax_structure.count() < 10:
+                tax_dictionary = {}
+                tax_id = ['' for _ in range(10)]
+                tax_desc = ['' for _ in range(10)]
 
-                    if tax_type == 'sales_taxes':
-                        for i in range(10):
-                            tax_id[i] = f'GST-S{i+1:02}'
-                            tax_desc[i] = f'SGST-{i+1:02}-SGST/CGST/IGST'
-                    else:
-                        for i in range(10):
-                            tax_id[i] = f'GST-P{i+1:02}'
-                            tax_desc[i] = f'PGST-{i+1:02}-SGST/CGST/IGST'
-
+                if tax_type == 'sales_taxes':
                     for i in range(10):
-                        tax_dictionary[i] = {'tax_type': tax_type, 'tax_id': tax_id[i], 'description': tax_desc[i]}
-                    bulk_tax_structure= [TaxStructure(**items) for items in tax_dictionary.values()]
-                    bulk_create = TaxStructure.objects.bulk_create(bulk_tax_structure)
-                    tax_structure_instance = TaxStructure.objects.filter(tax_type=tax_type)
-                    tax_structure_formset = TaxStructureFormSet(initial=tax_structure_instance.values())
+                        tax_id[i] = f'GST-S{i+1:02}'
+                        tax_desc[i] = f'SGST-{i+1:02}-SGST/CGST/IGST'
                 else:
-                    ic('else executed')
-                    tax_structure_queryset = TaxStructure.objects.filter(tax_type=tax_type)
-                    tax_structure_formset = TaxStructureFormSet(initial=tax_structure_queryset.values())
-                ic(tax_structure_formset)
+                    for i in range(10):
+                        tax_id[i] = f'GST-P{i+1:02}'
+                        tax_desc[i] = f'PGST-{i+1:02}-SGST/CGST/IGST'
+
+                for i in range(10):
+                    tax_dictionary[i] = {'tax_type': tax_type, 'tax_id': tax_id[i], 'description': tax_desc[i]}
+                bulk_tax_structure= [TaxStructure(**items) for items in tax_dictionary.values()]
+                bulk_create = TaxStructure.objects.bulk_create(bulk_tax_structure)
+                tax_structure_instance = TaxStructure.objects.filter(tax_type=tax_type)
+                tax_structure_formset = TaxStructureFormSet(initial=tax_structure_instance.values())
+            else:
+                ic('else executed')
+                tax_structure_formset = TaxStructureFormSet(initial=tax_structure.values())
         elif request.method == 'POST':
             tax_type = request.GET.get('tax_type', '')
             tax_structure_formset = TaxStructureFormSet(request.POST)
