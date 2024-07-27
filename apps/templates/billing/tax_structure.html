@@ -104,7 +104,8 @@
         #description_form {
             width: 200px;
         }
-        #tax_form{
+
+        #tax_form {
             width: 100px;
         }
     </style>
@@ -116,37 +117,43 @@
 
     <hr class="basic-line">
     <div class="container" style="margin-bottom: 2vh">
-        <form method="GET">
-            <div class="row align-items-center">
-                <div class="col-auto">
-                    <div class="form-group">
-                        <label for="tax_type_form">Tax Type</label>
-                        <select name="tax_type" id="tax_type_form" class="form-control" required>
-                            <option value="sales_taxes" {% if tax_type == 'sales_taxes' %} selected{% endif %}>Sales Taxes</option>
-                            <option value="purchase_taxes" {% if tax_type == 'purchase_taxes' %} selected{% endif %}>Purchase Taxes</option>
-                        </select>
+        <div class='get_form'>
+            <form method="GET" id="taxForm">
+                <div class="form-group" style="display: inline-flex">
+                    <label for="tax_type_form" style="padding-right: 20px">Tax Type:</label>
+                    <select name="tax_type" id="tax_type_form" class="form-control" required>
+                        <option value="sales_taxes" {% if tax_type == 'sales_taxes' %} selected{% endif %}>Sales
+                            Taxes
+                        </option>
+                        <option value="purchase_taxes" {% if tax_type == 'purchase_taxes' %} selected{% endif %}>
+                            Purchase Taxes
+                        </option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <form method="post" action="{% url 'setup_tax_structure' %}">
+
+            <div class="post_form" style="padding: 10px">
+                <div class="row" style="justify-content: center">
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Fetch</button>
-                </div>
             </div>
-        </form>
-    </div>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="d-flex justify-content-center">
-                <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"
-                            aria-label="Close"></button>
-                </div>
-            </div>
-        {% endfor %}
-    {% endif %}
-    {% if flag %}
-        <form method="post" action="{% url 'setup_tax_structure' %}">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="d-flex justify-content-center">
+                        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
             {% csrf_token %}
+
             {{ tax_structure_formset.management_form }}
 
             <div class="card border-0 shadow mb-4">
@@ -166,45 +173,47 @@
                             <tbody>
                             <!-- Item -->
                             {% for form in tax_structure_formset %}
-                                    {% include 'billing/form_errors.html' with form=form %}
+                                {% include 'billing/form_errors.html' with form=form %}
 
                                 {% if forloop.counter <= 10 %}
-                                <tr>
-                                <td>
-                                    {{ forloop.counter }}
-                                </td>
-                                    <td class="form-group">
-                                        {{ form.tax_id }}
-                                    </td>
-                                    <td class="form-group">
-                                        {{ form.description }}
-                                    </td>
-                                    <td class="form-group">
-                                        {{ form.sgst }}
-                                    </td>
-                                    <td class="form-group">
-                                        {{ form.cgst }}
+                                    <tr>
+                                        <td>
+                                            {{ forloop.counter }}
+                                        </td>
+                                        <td class="form-group">
+                                            {{ form.tax_id }}
+                                        </td>
+                                        <td class="form-group">
+                                            {{ form.description }}
+                                        </td>
+                                        <td class="form-group">
+                                            {{ form.sgst }}
+                                        </td>
+                                        <td class="form-group">
+                                            {{ form.cgst }}
 
-                                    </td>
-                                    <td class="form-group">
-                                        {{ form.igst }}
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td class="form-group">
+                                            {{ form.igst }}
+                                        </td>
+                                    </tr>
                                 {% endif %}
                             {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
-            <div class="row" style="justify-content: center">
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </div>
-                </div>
+
             </div>
 
 
         </form>
-    {% endif %}
-
+    </div>
+{% endblock %}
+{% block javascripts %}
+    <script>
+        document.getElementById('tax_type_form').addEventListener('change', function () {
+            document.getElementById('taxForm').submit();
+        });
+    </script>
 {% endblock %}

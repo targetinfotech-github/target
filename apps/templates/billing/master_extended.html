@@ -52,7 +52,8 @@
                                 <button type="button" class="btn-sm btn-warning">reset</button>
                             </a>
                             <input type="text" class="form-control" id="master_search" placeholder="Search"
-                                   aria-label="Search" aria-describedby="topbar-addon" style="max-width: 30%;height: 40px"
+                                   aria-label="Search" aria-describedby="topbar-addon"
+                                   style="max-width: 30%;height: 40px"
                                    oninput="autocomplete_master()" name="{{ input_name }}" autocomplete="off"
                                    value="{{ query }}">
                             <button type="submit" class="input-group-text" id="topbar-addon">
@@ -231,7 +232,7 @@
     <script src="{% static 'assets/js/master.js' %}"></script>
 
     <script>
-
+        save_form = document.getElementById('form_submit');
         function autocomplete_dropdown(data, input) {
             var existingDatalist = document.getElementById("autocomplete-list");
             if (existingDatalist) {
@@ -276,5 +277,13 @@
                 }
             }
         }
+
+        save_form.addEventListener('click', function (event) {
+            var confirmation = confirm('Are you sure you want to delete this record?');
+            if (!confirmation) {
+                event.preventDefault();
+            }
+        });
+
     </script>
 {% endblock javascripts %}

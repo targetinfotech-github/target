@@ -946,7 +946,6 @@ def view_customer(request):
 def setup_tax_structure(request):
     try:
         tax_structure_formset = TaxStructureFormSet()
-        flag = False
         if request.method == 'GET':
             tax_type = request.GET.get('tax_type', '')
             if tax_type:
@@ -976,7 +975,6 @@ def setup_tax_structure(request):
                     tax_structure_queryset = TaxStructure.objects.filter(tax_type=tax_type)
                     tax_structure_formset = TaxStructureFormSet(initial=tax_structure_queryset.values())
                 ic(tax_structure_formset)
-                flag = True
         elif request.method == 'POST':
             tax_type = request.GET.get('tax_type', '')
             tax_structure_formset = TaxStructureFormSet(request.POST)
@@ -1003,9 +1001,8 @@ def setup_tax_structure(request):
                     messages.error(request, 'Unable to update Tax Structure. Kindly contact support.')
             else:
                 messages.error(request, 'Please correct the errors below.')
-            flag = True
 
-        context = {'tax_structure_formset': tax_structure_formset,'flag':flag,'label':'Setup Tax Structure','tax_type':tax_type}
+        context = {'tax_structure_formset': tax_structure_formset,'label':'Setup Tax Structure','tax_type':tax_type}
         return render(request, 'billing/tax_structure.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
