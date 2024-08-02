@@ -9,7 +9,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from icecream import ic
 
-from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxStructure
+from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxStructure, SalesRep
 from django import forms
 from .models import Receipt, ReceiptProduct, Manufacturer, Product
 from django.db import transaction
@@ -417,3 +417,26 @@ class TaxStructureForm(forms.ModelForm):
             self.fields['description'].required = False
 
 TaxStructureFormSet = formset_factory(TaxStructureForm)
+
+class SalesRepForm(forms.ModelForm):
+    class Meta:
+        model = SalesRep
+        fields = '__all__'
+        widgets = {
+            'name': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Enter the Name', 'id': 'name_form'}),
+            'sh_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
+            'under': forms.TextInput(attrs={'class': 'form-control'}),
+            'rep_type_id': forms.Select(attrs={'class': 'form-control'}),
+            'rep_indent': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Rep Indent'}),
+            'address': forms.Textarea(
+                attrs={'class': 'form-control custom-address', 'placeholder': 'Enter the address',
+                       'id': 'address-form'}),
+            'mobile_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mobile Number'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telephone'}),
+            'fax': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter FAX'}),
+            'state_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter State Name'}),
+            'company': forms.Select(attrs={'class': 'form-control', 'id': 'company'}),
+            'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter City'}),
+            'postal_code': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter PIN'}),
+        }

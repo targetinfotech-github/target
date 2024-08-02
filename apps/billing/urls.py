@@ -55,6 +55,14 @@ urlpatterns = [
     # tax Structure
     path('setup_tax_structure/', views.setup_tax_structure, name="setup_tax_structure"),
 
+    # Selection List
+    path('setup_sales_rep/', views.setup_sales_rep, name="setup_sales_rep"),
+    path('view_sales_rep/', views.view_sales_rep, name="view_sales_rep"),
+    path('update_sales_rep/<int:pk>', views.update_sales_rep, name="update_sales_rep"),
+    path('get_sales_rep_modal/', views.get_sales_rep_modal, name="get_sales_rep_modal"),
+    path('delete_sales_rep/', views.delete_sales_rep, name="delete_sales_rep"),
+
+
 
 
     # Matches any html file

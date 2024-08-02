@@ -70,12 +70,12 @@
             <a href="{% url create_url %}">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </a>
-            {% if flag == 'modal' and flag != 'delete' %}
+            {% if flag == 'modal'%}
                 <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
                         name="submit_selected_record" value="" style="display: flex">Update
                 </button>
             {% endif %}
-            {% if flag != 'modal' and flag == 'delete' %}
+            {% if flag == 'delete' %}
                 <button type="submit" class="btn btn-danger" id="delete_selected_record"
                         name="delete_selected_record" value="" style="display: flex">Delete
                 </button>
@@ -87,7 +87,7 @@
 
 {% block create_form %}
 
-    {% if flag != 'view' and flag != 'modal' and flag != 'delete' %}
+    {% if flag == 'create' or flag == 'update' %}
         <form method="post">
             {% csrf_token %}
             {% include 'billing/form_errors.html' with form=manufacturer_form %}

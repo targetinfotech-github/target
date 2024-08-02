@@ -1,83 +1,90 @@
-{% extends "layouts/base.html" %}
+{% extends 'billing/selection_list_extended.html' %}
 
-{% block title %} Dashboard {% endblock %}
-{% load static %}
 
-<!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}
-    <link rel="stylesheet" href="{% static 'assets/css/master.css' %}">
-{% endblock stylesheets %}
-{% load humanize %}
-{% block content %}
-    <h2 class="h4">{{ label }}</h2>
-    <div class="row" style="margin-left: 20px">
-        <div class="col">
-            {% if flag != 'create' %}
-
-                <a href="{% url 'setup_sales_rep' %}">
-                    <button class="btn btn-sm btn-info" type="button">Create</button>
-                </a>
-            {% endif %}
-            {% if sales_data %}
-                <a href="#">
-                    <button class="btn btn-sm btn-tertiary" type="button">Update</button>
-                </a>
-                {% if flag != 'view' %}
-                    <a href="{% url 'view_sales_rep' %}">
-                        <button class="btn btn-sm btn-success" type="button">View</button>
-                    </a>
-                {% endif %}
-                <a href="#">
-                    <button class="btn btn-sm btn-danger" type="button">Delete</button>
-                </a>
-            {% endif %}
-        </div>
+{% block modal_display %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Company</th>
+                <th scope="col">Sh Name</th>
+                <th scope="col">Contact</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for rep in data %}
+                <tr id="row-{{ rep.id }}"
+                    onclick="selectMaster('{{ rep.id }}')">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ rep.name }}</td>
+                    <td>{{ rep.company }}</td>
+                    <td>{{ rep.sh_name }}</td>
+                    <td>{{ rep.mobile_number }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <!-- End of Item -->
+        </table>
     </div>
-    <hr class="basic-line">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="d-flex justify-content-center">
-                <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"
-                            aria-label="Close"></button>
-                </div>
-            </div>
-        {% endfor %}
-    {% endif %}
-    {% if flag == 'view' and sales_data %}
-        <div class="card border-0 shadow mb-4">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-centered table-nowrap mb-0 rounded">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Company</th>
-                            <th scope="col">Sh Name</th>
-                            <th scope="col">Contact</th>
-                        </tr>
-                        </thead>
-                        <!-- Item -->
-                        <tbody>
+{% endblock %}
 
-                        {% for rep in sales_data %}
-                            <tr id="row-{{ rep.id }}">
-                                <th scope="row">{{ forloop.counter }}</th>
-                                <td><a href="{% url update_url rep.id %}">{{ rep.name }}</a></td>
-                                <td>{{ rep.company }}</td>
-                                <td>{{ rep.sh_name }}</td>
-                                <td>{{ rep.mobile_number }}</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+{% block modal_post_request %}
+    <form method="post" action="{% url 'get_sales_rep_modal' %}">
+        {% csrf_token %}
+        <div class="modal-footer">
+            <a href="{% url create_url %}">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </a>
+            {% if flag == 'modal'%}
+                <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
+                        name="submit_selected_record" value="" style="display: flex">Update
+                </button>
+            {% endif %}
+            {% if flag == 'delete' %}
+                <button type="submit" class="btn btn-danger" id="delete_selected_record"
+                        name="delete_selected_record" value="" style="display: flex">Delete
+                </button>
+            {% endif %}
         </div>
+    </form>
+{% endblock modal_post_request %}
 
-    {% endif %}
+
+
+{% block master-view %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Company</th>
+                <th scope="col">Sh Name</th>
+                <th scope="col">Contact</th>
+            </tr>
+            </thead>
+            <!-- Item -->
+            <tbody>
+
+            {% for rep in data %}
+                <tr id="row-{{ rep.id }}">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td><a href="{% url update_url rep.id %}">{{ rep.name }}</a></td>
+                    <td>{{ rep.company }}</td>
+                    <td>{{ rep.sh_name }}</td>
+                    <td>{{ rep.mobile_number }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+
+{% block create_form %}
+
     {% if flag == 'create' or flag == 'update' %}
         <form method="post">
             {% csrf_token %}
@@ -208,10 +215,6 @@
                     </div>
                 </div>
             </div>
-
-
         </form>
     {% endif %}
-{% endblock %}
-{% block javascripts %}
 {% endblock %}

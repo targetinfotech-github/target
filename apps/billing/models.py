@@ -58,7 +58,7 @@ class CompanyProfile(models.Model):
     address = models.TextField(max_length=255, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     city = models.CharField(max_length=100)
-    postal_code = models.CharField(max_length=20)
+    postal_code = models.PositiveIntegerField(null=True, blank=True)
     state_name = models.CharField(max_length=50, null=True, blank=True)
     telephone1 = models.CharField(max_length=15, null=True, blank=True)
     telephone2 = models.CharField(max_length=15, null=True, blank=True)
@@ -445,3 +445,26 @@ class TaxStructure(models.Model):
 
     def __str__(self):
         return f'{self.tax_type}-{self.tax_id}'
+
+class SalesRep(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    REP_TYPE_ID = [('r','R'),
+                ('d','D'),
+                ('s','S')]
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=30, null=True, blank=True)
+    rep_indent = models.CharField(max_length=30, null=True, blank=True)
+    under = models.CharField(max_length=30, null=True, blank=True)
+    company = models.ForeignKey(Manufacturer, null=True, blank=True,on_delete=models.CASCADE,related_name='sales_rep')
+    rep_type_id = models.CharField(max_length=25,choices=REP_TYPE_ID,null=True,blank=True)
+    address = models.TextField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=100)
+    postal_code = models.PositiveIntegerField(null=True, blank=True)
+    state_name = models.CharField(max_length=50, null=True, blank=True)
+    telephone = models.CharField(max_length=15, null=True, blank=True)
+    fax = models.CharField(max_length=20, null=True, blank=True)
+    mobile_number = models.CharField(max_length=15, null=True, blank=True, verbose_name='Mb No')
+
+    def __str__(self):
+        return f'{self.name}-{self.company}'
+

@@ -1,0 +1,166 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Master {% endblock %}
+{% load static %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{% static 'assets/css/master.css' %}">
+{% endblock stylesheets %}
+{% load humanize %}
+{% block content %}
+    <h2 class="h4">{{ label }}</h2>
+    <div class="row" style="margin-left: 20px">
+        <div class="col">
+            {% if flag != 'create' %}
+                <a href="{% url create_url %}">
+                    <button class="btn btn-sm btn-info" type="button">Create</button>
+                </a>
+            {% endif %}
+            {% if data %}
+                <a href="{% url modal_url %}">
+                    <button class="btn btn-sm btn-tertiary" type="button">Update</button>
+                </a>
+                {% if flag != 'view' %}
+                    <a href="{% url view_url %}">
+                        <button class="btn btn-sm btn-success" type="button">View</button>
+                    </a>
+                {% endif %}
+                <a href="{% url delete_url %}">
+                    <button class="btn btn-sm btn-danger" type="button">Delete</button>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="d-flex justify-content-center">
+                <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <hr class="basic-line">
+    {% if flag == 'modal'  or flag == 'delete' %}
+        {% if data %}
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+                            {% block modal_display %}
+
+                            {% endblock modal_display %}
+                            <!-- Pagination -->
+                            {% if master_data %}
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination">
+                                        <li class="page-item">
+                                            <a class="page-link" href="?{{ input_name }}={{ query }}&page=1"
+                                               aria-label="First">
+                                                <span aria-hidden="true">&laquo;</span>
+                                                <span class="sr-only">First</span>
+                                            </a>
+                                        </li>
+                                        {% if page_obj.has_previous %}
+                                            <li class="page-item"><a class="page-link"
+                                                                     href="?{{ input_name }}={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                                            </li>
+                                        {% endif %}
+                                        <li class="page-item active"><a class="page-link"
+                                                                        href="#">{{ page_obj.number }}</a>
+                                        </li>
+                                        {% if page_obj.has_next %}
+                                            <li class="page-item"><a class="page-link"
+                                                                     href="?{{ input_name }}={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                                            </li>
+                                        {% endif %}
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="?{{ input_name }}={{ query }}&page={{ page_obj.paginator.num_pages }}"
+                                               aria-label="Last">
+                                                <span aria-hidden="true">&raquo;</span>
+                                                <span class="sr-only">Last</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            {% endif %}
+
+                        </div>
+                        {% block modal_post_request %}
+
+                        {% endblock modal_post_request %}
+
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+    {% if flag == 'view' and data %}
+
+        <div class="card border-0 shadow mb-4">
+            <div class="card-body">
+                {% block master-view %}
+
+                {% endblock %}
+                <!-- Pagination -->
+                {% if data %}
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item">
+                                <a class="page-link" href="?{{ input_name }}={{ query }}&page=1" aria-label="First">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">First</span>
+                                </a>
+                            </li>
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?{{ input_name }}={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                                </li>
+                            {% endif %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?{{ input_name }}={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                                </li>
+                            {% endif %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="?{{ input_name }}={{ query }}&page={{ page_obj.paginator.num_pages }}"
+                                   aria-label="Last">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Last</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %}
+                {#                    {% include 'billing/common_pagination.html' with query=query page_location='manufacturer_details' page_obj=page_obj %}#}
+
+            </div>
+        </div>
+
+    {% endif %}
+    {% block create_form %}
+    {% endblock create_form %}
+
+{% endblock %}
+{% block javascripts %}
+    <script src="{% static 'assets/js/selection_list.js' %}"></script>
+
+    <script>
+        save_form = document.getElementById('form_submit');
+
+
+        save_form.addEventListener('click', function (event) {
+            var confirmation = confirm('Are you sure you want to create this record?');
+            if (!confirmation) {
+                event.preventDefault();
+            }
+        });
+
+    </script>
+{% endblock javascripts %}

@@ -14,7 +14,7 @@ class SearchService:
         print('model search :: ', self.model_search)
         self.autocomplete_query = request.GET.get('autocomplete_query', '')
         self.details_query = request.GET.get(f'{self.model_search}_details', '')
-        print('product details query:  ', self.details_query)
+        print('details query:  ', self.details_query)
 
     def get_autocomplete_data(self):
         if 'product' in self.model_search:
@@ -130,7 +130,7 @@ class SearchService:
 
     def get_context(self, page_obj, operation):
         context_obj = SetupContext(self.model_search, page_obj, operation=operation)
-        context = context_obj.get_context()
+        context = context_obj.get_master_context()
         return context
 
 
