@@ -9,7 +9,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from icecream import ic
 
-from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxStructure, SalesRep
+from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxStructure, SalesRep, Area
 from django import forms
 from .models import Receipt, ReceiptProduct, Manufacturer, Product
 from django.db import transaction
@@ -439,4 +439,22 @@ class SalesRepForm(forms.ModelForm):
             'company': forms.Select(attrs={'class': 'form-control', 'id': 'company'}),
             'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter City'}),
             'postal_code': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter PIN'}),
+        }
+
+
+class AreaForm(forms.ModelForm):
+    class Meta:
+        model = Area
+        fields = '__all__'
+        widgets = {
+            'name': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Enter the Name', 'id': 'name_form'}),
+            'sh_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
+            'area_under': forms.Select(attrs={'class': 'form-control'}),
+            'fm_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'FM Name'}),
+            'area_status': forms.Select(attrs={'class': 'form-control'}),
+            'area_rep1': forms.Select(attrs={'class': 'form-control', 'id': 'area_rep'}),
+            'area_rep2': forms.Select(attrs={'class': 'form-control', 'id': 'area_rep'}),
+            'area_rep3': forms.Select(attrs={'class': 'form-control', 'id': 'area_rep'}),
+            'pin_code': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Pin Code'}),
         }

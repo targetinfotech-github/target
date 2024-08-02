@@ -1,0 +1,188 @@
+{% extends 'billing/selection_list_extended.html' %}
+
+
+{% block modal_display %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Company</th>
+                <th scope="col">Sh Name</th>
+                <th scope="col">Contact</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for rep in data %}
+                <tr id="row-{{ rep.id }}"
+                    onclick="selectMaster('{{ rep.id }}')">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ rep.name }}</td>
+                    <td>{{ rep.company }}</td>
+                    <td>{{ rep.sh_name }}</td>
+                    <td>{{ rep.mobile_number }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <!-- End of Item -->
+        </table>
+    </div>
+{% endblock %}
+
+{% block modal_post_request %}
+    <form method="post" action="{% url 'get_sales_rep_modal' %}">
+        {% csrf_token %}
+        <div class="modal-footer">
+            <a href="{% url create_url %}">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </a>
+            {% if flag == 'modal'%}
+                <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
+                        name="submit_selected_record" value="" style="display: flex">Update
+                </button>
+            {% endif %}
+            {% if flag == 'delete' %}
+                <button type="submit" class="btn btn-danger" id="delete_selected_record"
+                        name="delete_selected_record" value="" style="display: flex">Delete
+                </button>
+            {% endif %}
+        </div>
+    </form>
+{% endblock modal_post_request %}
+
+
+
+{% block master-view %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Company</th>
+                <th scope="col">Sh Name</th>
+                <th scope="col">Contact</th>
+            </tr>
+            </thead>
+            <!-- Item -->
+            <tbody>
+
+            {% for rep in data %}
+                <tr id="row-{{ rep.id }}">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td><a href="{% url update_url rep.id %}">{{ rep.name }}</a></td>
+                    <td>{{ rep.company }}</td>
+                    <td>{{ rep.sh_name }}</td>
+                    <td>{{ rep.mobile_number }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+
+{% block create_form %}
+
+    {% if flag == 'create' or flag == 'update' %}
+        <form method="post">
+            {% csrf_token %}
+            {% include 'billing/form_errors.html' with form=form %}
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 col-lg-6 col-sm-8">
+                        <div class="row justify-content-between">
+                            <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 4.3vw"
+                                           for="{{ form.name.id_for_label }}">{{ form.name.label }}:</label>
+                                    {{ form.name }}
+                                </div>
+                            </div>
+                            <div class="col-lg-auto col-md-auto">
+                                <div class="form-element" style="margin-right: 2vw">
+                                    <label class="form-label" style="min-width: 3.2vw"
+                                           for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}:</label>
+                                    <span class="form-items">
+                                    {{ form.sh_name }}
+                                        </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-between">
+                            <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width:4.3vw"
+                                           for="{{ form.area_under.id_for_label }}">{{ form.area_under.label }}:</label>
+                                    {{ form.area_under }}
+                                </div>
+                            </div>
+                            <div class="col-lg-auto col-md-auto">
+                                <div class="form-element" style="margin-right: 2vw">
+                                    <label class="form-label" style="min-width: 4.1vw"
+                                           for="{{ form.area_status.id_for_label }}">{{ form.area_status.label }}:</label>
+
+                                    {{ form.area_status }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-between">
+                            <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 3.5vw"
+                                           for="{{ form.pin_code.id_for_label }}">{{ form.pin_code.label }}:</label>
+                                    {{ form.pin_code }}
+                                </div>
+                            </div>
+                            <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element" style="margin-right: 2.8vw">
+                                    <label class="form-label" style="min-width: 4.1vw"
+                                           for="{{ form.fm_name.id_for_label }}">{{ form.fm_name.label }}</label>
+                                    {{ form.fm_name }}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6 col-lg-6 col-sm-8" style="display: flex;flex-direction: column">
+                        <div class="row justify-content-start">
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.area_rep1.id_for_label }}">{{ form.area_rep1.label }}:</label>
+                                    {{ form.area_rep1 }}
+                                </div>
+                            </div>
+                            <div class="col-md-auto col-lg-auto">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 4.1vw"
+                                           for="{{ form.area_rep2.id_for_label }}">{{ form.area_rep2.label }}</label>
+                                    {{ form.area_rep2 }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-start">
+                            <div class="col-md-auto col-lg-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label"
+                                           for="{{ form.area_rep3.id_for_label }}">{{ form.area_rep3.label }}:</label>
+                                    {{ form.area_rep3 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="post_form" style="padding: 10px">
+                <div class="row" style="justify-content: center">
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    {% endif %}
+{% endblock %}

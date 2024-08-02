@@ -63,6 +63,10 @@ urlpatterns = [
     path('delete_sales_rep/', views.delete_sales_rep, name="delete_sales_rep"),
 
 
+    # Area
+    path('setup_area/', views.setup_area, name="setup_area"),
+
+
 
 
     # Matches any html file

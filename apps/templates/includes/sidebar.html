@@ -136,6 +136,16 @@
                                     </li>
                                 </ul>
                             </div>
+                            <div class="multi-level collapse {% if 'master-selection-' in segment %} show {% endif %}"
+                                 role="list" id="submenu-app" aria-expanded="false">
+                                <ul class="flex-column nav">
+                                    <li class="nav-item {% if 'area' in segment %} active {% endif %}">
+                                        <a class="nav-link" href="{% url 'setup_area' %}">
+                                            <span class="sidebar-text">Area</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                     </ul>
                 </div>

@@ -468,3 +468,22 @@ class SalesRep(models.Model):
     def __str__(self):
         return f'{self.name}-{self.company}'
 
+
+class Area(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    STATUS = [('active','Active'),
+                ('inactive','Inactive')]
+    area_under = models.ForeignKey('self',on_delete=models.SET_NULL, null=True,blank=True,related_name='subarea')
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=30, null=True, blank=True)
+    pin_code = models.PositiveIntegerField(null=True, blank=True)
+    fm_name = models.CharField(null=True,blank=True,max_length=20)
+    area_status = models.CharField(max_length=20,null=True,blank=True,choices=STATUS)
+    area_rep1 = models.ForeignKey(SalesRep,on_delete=models.SET_NULL, null=True, blank=True,related_name='area_rep1')
+    area_rep2 = models.ForeignKey(SalesRep,on_delete=models.SET_NULL, null=True, blank=True,related_name='area_rep2')
+    area_rep3 = models.ForeignKey(SalesRep,on_delete=models.SET_NULL, null=True, blank=True,related_name='area_rep3')
+
+    def __str__(self):
+        # return f'{self.name}-{self.company}'
+        return f'{self.name}'
+
