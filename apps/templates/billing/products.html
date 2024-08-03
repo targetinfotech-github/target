@@ -7,7 +7,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Product Name</th>
-                <th scope="col">Product Code</th>
+                <th scope="col">Product Spec</th>
                 <th scope="col">Manufacturer</th>
                 <th scope="col">Buy Rate</th>
                 <th scope="col">Sell Rate</th>
@@ -19,7 +19,7 @@
                     <th scope="row">{{ forloop.counter }}</th>
                     <td><a href="{% url update_url product.id %}">{{ product.product_name }}</a>
                     </td>
-                    <td>{{ product.product_code }}</td>
+                    <td>{{ product.product_spec }}</td>
                     <td>{{ product.manufacturer__name }}</td>
                     <td>{{ product.buy_rate }}</td>
                     <td>{{ product.sell_rate }}</td>
@@ -38,7 +38,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Product Name</th>
-                <th scope="col">Product Code</th>
+                <th scope="col">Product Spec</th>
                 <th scope="col">Manufacturer</th>
                 <th scope="col">Buy Rate</th>
                 <th scope="col">Sell Rate</th>
@@ -51,7 +51,7 @@
                     onclick="selectMaster('{{ product.id }}')">
                     <th scope="row">{{ forloop.counter }}</th>
                     <td>{{ product.product_name }}</td>
-                    <td>{{ product.product_code }}</td>
+                    <td>{{ product.product_spec }}</td>
                     <td>{{ product.manufacturer__name }}</td>
                     <td>{{ product.buy_rate }}</td>
                     <td>{{ product.sell_rate }}</td>

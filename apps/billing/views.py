@@ -18,10 +18,10 @@ from icecream import ic
 
 from apps.billing.services.decorators import measure_execution_time
 from apps.billing.form import ManufacturerForm, ProductForm, ReceiptForm, GroupForm, CustomerForm, SignUpForm, \
-    LoginForm, LocationForm, TaxStructureForm, TaxStructureFormSet, SalesRepForm, AreaForm
+    LoginForm, LocationForm, TaxStructureForm, TaxStructureFormSet, SalesRepForm, AreaForm, CustomerManufacturerForm
 from django.shortcuts import render, redirect
 from apps.billing.models import Manufacturer, Product, Receipt, ReceiptProduct, ProductGroup, Customer, CustomUser, \
-    Location, TaxStructure, SalesRep, Area
+    Location, TaxStructure, SalesRep, Area, CustomerManufacturer
 import json
 
 # views.py or any module
@@ -104,7 +104,7 @@ def login_view(request):
             else:
                 messages.error(request, 'Invalid credentials')
         else:
-            messages.error(request, f'Invalid Form: {form.errors}')
+            messages.error(request, f'Invalid Form')
 
     return render(request, "accounts/login.html", {"form": form})
 
@@ -128,8 +128,8 @@ def register_user(request):
             messages.success(request, f'User created - please Sign IN.')
 
         else:
-            messages.error(request, f'Invalid Form: {form.errors}')
-            return redirect('register')
+            messages.error(request, f'Invalid Form')
+            # return redirect('register')
     else:
         form = SignUpForm()
 
@@ -393,7 +393,7 @@ def create_product(request):
 def get_product_modal(request):
     try:
         product_data = Product.objects.select_related('manufacturer'). \
-            values('id', 'product_name', 'product_code',
+            values('id', 'product_name', 'product_spec',
                    'manufacturer__name', 'buy_rate', 'sell_rate').order_by('product_name')
         # form = ProductForm()
         if request.method == 'POST':
@@ -428,12 +428,11 @@ def get_product_modal(request):
 def delete_product(request):
     try:
         product_data = Product.objects.select_related('manufacturer'). \
-            values('id', 'product_name', 'product_code',
+            values('id', 'product_name', 'product_spec',
                    'manufacturer__name', 'buy_rate', 'sell_rate').order_by('product_name')
         page_obj = pagination(request, product_data)
         context_obj = SetupContext(model_search='product_modal', page_obj=page_obj, operation='delete',segment='master-product')
         context = context_obj.get_master_context()
-        context['segment'] = 'master-product'
         if not product_data:
             messages.info(request, 'Records not found')
             return render(request, 'billing/products.html', context=context)
@@ -476,13 +475,13 @@ def view_product(request):
     try:
         query = ''
         results = Product.objects.select_related('manufacturer').values(
-            'id', 'product_name', 'product_code', 'manufacturer__name', 'buy_rate', 'sell_rate',
+            'id', 'product_name','product_spec', 'manufacturer__name', 'buy_rate', 'sell_rate',
             'manufacturer', 'buy_rate', 'sell_rate').order_by('product_name')
         page_obj = pagination(request, results)
+        ic(page_obj)
         context_obj = SetupContext(model_search='product', page_obj=page_obj, operation='view',segment='product')
         context = context_obj.get_master_context()
-        context['segment'] = 'product'
-
+        ic(context)
         if not results:
             messages.info(request, 'Records not found')
             return render(request, 'billing/products.html', context=context)
@@ -965,7 +964,6 @@ def setup_tax_structure(request):
                                 tax_structure_instance.sgst = float(sgst) if sgst else None
                                 tax_structure_instance.cgst = float(cgst) if cgst else None
                                 tax_structure_instance.igst = float(igst) if igst else None
-                                tax_structure_instance.igst = float(igst) if igst else None
                                 tax_structure_instance.description = description
                                 tax_structure_instance.save()
                     messages.success(request, 'Tax Structure successfully updated.')
@@ -1045,7 +1043,7 @@ def update_sales_rep(request, pk):
 @measure_execution_time
 def get_sales_rep_modal(request):
     try:
-        representative_data = SalesRep.objects.select_related('company').values('id', 'name', 'company', 'sh_name',
+        representative_data = SalesRep.objectsvalues('id', 'name', 'sh_name',
                                                                                 'mobile_number').order_by('name')
         if request.method == 'POST':
             if 'submit_selected_record' in request.POST:
@@ -1061,7 +1059,7 @@ def get_sales_rep_modal(request):
                 return redirect('create_manufacturer')
         page_obj = pagination(request, representative_data)
         context_obj = SetupContext(model_search='sales_rep', operation='modal',page_obj=page_obj, segment='master-selection-sales',
-                                   data=representative_data, label='View Sales Representative')
+                                   data=representative_data, label='Update Sales Representative')
         context = context_obj.get_selection_list_context()
 
         if not representative_data:
@@ -1079,7 +1077,7 @@ def get_sales_rep_modal(request):
 @measure_execution_time
 def delete_sales_rep(request):
     try:
-        representative_data = SalesRep.objects.select_related('company').values('id', 'name', 'company', 'sh_name',
+        representative_data = SalesRep.objects.values('id', 'name', 'sh_name',
                                                                                 'mobile_number').order_by('name')
         page_obj = pagination(request, representative_data)
         context_obj = SetupContext(model_search='sales_rep', operation='delete', page_obj=page_obj,
@@ -1098,7 +1096,6 @@ def delete_sales_rep(request):
         return render(request, 'billing/page-500.html')
 
 
-
 @login_required(login_url="/login/")
 @measure_execution_time
 def setup_area(request):
@@ -1112,3 +1109,119 @@ def setup_area(request):
                                form=form,data=data,label='Setup Area')
     context = context_obj.get_selection_list_context()
     return render(request, 'billing/area.html', context=context)
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def view_area(request):
+    data = Area.objects.all()
+    page_obj = pagination(request, data)
+    context_obj = SetupContext(model_search='area', operation='view', segment='master-selection-area',
+                               page_obj=page_obj, data=data, label='View Area')
+    context = context_obj.get_selection_list_context()
+    return render(request, 'billing/area.html', context=context)
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def get_area_modal(request):
+    try:
+        data = Area.objects.values('id', 'name', 'pin_code', 'sh_name','area_status').order_by('name')
+        if request.method == 'POST':
+            if 'submit_selected_record' in request.POST:
+                id = request.POST['submit_selected_record']
+                return redirect('update_area', int(id))
+            elif 'delete_selected_record' in request.POST:
+                id = request.POST['delete_selected_record']
+                model = Area.objects.get(id=id)
+                delete_models(request, model, name=model.name)
+                return redirect('setup_area')
+            else:
+                messages.info(request, 'No operation performed.')
+                return redirect('create_manufacturer')
+        page_obj = pagination(request, data)
+        context_obj = SetupContext(model_search='area', operation='modal', page_obj=page_obj,
+                                   segment='master-selection-area',
+                                   data=data, label='Update Area')
+        context = context_obj.get_selection_list_context()
+        ic(context)
+        if not data:
+            messages.info(request, 'Records not found')
+            return render(request, 'billing/area.html', context=context)
+        else:
+            return render(request, 'billing/area.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def update_area(request,pk):
+    data = Area.objects.get(id=pk)
+    form = AreaForm(instance=data)
+    if request.method == 'POST':
+        form = AreaForm(request.POST, instance=data)
+        form.save()
+        return redirect('setup_area')
+    context_obj = SetupContext(model_search='area', operation='update', segment='master-selection-area',
+                               form=form, data=data, label='Update Area')
+    context = context_obj.get_selection_list_context()
+    return render(request, 'billing/area.html', context=context)
+
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def delete_area(request):
+    try:
+        data = Area.objects.values('id', 'name', 'pin_code', 'sh_name','area_status').order_by('name')
+        page_obj = pagination(request, data)
+        context_obj = SetupContext(model_search='area', operation='delete', page_obj=page_obj,
+                                   segment='master-selection-area',
+                                   data=data, label='Delete Area')
+        context = context_obj.get_selection_list_context()
+
+        if not data:
+            messages.info(request, 'Records not found')
+            return render(request, 'billing/area.html', context=context)
+        else:
+            return render(request, 'billing/area.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def setup_customer_manufacturer(request):
+    data = CustomerManufacturer.objects.exists()
+    data = 0
+    form = CustomerManufacturerForm()
+    if request.method == 'POST':
+        form = CustomerManufacturerForm(request.POST)
+        if form.is_valid():
+            customer_id = form.cleaned_data.get('customer',None)
+
+            form_instance = form.save(commit=False)
+            ic(form_instance)
+            try:
+                if customer_id:
+                    customer = Customer.objects.get(id=customer_id)
+                    customer.CustomerManufacturer = form_instance
+                    form_instance.save()
+                    customer.save()
+                    messages.success(request, 'Customer Manufacturer Successfully created')
+            except Exception as e:
+                customer_manufacturer = CustomerManufacturer.objects.filter(id=form_instance.id)
+                if customer_manufacturer.exists():
+                    customer_manufacturer.delete()
+                messages.error(request,f'Exception occurred:{e} submit the Form again')
+
+
+            return redirect('setup_customer_manufacturer')
+    context_obj = SetupContext(model_search='customer_manufacturer', operation='create', segment='master-selection-cm',
+                               form=form, data=data, label='Setup Customer Manufacturer')
+    context = context_obj.get_selection_list_context()
+    return render(request, 'billing/customer_manufacturer.html', context=context)

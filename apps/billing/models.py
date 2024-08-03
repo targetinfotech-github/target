@@ -155,7 +155,16 @@ class ManufacturerManager(models.Manager):
         return manufacturer
 
 
+
+
+
+
+
+
+
+
 class Manufacturer(models.Model):
+
     TYPE_CHOICES = [
         ('manufacturer', 'Manufacturer'),
         ('supplier', 'Supplier'),
@@ -283,7 +292,7 @@ class Product(models.Model):
 
 
     def __str__(self):
-        return f"{self.product_name} ({self.product_code})"
+        return f"{self.product_name} ({self.product_spec})"
 
     class Meta:
         ordering = ['-id']
@@ -292,6 +301,54 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         self.last_accessed = now()
         super().save(*args, **kwargs)
+
+class SalesRep(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    REP_TYPE_ID = [('r','R'),
+                ('d','D'),
+                ('s','S')]
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=30, null=True, blank=True)
+    rep_indent = models.CharField(max_length=30, null=True, blank=True)
+    # company = models.ForeignKey(Manufacturer, null=True, blank=True,on_delete=models.CASCADE,related_name='sales_rep')
+    rep_type_id = models.CharField(max_length=25,choices=REP_TYPE_ID,null=True,blank=True)
+    address = models.TextField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=100)
+    postal_code = models.PositiveIntegerField(null=True, blank=True)
+    state_name = models.CharField(max_length=50, null=True, blank=True)
+    telephone = models.CharField(max_length=15, null=True, blank=True)
+    fax = models.CharField(max_length=20, null=True, blank=True)
+    mobile_number = models.CharField(max_length=15, null=True, blank=True, verbose_name='Mb No')
+
+    def __str__(self):
+        return f'{self.name}'
+
+
+class Area(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    STATUS = [('active','Active'),
+                ('inactive','Inactive')]
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=30, null=True, blank=True)
+    pin_code = models.PositiveIntegerField(null=True, blank=True)
+    area_status = models.CharField(max_length=20,null=True,blank=True,choices=STATUS)
+
+    def __str__(self):
+        # return f'{self.name}-{self.company}'
+        return f'{self.name}'
+
+
+class CustomerManufacturer(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    manufacturer = models.ForeignKey(Manufacturer,null=True,blank=True, on_delete=models.CASCADE, related_name='customer_manufacturer')
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True,blank=True, related_name='customer_manufacturer')
+    representative = models.ForeignKey(SalesRep, on_delete=models.CASCADE, null=True,blank=True, related_name='customer_manufacturer')
+
+    class Meta:
+        unique_together = ('manufacturer', 'area', 'representative')
+
+    def __str__(self):
+        return f'{self.customer.name}-{self.manufacturer.name}'
 
 
 class Customer(models.Model):
@@ -321,6 +378,9 @@ class Customer(models.Model):
 
 
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    CustomerManufacturer = models.ForeignKey(CustomerManufacturer,null=True,blank=True,on_delete=models.CASCADE
+                                             ,related_name='customer')
+
     location = models.OneToOneField(Location,on_delete=models.PROTECT,related_name='customer_location',null=True,blank=True)
     customer_name = models.CharField(unique=True, max_length=30, null=True, blank=True)
     print_name = models.CharField(max_length=30, null=True, blank=True)
@@ -365,6 +425,9 @@ class Customer(models.Model):
         super().delete(*args, **kwargs)
         if self.location:
             self.location.delete()
+
+
+
 
 class Receipt(models.Model):
     receipt_type = [('purchases', 'Purchases'),
@@ -446,44 +509,4 @@ class TaxStructure(models.Model):
     def __str__(self):
         return f'{self.tax_type}-{self.tax_id}'
 
-class SalesRep(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    REP_TYPE_ID = [('r','R'),
-                ('d','D'),
-                ('s','S')]
-    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
-    sh_name = models.CharField(max_length=30, null=True, blank=True)
-    rep_indent = models.CharField(max_length=30, null=True, blank=True)
-    under = models.CharField(max_length=30, null=True, blank=True)
-    company = models.ForeignKey(Manufacturer, null=True, blank=True,on_delete=models.CASCADE,related_name='sales_rep')
-    rep_type_id = models.CharField(max_length=25,choices=REP_TYPE_ID,null=True,blank=True)
-    address = models.TextField(max_length=255, null=True, blank=True)
-    city = models.CharField(max_length=100)
-    postal_code = models.PositiveIntegerField(null=True, blank=True)
-    state_name = models.CharField(max_length=50, null=True, blank=True)
-    telephone = models.CharField(max_length=15, null=True, blank=True)
-    fax = models.CharField(max_length=20, null=True, blank=True)
-    mobile_number = models.CharField(max_length=15, null=True, blank=True, verbose_name='Mb No')
-
-    def __str__(self):
-        return f'{self.name}-{self.company}'
-
-
-class Area(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    STATUS = [('active','Active'),
-                ('inactive','Inactive')]
-    area_under = models.ForeignKey('self',on_delete=models.SET_NULL, null=True,blank=True,related_name='subarea')
-    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
-    sh_name = models.CharField(max_length=30, null=True, blank=True)
-    pin_code = models.PositiveIntegerField(null=True, blank=True)
-    fm_name = models.CharField(null=True,blank=True,max_length=20)
-    area_status = models.CharField(max_length=20,null=True,blank=True,choices=STATUS)
-    area_rep1 = models.ForeignKey(SalesRep,on_delete=models.SET_NULL, null=True, blank=True,related_name='area_rep1')
-    area_rep2 = models.ForeignKey(SalesRep,on_delete=models.SET_NULL, null=True, blank=True,related_name='area_rep2')
-    area_rep3 = models.ForeignKey(SalesRep,on_delete=models.SET_NULL, null=True, blank=True,related_name='area_rep3')
-
-    def __str__(self):
-        # return f'{self.name}-{self.company}'
-        return f'{self.name}'
 

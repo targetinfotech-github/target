@@ -9,7 +9,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from icecream import ic
 
-from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxStructure, SalesRep, Area
+from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxStructure, SalesRep, Area, \
+    CustomerManufacturer
 from django import forms
 from .models import Receipt, ReceiptProduct, Manufacturer, Product
 from django.db import transaction
@@ -237,8 +238,11 @@ class ManufacturerForm(forms.ModelForm):
 
 
 class ProductForm(forms.ModelForm):
+    UOM = [('','---------'),('centimeter', 'Centimeter'), ('gallon', 'Gallon'), ('liter', 'Liter'),
+           ('meter', 'Meter'), ('metric_ton', 'Metric Ton'), ('milligram', 'Milligram'),
+           ('pound', 'Pound')]
     unit_of_measurement = forms.CharField(label='UOM',
-                                          widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'UOM'}))
+                                          widget=forms.Select(choices=UOM,attrs={'class': 'form-control'}),required=False)
 
     class Meta:
         model = Product
@@ -426,7 +430,6 @@ class SalesRepForm(forms.ModelForm):
             'name': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Enter the Name', 'id': 'name_form'}),
             'sh_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
-            'under': forms.TextInput(attrs={'class': 'form-control'}),
             'rep_type_id': forms.Select(attrs={'class': 'form-control'}),
             'rep_indent': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Rep Indent'}),
             'address': forms.Textarea(
@@ -436,7 +439,7 @@ class SalesRepForm(forms.ModelForm):
             'telephone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telephone'}),
             'fax': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter FAX'}),
             'state_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter State Name'}),
-            'company': forms.Select(attrs={'class': 'form-control', 'id': 'company'}),
+            # 'company': forms.Select(attrs={'class': 'form-control', 'id': 'company'}),
             'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter City'}),
             'postal_code': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter PIN'}),
         }
@@ -450,11 +453,24 @@ class AreaForm(forms.ModelForm):
             'name': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Enter the Name', 'id': 'name_form'}),
             'sh_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
-            'area_under': forms.Select(attrs={'class': 'form-control'}),
-            'fm_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'FM Name'}),
             'area_status': forms.Select(attrs={'class': 'form-control'}),
-            'area_rep1': forms.Select(attrs={'class': 'form-control', 'id': 'area_rep'}),
-            'area_rep2': forms.Select(attrs={'class': 'form-control', 'id': 'area_rep'}),
-            'area_rep3': forms.Select(attrs={'class': 'form-control', 'id': 'area_rep'}),
             'pin_code': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Pin Code'}),
         }
+
+class CustomerManufacturerForm(forms.ModelForm):
+    customer_data = [customer_tuple for customer_tuple in Customer.objects.values_list('id','customer_name')]
+
+    customer = forms.ChoiceField(label='Customer',widget=forms.Select(choices=[],attrs={'class': 'form-control','id':'name_form'}))
+    class Meta:
+        model = CustomerManufacturer
+        fields = ['manufacturer','area','representative','customer']
+        widgets = {
+            'manufacturer': forms.Select(attrs={'class': 'form-control','id':'name_form'}),
+            'area': forms.Select(attrs={'class': 'form-control','id':'name_form'}),
+            'representative': forms.Select(attrs={'class': 'form-control','id':'name_form'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        customer_data = Customer.objects.values_list('id', 'customer_name')
+        self.fields['customer'].choices = [(id, name) for id, name in customer_data]

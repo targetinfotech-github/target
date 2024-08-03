@@ -8,7 +8,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
-                <th scope="col">Company</th>
+{#                <th scope="col">Company</th>#}
                 <th scope="col">Sh Name</th>
                 <th scope="col">Contact</th>
             </tr>
@@ -19,7 +19,7 @@
                     onclick="selectMaster('{{ rep.id }}')">
                     <th scope="row">{{ forloop.counter }}</th>
                     <td>{{ rep.name }}</td>
-                    <td>{{ rep.company }}</td>
+{#                    <td>{{ rep.company }}</td>#}
                     <td>{{ rep.sh_name }}</td>
                     <td>{{ rep.mobile_number }}</td>
                 </tr>
@@ -60,7 +60,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
-                <th scope="col">Company</th>
+{#                <th scope="col">Company</th>#}
                 <th scope="col">Sh Name</th>
                 <th scope="col">Contact</th>
             </tr>
@@ -72,7 +72,7 @@
                 <tr id="row-{{ rep.id }}">
                     <th scope="row">{{ forloop.counter }}</th>
                     <td><a href="{% url update_url rep.id %}">{{ rep.name }}</a></td>
-                    <td>{{ rep.company }}</td>
+{#                    <td>{{ rep.company }}</td>#}
                     <td>{{ rep.sh_name }}</td>
                     <td>{{ rep.mobile_number }}</td>
                 </tr>
@@ -113,10 +113,10 @@
                         </div>
                         <div class="row justify-content-between">
                             <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
-                                <div class="form-element">
-                                    <label class="form-label" style="min-width:4.3vw"
-                                           for="{{ form.under.id_for_label }}">{{ form.under.label }}:</label>
-                                    {{ form.under }}
+                                <div class="form-element" style="margin-right: 2.8vw">
+                                    <label class="form-label" style="min-width: 4.1vw"
+                                           for="{{ form.rep_indent.id_for_label }}">{{ form.rep_indent.label }}</label>
+                                    {{ form.rep_indent }}
                                 </div>
                             </div>
                             <div class="col-lg-auto col-md-auto">
@@ -128,22 +128,16 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row justify-content-between">
-                            <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
-                                <div class="form-element">
-                                    <label class="form-label" style="min-width: 3.5vw"
-                                           for="{{ form.company.id_for_label }}">{{ form.company.label }}:</label>
-                                    {{ form.company }}
-                                </div>
-                            </div>
-                            <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
-                                <div class="form-element" style="margin-right: 2.8vw">
-                                    <label class="form-label" style="min-width: 4.1vw"
-                                           for="{{ form.rep_indent.id_for_label }}">{{ form.rep_indent.label }}</label>
-                                    {{ form.rep_indent }}
-                                </div>
-                            </div>
-                        </div>
+{#                        <div class="row justify-content-between">#}
+{#                            <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">#}
+{#                                <div class="form-element">#}
+{#                                    <label class="form-label" style="min-width: 3.5vw"#}
+{#                                           for="{{ form.company.id_for_label }}">{{ form.company.label }}:</label>#}
+{#                                    {{ form.company }}#}
+{#                                </div>#}
+{#                            </div>#}
+{##}
+{#                        </div>#}
                         <div class="row justify-content-between">
                             <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
                                 <div class="form-element">

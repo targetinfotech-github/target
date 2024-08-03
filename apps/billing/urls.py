@@ -56,6 +56,7 @@ urlpatterns = [
     path('setup_tax_structure/', views.setup_tax_structure, name="setup_tax_structure"),
 
     # Selection List
+    # sales rep
     path('setup_sales_rep/', views.setup_sales_rep, name="setup_sales_rep"),
     path('view_sales_rep/', views.view_sales_rep, name="view_sales_rep"),
     path('update_sales_rep/<int:pk>', views.update_sales_rep, name="update_sales_rep"),
@@ -65,6 +66,13 @@ urlpatterns = [
 
     # Area
     path('setup_area/', views.setup_area, name="setup_area"),
+    path('view_area/', views.view_area, name="view_area"),
+    path('get_area_modal/', views.get_area_modal, name="get_area_modal"),
+    path('update_area/<int:pk>', views.update_area, name="update_area"),
+    path('delete_area/', views.delete_area, name="delete_area"),
+
+    # customer manufacturer
+    path('setup_customer_manufacturer/', views.setup_customer_manufacturer, name="setup_customer_manufacturer"),
 
 
 

@@ -8,9 +8,9 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
+                <th scope="col">Company</th>
                 <th scope="col">Sh Name</th>
-                <th scope="col">Pin Code</th>
-                <th scope="col">Status</th>
+                <th scope="col">Contact</th>
             </tr>
             </thead>
             <tbody>
@@ -19,9 +19,9 @@
                     onclick="selectMaster('{{ rep.id }}')">
                     <th scope="row">{{ forloop.counter }}</th>
                     <td>{{ rep.name }}</td>
+                    <td>{{ rep.company }}</td>
                     <td>{{ rep.sh_name }}</td>
-                    <td>{{ rep.pin_code }}</td>
-                    <td>{{ rep.area_status }}</td>
+                    <td>{{ rep.mobile_number }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -31,7 +31,7 @@
 {% endblock %}
 
 {% block modal_post_request %}
-    <form method="post" action="{% url 'get_area_modal' %}">
+    <form method="post" action="{% url 'get_sales_rep_modal' %}">
         {% csrf_token %}
         <div class="modal-footer">
             <a href="{% url create_url %}">
@@ -60,9 +60,9 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
+                <th scope="col">Company</th>
                 <th scope="col">Sh Name</th>
-                <th scope="col">Pin Code</th>
-                <th scope="col">Status</th>
+                <th scope="col">Contact</th>
             </tr>
             </thead>
             <!-- Item -->
@@ -72,9 +72,9 @@
                 <tr id="row-{{ rep.id }}">
                     <th scope="row">{{ forloop.counter }}</th>
                     <td><a href="{% url update_url rep.id %}">{{ rep.name }}</a></td>
+                    <td>{{ rep.company }}</td>
                     <td>{{ rep.sh_name }}</td>
-                    <td>{{ rep.pin_code }}</td>
-                    <td>{{ rep.area_status }}</td>
+                    <td>{{ rep.mobile_number }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -89,38 +89,36 @@
         <form method="post">
             {% csrf_token %}
             {% include 'billing/form_errors.html' with form=form %}
-
             <div class="container">
                 <div class="row">
                     <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
                         <div class="form-element">
                             <label class="form-label" style="min-width: 4.3vw"
-                                   for="{{ form.name.id_for_label }}">{{ form.name.label }}:</label>
-                            {{ form.name }}
+                                   for="{{ form.customer.id_for_label }}">{{ form.customer.label }}:</label>
+                            {{ form.customer }}
+                        </div>
+                    </div><div class="col-lg-auto col-md-auto">
+                        <div class="form-element">
+                            <label class="form-label" style="min-width: 4.3vw"
+                                   for="{{ form.manufacturer.id_for_label }}">{{ form.manufacturer.label }}:</label>
+                            {{ form.manufacturer }}
                         </div>
                     </div>
                     <div class="col-lg-auto col-md-auto">
-                        <div class="form-element" style="margin-right: 2vw">
-                            <label class="form-label" style="min-width: 3.2vw"
-                                   for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}:</label>
+                        <div class="form-element">
+                            <label class="form-label" style="min-width: 3vw"
+                                   for="{{ form.area.id_for_label }}">{{ form.area.label }}:</label>
                             <span class="form-items">
-                                    {{ form.sh_name }}
+                                    {{ form.area }}
                                         </span>
                         </div>
                     </div>
                     <div class="col-lg-auto col-md-auto">
-                        <div class="form-element" style="margin-right: 2vw">
-                            <label class="form-label" style="min-width: 4.1vw"
-                                   for="{{ form.area_status.id_for_label }}">{{ form.area_status.label }}:</label>
-
-                            {{ form.area_status }}
-                        </div>
-                    </div>
-                    <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
                         <div class="form-element">
-                            <label class="form-label" style="min-width: 3.5vw"
-                                   for="{{ form.pin_code.id_for_label }}">{{ form.pin_code.label }}:</label>
-                            {{ form.pin_code }}
+                            <label class="form-label" style="min-width: 3vw"
+                                   for="{{ form.representative.id_for_label }}">{{ form.representative.label }}:</label>
+
+                            {{ form.representative }}
                         </div>
                     </div>
                 </div>

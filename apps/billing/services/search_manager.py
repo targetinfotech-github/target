@@ -28,19 +28,17 @@ class SearchService:
 
     def get_product_autocomplete(self):
         products = Product.objects.filter(
-            Q(product_name__icontains=self.autocomplete_query) |
-            Q(product_code__icontains=self.autocomplete_query)
+            Q(product_name__icontains=self.autocomplete_query)
         ).values_list('product_name', flat=True)[:10]
         if not products:
             products = Product.objects.filter(
-                product_code__icontains=self.autocomplete_query
-            ).values_list('product_code', flat=True)[:10]
+                product_spec__icontains=self.autocomplete_query
+            ).values_list('product_spec', flat=True)[:10]
         return list(products)
 
     def get_manufacturer_autocomplete(self):
         manufacturers = Manufacturer.objects.filter(
-            Q(name__icontains=self.autocomplete_query) |
-            Q(email__icontains=self.autocomplete_query)
+            Q(name__icontains=self.autocomplete_query)
         ).values_list('name', flat=True)[:10]
         if not manufacturers:
             manufacturers = Manufacturer.objects.filter(
@@ -50,8 +48,7 @@ class SearchService:
 
     def get_customer_autocomplete(self):
         customers = Customer.objects.filter(
-            Q(customer_name__icontains=self.autocomplete_query) |
-            Q(email__icontains=self.autocomplete_query)
+            Q(customer_name__icontains=self.autocomplete_query)
         ).values_list('customer_name', flat=True)[:10]
         if not customers:
             customers = Customer.objects.filter(
@@ -61,8 +58,7 @@ class SearchService:
 
     def get_group_autocomplete(self):
         groups = ProductGroup.objects.filter(
-            Q(group_name__icontains=self.autocomplete_query) |
-            Q(code_name__icontains=self.autocomplete_query)
+            Q(group_name__icontains=self.autocomplete_query)
         ).values_list('group_name', flat=True)[:10]
         if not groups:
             groups = ProductGroup.objects.filter(
@@ -83,9 +79,9 @@ class SearchService:
     def get_product_search_results(self):
         results = Product.objects.filter(
             Q(product_name__icontains=self.details_query) |
-            Q(product_code__icontains=self.details_query)
+            Q(product_spec__icontains=self.details_query)
         ).select_related('manufacturer').values(
-            'id', 'product_name', 'product_code', 'manufacturer__name', 'buy_rate', 'sell_rate', 'manufacturer'
+            'id', 'product_name', 'product_spec', 'manufacturer__name', 'buy_rate', 'sell_rate', 'manufacturer'
         )
         return self.paginate_results(results)
 
