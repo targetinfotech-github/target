@@ -1043,8 +1043,7 @@ def update_sales_rep(request, pk):
 @measure_execution_time
 def get_sales_rep_modal(request):
     try:
-        representative_data = SalesRep.objectsvalues('id', 'name', 'sh_name',
-                                                                                'mobile_number').order_by('name')
+        representative_data = SalesRep.objects.values('id', 'name', 'sh_name','mobile_number').order_by('name')
         if request.method == 'POST':
             if 'submit_selected_record' in request.POST:
                 id = request.POST['submit_selected_record']
@@ -1099,26 +1098,36 @@ def delete_sales_rep(request):
 @login_required(login_url="/login/")
 @measure_execution_time
 def setup_area(request):
-    data = Area.objects.exists()
-    form = AreaForm()
-    if request.method == 'POST':
-        form = AreaForm(request.POST)
-        form.save()
-        return redirect('setup_area')
-    context_obj = SetupContext(model_search='area', operation='create',segment='master-selection-area',
-                               form=form,data=data,label='Setup Area')
-    context = context_obj.get_selection_list_context()
-    return render(request, 'billing/area.html', context=context)
+    try:
+        data = Area.objects.exists()
+        form = AreaForm()
+        if request.method == 'POST':
+            form = AreaForm(request.POST)
+            form.save()
+            return redirect('setup_area')
+        context_obj = SetupContext(model_search='area', operation='create',segment='master-selection-area',
+                                   form=form,data=data,label='Setup Area')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/area.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
 
 @login_required(login_url="/login/")
 @measure_execution_time
 def view_area(request):
-    data = Area.objects.all()
-    page_obj = pagination(request, data)
-    context_obj = SetupContext(model_search='area', operation='view', segment='master-selection-area',
-                               page_obj=page_obj, data=data, label='View Area')
-    context = context_obj.get_selection_list_context()
-    return render(request, 'billing/area.html', context=context)
+    try:
+        data = Area.objects.all()
+        page_obj = pagination(request, data)
+        context_obj = SetupContext(model_search='area', operation='view', segment='master-selection-area',
+                                   page_obj=page_obj, data=data, label='View Area')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/area.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
 
 @login_required(login_url="/login/")
 @measure_execution_time
@@ -1158,16 +1167,21 @@ def get_area_modal(request):
 @login_required(login_url="/login/")
 @measure_execution_time
 def update_area(request,pk):
-    data = Area.objects.get(id=pk)
-    form = AreaForm(instance=data)
-    if request.method == 'POST':
-        form = AreaForm(request.POST, instance=data)
-        form.save()
-        return redirect('setup_area')
-    context_obj = SetupContext(model_search='area', operation='update', segment='master-selection-area',
-                               form=form, data=data, label='Update Area')
-    context = context_obj.get_selection_list_context()
-    return render(request, 'billing/area.html', context=context)
+    try:
+        data = Area.objects.get(id=pk)
+        form = AreaForm(instance=data)
+        if request.method == 'POST':
+            form = AreaForm(request.POST, instance=data)
+            form.save()
+            return redirect('setup_area')
+        context_obj = SetupContext(model_search='area', operation='update', segment='master-selection-area',
+                                   form=form, data=data, label='Update Area')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/area.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
 
 
 @login_required(login_url="/login/")
@@ -1196,32 +1210,37 @@ def delete_area(request):
 @login_required(login_url="/login/")
 @measure_execution_time
 def setup_customer_manufacturer(request):
-    data = CustomerManufacturer.objects.exists()
-    data = 0
-    form = CustomerManufacturerForm()
-    if request.method == 'POST':
-        form = CustomerManufacturerForm(request.POST)
-        if form.is_valid():
-            customer_id = form.cleaned_data.get('customer',None)
+    try:
+        data = CustomerManufacturer.objects.exists()
+        data = 0
+        form = CustomerManufacturerForm()
+        if request.method == 'POST':
+            form = CustomerManufacturerForm(request.POST)
+            if form.is_valid():
+                customer_id = form.cleaned_data.get('customer',None)
 
-            form_instance = form.save(commit=False)
-            ic(form_instance)
-            try:
-                if customer_id:
-                    customer = Customer.objects.get(id=customer_id)
-                    customer.CustomerManufacturer = form_instance
-                    form_instance.save()
-                    customer.save()
-                    messages.success(request, 'Customer Manufacturer Successfully created')
-            except Exception as e:
-                customer_manufacturer = CustomerManufacturer.objects.filter(id=form_instance.id)
-                if customer_manufacturer.exists():
-                    customer_manufacturer.delete()
-                messages.error(request,f'Exception occurred:{e} submit the Form again')
+                form_instance = form.save(commit=False)
+                ic(form_instance)
+                try:
+                    if customer_id:
+                        customer = Customer.objects.get(id=customer_id)
+                        customer.CustomerManufacturer = form_instance
+                        form_instance.save()
+                        customer.save()
+                        messages.success(request, 'Customer Manufacturer Successfully created')
+                except Exception as e:
+                    customer_manufacturer = CustomerManufacturer.objects.filter(id=form_instance.id)
+                    if customer_manufacturer.exists():
+                        customer_manufacturer.delete()
+                    messages.error(request,f'Exception occurred:{e} submit the Form again')
 
 
-            return redirect('setup_customer_manufacturer')
-    context_obj = SetupContext(model_search='customer_manufacturer', operation='create', segment='master-selection-cm',
-                               form=form, data=data, label='Setup Customer Manufacturer')
-    context = context_obj.get_selection_list_context()
-    return render(request, 'billing/customer_manufacturer.html', context=context)
+                return redirect('setup_customer_manufacturer')
+        context_obj = SetupContext(model_search='customer_manufacturer', operation='create', segment='master-selection-cm',
+                                   form=form, data=data, label='Setup Customer Manufacturer')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/customer_manufacturer.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
