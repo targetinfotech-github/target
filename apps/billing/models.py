@@ -344,7 +344,6 @@ class Area(models.Model):
         return f'{self.name}'
 
 
-
 class Customer(models.Model):
 
     SALE_TYPE = [('cash','Cash'),
@@ -372,6 +371,8 @@ class Customer(models.Model):
 
 
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+
+    is_auto_area = models.BooleanField(default=False)
 
     location = models.OneToOneField(Location,on_delete=models.PROTECT,related_name='customer_location',null=True,blank=True)
     customer_name = models.CharField(unique=True, max_length=30, null=True, blank=True)

@@ -86,15 +86,15 @@
 {% block create_form %}
 
     {% if flag == 'create' or flag == 'update' %}
-        {% include 'billing/form_errors.html' with form=form %}
+        {% include 'billing/form_errors.html' with form=customer_form %}
         <div class="container">
             <div class='get_form'>
                 <form method="GET" id="customer_manufacturer_form">
                     <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
                         <div class="form-element">
                             <label class="form-label" style="min-width: 4.3vw"
-                                   for="{{ form.customer.id_for_label }}">{{ form.customer.label }}:</label>
-                            {{ form.customer }}
+                                   for="{{ customer_form.customer.id_for_label }}">{{ customer_form.customer.label }}:</label>
+                            {{ customer_form.customer }}
                         </div>
                     </div>
                 </form>
@@ -119,7 +119,7 @@
                         </div>
                     {% endfor %}
                 {% endif %}
-
+            {{ manufacturer_data_form.management_form }}
                 <div class="card border-0 shadow mb-4">
                     <div class="card-body">
                         <div class="table-responsive">
@@ -133,10 +133,9 @@
                                 </thead>
                                 <tbody>
                                 <!-- Item -->
-                                {% for form in CustomerManufacturerFormSet %}
+                                {% for form in manufacturer_data_form %}
                                     {% include 'billing/form_errors.html' with form=form %}
-
-                                    {% if forloop.counter <= 10 %}
+                                    {% if forloop.counter <= total %}
                                         <tr>
                                             <td>
                                                 {{ forloop.counter }}
@@ -161,4 +160,11 @@
         </div>
 
     {% endif %}
+{% endblock %}
+{% block javascripts %}
+    <script>
+        document.getElementById('name_form').addEventListener('change', function () {
+            document.getElementById('customer_manufacturer_form').submit();
+        });
+    </script>
 {% endblock %}

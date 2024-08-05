@@ -72,7 +72,7 @@ urlpatterns = [
     path('delete_area/', views.delete_area, name="delete_area"),
 
     # customer manufacturer
-    path('setup_customer_manufacturer/', views.setup_customer_manufacturer, name="setup_customer_manufacturer"),
+    path('setup_manufacturer_area/', views.setup_manufacturer_area, name="setup_manufacturer_area"),
 
 
 

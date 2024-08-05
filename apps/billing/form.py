@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.core.validators import MinValueValidator
+from django.db.models import Case, When, IntegerField
 from django.forms import formset_factory
 from django.utils.translation import gettext_lazy as _
 from django import forms
@@ -301,7 +302,13 @@ class CustomerForm(forms.ModelForm):
         forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the name', 'id': 'name_form'})))
 
     area = forms.ModelChoiceField(
-        queryset=Area.objects.all(),
+        Area.objects.annotate(
+            order_priority=Case(
+                When(name='AUTO', then=0),
+                default=1,
+                output_field=IntegerField()
+            )
+        ).order_by('order_priority', 'name'),
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
@@ -462,21 +469,33 @@ class AreaForm(forms.ModelForm):
             'pin_code': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Pin Code'}),
         }
 
-class ManufacturerAreaForm(forms.ModelForm):
-    customer_data = [customer_tuple for customer_tuple in Customer.objects.values_list('id','customer_name')]
-
+class ManufacturerAreaCustomerDisplayForm(forms.Form):
     customer = forms.ChoiceField(label='Customer',widget=forms.Select(choices=[],attrs={'class': 'form-control','id':'name_form'}))
+    def __init__(self,*args, **kwargs):
+        super().__init__(*args, **kwargs)
+        customer_data = Customer.objects.filter(is_auto_area=True).distinct().values_list('id', 'customer_name')
+        self.fields['customer'].choices = [(id, name) for id, name in customer_data]
+
+
+class ManufacturerAreaForm(forms.ModelForm):
+
     class Meta:
         model = ManufacturerArea
         fields = ['manufacturer','area','customer']
         widgets = {
-            'manufacturer': forms.Select(attrs={'class': 'form-control','id':'name_form'}),
+            'manufacturer': forms.TextInput(attrs={'class': 'form-control','id':'name_form'}),
             'area': forms.Select(attrs={'class': 'form-control','id':'name_form'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        customer_data = Customer.objects.values_list('id', 'customer_name')
-        self.fields['customer'].choices = [(id, name) for id, name in customer_data]
+        initial = kwargs.pop('initial', {})
+        if 'manufacturer_id' in initial:
+            self.fields['manufacturer'].widget.attrs['readonly'] = 'readonly'
+            manufacturer = Manufacturer.objects.get(id=int(initial['manufacturer_id']))
+            self.initial['manufacturer'] = manufacturer.name
+            self.fields['manufacturer'].initial = manufacturer.name
+            self.fields['manufacturer'].widget.attrs['value'] = manufacturer.name
 
-CustomerManufacturerFormSet = formset_factory(ManufacturerAreaForm, extra=5)
+
+CustomerManufacturerFormSet = formset_factory(ManufacturerAreaForm,extra=0)
