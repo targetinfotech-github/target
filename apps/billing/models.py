@@ -155,7 +155,13 @@ class ManufacturerManager(models.Manager):
         return manufacturer
 
 
-
+class AreaManager(models.Manager):
+    def get_or_create_area(self):
+        area, created = self.get_or_create(
+            name='AUTO',
+            defaults={'name': 'AUTO','sh_name':'auto'}
+        )
+        return area
 
 
 
@@ -332,23 +338,11 @@ class Area(models.Model):
     sh_name = models.CharField(max_length=30, null=True, blank=True)
     pin_code = models.PositiveIntegerField(null=True, blank=True)
     area_status = models.CharField(max_length=20,null=True,blank=True,choices=STATUS)
-
+    objects = AreaManager()
     def __str__(self):
         # return f'{self.name}-{self.company}'
         return f'{self.name}'
 
-
-class CustomerManufacturer(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    manufacturer = models.ForeignKey(Manufacturer,null=True,blank=True, on_delete=models.CASCADE, related_name='customer_manufacturer')
-    area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True,blank=True, related_name='customer_manufacturer')
-    representative = models.ForeignKey(SalesRep, on_delete=models.CASCADE, null=True,blank=True, related_name='customer_manufacturer')
-
-    class Meta:
-        unique_together = ('manufacturer', 'area', 'representative')
-
-    def __str__(self):
-        return f'{self.customer.name}-{self.manufacturer.name}'
 
 
 class Customer(models.Model):
@@ -378,8 +372,6 @@ class Customer(models.Model):
 
 
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    CustomerManufacturer = models.ForeignKey(CustomerManufacturer,null=True,blank=True,on_delete=models.CASCADE
-                                             ,related_name='customer')
 
     location = models.OneToOneField(Location,on_delete=models.PROTECT,related_name='customer_location',null=True,blank=True)
     customer_name = models.CharField(unique=True, max_length=30, null=True, blank=True)
@@ -396,7 +388,6 @@ class Customer(models.Model):
     billing_stat = models.CharField(choices=BILLING_STAT,max_length=15, null=True,blank=True)
     telephone = models.CharField(max_length=15, null=True, blank=True)
     mobile_number = models.CharField(max_length=15, null=True, blank=True,verbose_name='Mb No')
-    area = models.CharField(max_length=15, null=True, blank=True,verbose_name='Area') #not a charfield, change later
     customer_representative = models.CharField(max_length=15, null=True, blank=True) #not a charfield, change later
     tin = models.CharField(max_length=15, null=True, blank=True)
     cst = models.CharField(max_length=15, null=True, blank=True)
@@ -426,6 +417,19 @@ class Customer(models.Model):
         if self.location:
             self.location.delete()
 
+
+
+class ManufacturerArea(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    manufacturer = models.ForeignKey(Manufacturer,null=True,blank=True, on_delete=models.CASCADE, related_name='manufacturer_area')
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True,blank=True, related_name='manufacturer_area')
+    customer = models.ForeignKey(Customer, null=True, blank=True, on_delete=models.CASCADE
+                                          , related_name='manufacturer_area')
+    class Meta:
+        unique_together = ('customer','manufacturer', 'area')
+
+    def __str__(self):
+        return f'{self.customer.customer_name}-{self.manufacturer.name}'
 
 
 

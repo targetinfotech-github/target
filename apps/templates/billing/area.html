@@ -16,7 +16,7 @@
             <tbody>
             {% for rep in data %}
                 <tr id="row-{{ rep.id }}"
-                    onclick="selectMaster('{{ rep.id }}')">
+                    onclick="selectList('{{ rep.id }}')">
                     <th scope="row">{{ forloop.counter }}</th>
                     <td>{{ rep.name }}</td>
                     <td>{{ rep.sh_name }}</td>

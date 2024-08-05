@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from icecream import ic
 
 from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxStructure, SalesRep, Area, \
-    CustomerManufacturer
+    ManufacturerArea
 from django import forms
 from .models import Receipt, ReceiptProduct, Manufacturer, Product
 from django.db import transaction
@@ -140,14 +140,14 @@ class LocationForm(forms.ModelForm):
         if self.cleaned_data['state_name']:
             state_name = self.cleaned_data['state_name'].lower()
             if state_name not in self.STATE_NAMES:
-                self.add_error('state_name', f'state name: {state_name} does not exists')
+                self.add_error('state_name', f'state name: {state_name} does not exists.')
         if self.cleaned_data['state_code']:
             state_code = self.cleaned_data['state_code'].lower()
             if state_code not in self.STATE_CODES:
                 self.add_error('state_code', f'State Code: {state_code} does not exists')
         if state_name and state_code:
-            if self.STATE_CODES[state_code] != state_name:
-                self.add_error('state_name', 'State name does not match the state code.')
+            if self.STATE_CODES[state_code].lower() != state_name.lower():
+                self.add_error('state_name', f'State name does not match the state code.')
                 self.add_error('state_code', 'State code does not match the state name.')
         return cleaned_data
 
@@ -300,6 +300,11 @@ class CustomerForm(forms.ModelForm):
     customer_name = forms.CharField(label='Name', widget=(
         forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the name', 'id': 'name_form'})))
 
+    area = forms.ModelChoiceField(
+        queryset=Area.objects.all(),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
     class Meta:
         model = Customer
         # fields = ['type','name', 'print_name', 'sh_name', 'contact','hsn_code','address','email']
@@ -320,7 +325,6 @@ class CustomerForm(forms.ModelForm):
             'mobile_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mobile Number'}),
             'contact1': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact 1'}),
             'contact2': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact 2'}),
-            'area': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Area'}),
             'tin': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter TIN'}),
             'cst': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter CST'}),
             'fax': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter FAX'}),
@@ -337,6 +341,7 @@ class CustomerForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['customer_name'].required = True
         self.fields['sh_name'].required = True
+
 
 
 class GroupForm(forms.ModelForm):
@@ -457,20 +462,21 @@ class AreaForm(forms.ModelForm):
             'pin_code': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Pin Code'}),
         }
 
-class CustomerManufacturerForm(forms.ModelForm):
+class ManufacturerAreaForm(forms.ModelForm):
     customer_data = [customer_tuple for customer_tuple in Customer.objects.values_list('id','customer_name')]
 
     customer = forms.ChoiceField(label='Customer',widget=forms.Select(choices=[],attrs={'class': 'form-control','id':'name_form'}))
     class Meta:
-        model = CustomerManufacturer
-        fields = ['manufacturer','area','representative','customer']
+        model = ManufacturerArea
+        fields = ['manufacturer','area','customer']
         widgets = {
             'manufacturer': forms.Select(attrs={'class': 'form-control','id':'name_form'}),
             'area': forms.Select(attrs={'class': 'form-control','id':'name_form'}),
-            'representative': forms.Select(attrs={'class': 'form-control','id':'name_form'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         customer_data = Customer.objects.values_list('id', 'customer_name')
         self.fields['customer'].choices = [(id, name) for id, name in customer_data]
+
+CustomerManufacturerFormSet = formset_factory(ManufacturerAreaForm, extra=5)

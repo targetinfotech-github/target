@@ -18,10 +18,10 @@ from icecream import ic
 
 from apps.billing.services.decorators import measure_execution_time
 from apps.billing.form import ManufacturerForm, ProductForm, ReceiptForm, GroupForm, CustomerForm, SignUpForm, \
-    LoginForm, LocationForm, TaxStructureForm, TaxStructureFormSet, SalesRepForm, AreaForm, CustomerManufacturerForm
+    LoginForm, LocationForm, TaxStructureForm, TaxStructureFormSet, SalesRepForm, AreaForm, ManufacturerAreaForm
 from django.shortcuts import render, redirect
 from apps.billing.models import Manufacturer, Product, Receipt, ReceiptProduct, ProductGroup, Customer, CustomUser, \
-    Location, TaxStructure, SalesRep, Area, CustomerManufacturer
+    Location, TaxStructure, SalesRep, Area, ManufacturerArea
 import json
 
 # views.py or any module
@@ -716,6 +716,7 @@ def delete_group(request):
 @measure_execution_time
 def create_customer(request):
     try:
+        Area.objects.get_or_create_area()
         if request.method == 'POST':
             location_form = LocationForm(request.POST)
             customer_form = CustomerForm(request.POST)
@@ -731,21 +732,34 @@ def create_customer(request):
                 location_instance = None
             if location_instance:
                 if customer_form.is_valid():
-                    name = customer_form.cleaned_data['customer_name']
+                    name = customer_form.cleaned_data.get('customer_name','')
+                    area = customer_form.cleaned_data.get('area','')
                     try:
                         customer = customer_form.save(commit=True)
                         customer.location = location_instance
                         customer.save()
+
+                        if area:
+                            manufacturer_area,created = ManufacturerArea.objects.get_or_create(customer=customer,area=area)
                         messages.success(request, f'Customer {name} successfully created')
                         return redirect('create_customer')
                     except Exception as e:
+                        ic(e)
                         if not Customer.objects.filter(customer_name=name).exists():
                             try:
                                 Location.objects.get(id=location_instance.id).delete()
                             except:
                                 pass
-                            messages.error(request,
-                                           'Exception occurred while creating the customer. Please submit the form again.')
+                        else:
+                            try:
+                                ic('custoemr remove')
+                                customer_remove = Customer.objects.get(customer_name=name).delete()
+                                ic(customer_remove)
+                            except Exception as e:
+                                ic(e)
+                                pass
+                        messages.error(request,
+                                       'Exception occurred while creating the customer. Please submit the form again.')
                 else:
                     Location.objects.get(id=location_instance.id).delete()
                     print('invalid form')
@@ -806,6 +820,7 @@ def update_customer(request, pk):
     try:
         try:
             customer_data = Customer.objects.get(id=pk)
+            manufacturer_area = ManufacturerArea.objects.filter(customer=customer_data).first()
         except Exception as e:
             print(e)
             return render(request, 'billing/page-404.html')
@@ -830,10 +845,17 @@ def update_customer(request, pk):
             if location_instance:
                 if customer_form.is_valid():
                     name = customer_form.cleaned_data['customer_name']
+                    area = customer_form.cleaned_data['area']
                     try:
                         customer = customer_form.save(commit=False)
                         customer.location = location_instance
                         customer.save()
+                        if area != 'AUTO' and manufacturer_area.area.name == 'AUTO':
+                            delete = ManufacturerArea.objects.filter(customer=customer_data).delete()
+                            ic(delete)
+                            manufacturer_area, created = ManufacturerArea.objects.get_or_create(customer=customer,
+                                                                                            area=area)
+
                         messages.info(request, f'Customer {name} updated.')
                         return redirect('create_customer')
                     except Exception as e:
@@ -849,8 +871,13 @@ def update_customer(request, pk):
                     Location.objects.get(id=location_instance.id).delete()
                     print('invalid form')
         else:
+
             location_form = LocationForm(instance=location_data)
-            customer_form = CustomerForm(instance=customer_data)
+            ic(manufacturer_area.area.name)
+            if manufacturer_area.area.name != 'AUTO':
+                customer_form = CustomerForm(instance=customer_data,initial={'area':manufacturer_area.area})
+            else:
+                customer_form = CustomerForm(instance=customer_data,initial={'area':manufacturer_area.area})
 
         context_obj = SetupContext(model_search='customer', page_obj=customer_data, operation='update',segment='master-customer',
         location_form = location_form,customer_form = customer_form)
@@ -889,11 +916,11 @@ def view_customer(request):
         if request.method == 'POST':
             customer_name = request.POST.get('customer_name')
             if customer_name:
-                customer_data = Customer.objects.filter(name__icontains=customer_name).order_by('customer_name')
+                customer_data = Customer.objects.filter(name__icontains=customer_name).order_by('-id')
             else:
-                customer_data = Customer.objects.all().order_by('customer_name')
+                customer_data = Customer.objects.all().order_by('-id')
         else:
-            customer_data = Customer.objects.all().order_by('customer_name')
+            customer_data = Customer.objects.all().order_by('-id')
 
         page_obj = pagination(request, customer_data)
 
@@ -1099,6 +1126,7 @@ def delete_sales_rep(request):
 @measure_execution_time
 def setup_area(request):
     try:
+        auto_area = Area.objects.get_or_create_area()
         data = Area.objects.exists()
         form = AreaForm()
         if request.method == 'POST':
@@ -1118,7 +1146,9 @@ def setup_area(request):
 @measure_execution_time
 def view_area(request):
     try:
-        data = Area.objects.all()
+        auto_area = Area.objects.get_or_create_area()
+        data = Area.objects.all().exclude(name='AUTO')
+        ic(data)
         page_obj = pagination(request, data)
         context_obj = SetupContext(model_search='area', operation='view', segment='master-selection-area',
                                    page_obj=page_obj, data=data, label='View Area')
@@ -1133,7 +1163,7 @@ def view_area(request):
 @measure_execution_time
 def get_area_modal(request):
     try:
-        data = Area.objects.values('id', 'name', 'pin_code', 'sh_name','area_status').order_by('name')
+        data = Area.objects.values('id', 'name', 'pin_code', 'sh_name','area_status').order_by('-id').exclude(name='AUTO')
         if request.method == 'POST':
             if 'submit_selected_record' in request.POST:
                 id = request.POST['submit_selected_record']
@@ -1188,7 +1218,7 @@ def update_area(request,pk):
 @measure_execution_time
 def delete_area(request):
     try:
-        data = Area.objects.values('id', 'name', 'pin_code', 'sh_name','area_status').order_by('name')
+        data = Area.objects.values('id', 'name', 'pin_code', 'sh_name','area_status').order_by('name').exclude(name='AUTO')
         page_obj = pagination(request, data)
         context_obj = SetupContext(model_search='area', operation='delete', page_obj=page_obj,
                                    segment='master-selection-area',
@@ -1211,11 +1241,16 @@ def delete_area(request):
 @measure_execution_time
 def setup_customer_manufacturer(request):
     try:
-        data = CustomerManufacturer.objects.exists()
+        data = ManufacturerArea.objects.exists()
         data = 0
-        form = CustomerManufacturerForm()
+        form = ManufacturerAreaForm()
+        if request.method == 'GET':
+            # customer_id = form.cleaned_data.get('customer',None)
+            customer_id = 9
+            manufacturer = Manufacturer.objects.filter(customer_manufacturer__customer__id=customer_id)
+            ic(manufacturer)
         if request.method == 'POST':
-            form = CustomerManufacturerForm(request.POST)
+            form = ManufacturerAreaForm(request.POST)
             if form.is_valid():
                 customer_id = form.cleaned_data.get('customer',None)
 
@@ -1224,12 +1259,12 @@ def setup_customer_manufacturer(request):
                 try:
                     if customer_id:
                         customer = Customer.objects.get(id=customer_id)
-                        customer.CustomerManufacturer = form_instance
+                        customer.ManufacturerArea = form_instance
                         form_instance.save()
                         customer.save()
                         messages.success(request, 'Customer Manufacturer Successfully created')
                 except Exception as e:
-                    customer_manufacturer = CustomerManufacturer.objects.filter(id=form_instance.id)
+                    customer_manufacturer = ManufacturerArea.objects.filter(id=form_instance.id)
                     if customer_manufacturer.exists():
                         customer_manufacturer.delete()
                     messages.error(request,f'Exception occurred:{e} submit the Form again')
@@ -1239,8 +1274,9 @@ def setup_customer_manufacturer(request):
         context_obj = SetupContext(model_search='customer_manufacturer', operation='create', segment='master-selection-cm',
                                    form=form, data=data, label='Setup Customer Manufacturer')
         context = context_obj.get_selection_list_context()
-        return render(request, 'billing/customer_manufacturer.html', context=context)
+        return render(request, 'billing/manufacturer_area.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
     except:
         return render(request, 'billing/page-500.html')
+

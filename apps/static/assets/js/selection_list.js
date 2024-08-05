@@ -19,58 +19,7 @@ if (delete_record) {
 
 }
 
-function selectMasterRemovable(id, related) {
-    console.log(`id:${id} , related: ${related}`)
-    var selectedRow = document.getElementById('row-' + id);
-    if (!isNaN(parseInt(related)) & parseInt(related) === 0) {
-        removable = true;
-    } else {
-        removable = false;
-    }
-
-    if (delete_record) {
-        delete_record.style.display = 'none';
-
-    }
-    console.log(id)
-    if (selectedRowId === id) {
-        // Deselect the row
-        selectedRow.classList.remove('selected-row');
-        if (input_record) {
-            input_record.value = '';
-            input_record.style.display = 'none';
-        }
-        if (delete_record) {
-            delete_record.value = ''
-            delete_record.style.display = 'none'
-        }
-
-
-        selectedRowId = null;
-    } else {
-        if (selectedRowId !== null) {
-            document.getElementById('row-' + selectedRowId).classList.remove('selected-row');
-        }
-
-        selectedRow.classList.add('selected-row');
-
-        if (input_record) {
-            input_record.value = id;
-            input_record.style.display = '';
-        }
-        if (delete_record) {
-            delete_record.value = id;
-            if (removable) {
-                delete_record.style.display = ''
-            }
-        }
-
-        selectedRowId = id;
-    }
-}
-
-
-function selectMaster(id) {
+function selectList(id) {
     var selectedRow = document.getElementById('row-' + id);
 
     if (selectedRowId === id) {
