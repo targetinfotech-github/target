@@ -74,6 +74,8 @@ urlpatterns = [
     # customer manufacturer
     path('setup_manufacturer_area/', views.setup_manufacturer_area, name="setup_manufacturer_area"),
     path('setup_manufacturer_rep/', views.setup_manufacturer_rep, name="setup_manufacturer_rep"),
+    path('setup_carriers/', views.setup_carriers, name="setup_carriers"),
+
 
 
 

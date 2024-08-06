@@ -1383,3 +1383,24 @@ def setup_manufacturer_rep(request):
                                flag=flag,manufacturer_data_form=manufacturer_data_form,label='Setup Manufacturer Representative',customer_form=customer_form)
     context = context_obj.get_selection_list_context()
     return render(request, 'billing/manufacturer_rep.html', context=context)
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def setup_carriers(request):
+    try:
+        data = Carriers.objects.exists()
+        data = 0
+        form = CarrierForm()
+        if request.method == 'POST':
+            form = CarrierForm(request.POST)
+            form.save()
+            return redirect('setup_carriers')
+        context_obj = SetupContext(model_search='carriers', operation='create',segment='master-selection-carriers',
+                                   form=form,data=data,label='Setup Carriers')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/carriers.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+

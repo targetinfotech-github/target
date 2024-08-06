@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from icecream import ic
 
 from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxStructure, SalesRep, Area, \
-    ManufacturerArea, ManufacturerRep
+    ManufacturerArea, ManufacturerRep, Carriers
 from django import forms
 from .models import Receipt, ReceiptProduct, Manufacturer, Product
 from django.db import transaction
@@ -534,3 +534,34 @@ class ManufacturerRepForm(forms.Form):
 
 
 ManufacturerRepFormset = formset_factory(ManufacturerRepForm, extra=0)
+
+
+
+class CarrierForm(forms.ModelForm):
+    postal_code = forms.IntegerField(label='PIN', required=False, widget=(
+        forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter PIN'})))
+    class Meta:
+        model = Carriers
+        fields = '__all__'
+        widgets = {
+            'name': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Enter the Name', 'id': 'name_form'}),
+            'sh_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
+            'address': forms.Textarea(
+                attrs={'class': 'form-control custom-address', 'placeholder': 'Enter the Address',
+                       'id': 'address-form'}),
+            'remarks': forms.Textarea(
+                attrs={'class': 'form-control custom-address', 'placeholder': 'Enter the Remarks',
+                       'id': 'address-form'}),
+            'gstin': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the GSTIN'}),
+            'e_way_id': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the E Way ID'}),
+            'regn_no': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Regn NO'}),
+
+            'mobile_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mobile Number'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telephone'}),
+            'fax': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter FAX'}),
+            'state_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter State Name'}),
+            'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter City'}),
+        }
+
+

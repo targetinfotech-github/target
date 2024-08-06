@@ -166,6 +166,16 @@
                                     </li>
                                 </ul>
                             </div>
+                            <div class="multi-level collapse {% if 'master-selection-' in segment %} show {% endif %}"
+                                 role="list" id="submenu-app" aria-expanded="false">
+                                <ul class="flex-column nav">
+                                    <li class="nav-item {% if 'master-selection-carriers' in segment %} active {% endif %}">
+                                        <a class="nav-link" href="{% url 'setup_carriers' %}">
+                                            <span class="sidebar-text">Carriers</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                     </ul>
                 </div>

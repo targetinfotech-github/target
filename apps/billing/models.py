@@ -527,3 +527,18 @@ class TaxStructure(models.Model):
         return f'{self.tax_type}-{self.tax_id}'
 
 
+class Carriers(models.Model):
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=30, null=True, blank=True)
+    address = models.TextField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
+    postal_code = models.PositiveIntegerField(null=True, blank=True)
+    state_name = models.CharField(max_length=50, null=True, blank=True)
+    telephone = models.CharField(max_length=15, null=True, blank=True)
+    fax = models.CharField(max_length=20, null=True, blank=True)
+    mobile_number = models.CharField(max_length=15, null=True, blank=True, verbose_name='Mb No')
+    gstin = models.CharField(max_length=15, validators=[validate_gstin], null=True, blank=True)
+    e_way_id = models.CharField(max_length=12 ,null=True, blank=True)
+    regn_no = models.CharField(max_length=15, null=True, blank=True)
+    remarks = models.TextField(max_length=100, null=True, blank=True)
+
