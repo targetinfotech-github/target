@@ -149,9 +149,19 @@
                             <div class="multi-level collapse {% if 'master-selection-' in segment %} show {% endif %}"
                                  role="list" id="submenu-app" aria-expanded="false">
                                 <ul class="flex-column nav">
-                                    <li class="nav-item {% if 'master-selection-cm' in segment %} active {% endif %}">
+                                    <li class="nav-item {% if 'master-selection-ma' in segment %} active {% endif %}">
                                         <a class="nav-link" href="{% url 'setup_manufacturer_area' %}">
                                             <span class="sidebar-text">Manufacturer Area</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="multi-level collapse {% if 'master-selection-' in segment %} show {% endif %}"
+                                 role="list" id="submenu-app" aria-expanded="false">
+                                <ul class="flex-column nav">
+                                    <li class="nav-item {% if 'master-selection-mr' in segment %} active {% endif %}">
+                                        <a class="nav-link" href="{% url 'setup_manufacturer_rep' %}">
+                                            <span class="sidebar-text">Manufacturer Rep</span>
                                         </a>
                                     </li>
                                 </ul>

@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from django.core.validators import MinValueValidator
-from django.db.models import Case, When, IntegerField
+from django.db.models import Case, When, IntegerField, Q
 from django.forms import formset_factory
 from django.utils.translation import gettext_lazy as _
 from django import forms
@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from icecream import ic
 
 from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxStructure, SalesRep, Area, \
-    ManufacturerArea
+    ManufacturerArea, ManufacturerRep
 from django import forms
 from .models import Receipt, ReceiptProduct, Manufacturer, Product
 from django.db import transaction
@@ -284,13 +284,6 @@ class ProductForm(forms.ModelForm):
 
 
 class CustomerForm(forms.ModelForm):
-    customer_representative = forms.CharField(
-        label='Rep', required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Enter REP'
-        })
-    )
     telephone = forms.CharField(
         label='Tel', required=False,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telephone Number'})
@@ -301,6 +294,7 @@ class CustomerForm(forms.ModelForm):
     customer_name = forms.CharField(label='Name', widget=(
         forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the name', 'id': 'name_form'})))
 
+    area_object = Area.objects.get_or_create_model()
     area = forms.ModelChoiceField(
         Area.objects.annotate(
             order_priority=Case(
@@ -310,7 +304,22 @@ class CustomerForm(forms.ModelForm):
             )
         ).order_by('order_priority', 'name'),
         required=False,
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        initial=area_object
+    )
+    sales_object = SalesRep.objects.get_or_create_model()
+    sales_representative = forms.ModelChoiceField(
+        SalesRep.objects.annotate(
+            order_priority=Case(
+                When(name='AUTO', then=0),
+                default=1,
+                output_field=IntegerField()
+            )
+        ).order_by('order_priority', 'name'),
+        required=False,
+        label='Rep',
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        initial=sales_object
     )
     class Meta:
         model = Customer
@@ -432,7 +441,7 @@ class TaxStructureForm(forms.ModelForm):
         if 'description' in self.fields:
             self.fields['description'].required = False
 
-TaxStructureFormSet = formset_factory(TaxStructureForm)
+TaxStructureFormSet = formset_factory(TaxStructureForm,extra=0)
 
 class SalesRepForm(forms.ModelForm):
     class Meta:
@@ -469,7 +478,7 @@ class AreaForm(forms.ModelForm):
             'pin_code': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Pin Code'}),
         }
 
-class ManufacturerAreaCustomerDisplayForm(forms.Form):
+class CustomerDisplayForm(forms.Form):
     customer = forms.ChoiceField(label='Customer',widget=forms.Select(choices=[],attrs={'class': 'form-control','id':'name_form'}))
     def __init__(self,*args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -477,25 +486,51 @@ class ManufacturerAreaCustomerDisplayForm(forms.Form):
         self.fields['customer'].choices = [(id, name) for id, name in customer_data]
 
 
-class ManufacturerAreaForm(forms.ModelForm):
+class ManufacturerAreaForm(forms.Form):
+    manufacturer = forms.ChoiceField(label='Manufacturer',widget=forms.Select(choices=[],attrs={'class': 'form-control','id':'name_form'}))
+    area = forms.ChoiceField(label='Area',widget=forms.Select(choices=[],attrs={'class': 'form-control','id':'name_form'}))
 
     class Meta:
-        model = ManufacturerArea
-        fields = ['manufacturer','area','customer']
-        widgets = {
-            'manufacturer': forms.TextInput(attrs={'class': 'form-control','id':'name_form'}),
-            'area': forms.Select(attrs={'class': 'form-control','id':'name_form'}),
-        }
+        fields = ['manufacturer','area']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        initial = kwargs.pop('initial', {})
-        if 'manufacturer_id' in initial:
-            self.fields['manufacturer'].widget.attrs['readonly'] = 'readonly'
-            manufacturer = Manufacturer.objects.get(id=int(initial['manufacturer_id']))
-            self.initial['manufacturer'] = manufacturer.name
-            self.fields['manufacturer'].initial = manufacturer.name
-            self.fields['manufacturer'].widget.attrs['value'] = manufacturer.name
+        initial = kwargs.pop('initial')
+        if initial['manufacturer']:
+            manufacturer = Manufacturer.objects.filter(id=initial['manufacturer']).values_list('id','name')
+            self.fields['manufacturer'].choices = [(id, name) for id, name in manufacturer]
+            manufacturer_area = ManufacturerArea.objects.get(id=initial['id'])
+            if manufacturer_area.area is not None:
+                area_list =Area.objects.exclude(Q(id=manufacturer_area.area.id) | Q(name='AUTO')).values_list('id','name')
+                self.fields['area'].choices = [(manufacturer_area.area.id,manufacturer_area.area.name),(None,'-------')] + [(id, name) for id, name in area_list]
+            else:
+                area_list = Area.objects.all().values_list('id','name').exclude(name='AUTO')
+                self.fields['area'].choices =[(None,'-------')] + [(id,name) for id, name in area_list]
 
 
-CustomerManufacturerFormSet = formset_factory(ManufacturerAreaForm,extra=0)
+ManufacturerAreaFormset = formset_factory(ManufacturerAreaForm, extra=0)
+
+
+class ManufacturerRepForm(forms.Form):
+    manufacturer = forms.ChoiceField(widget=forms.Select(choices=[],attrs={'class': 'form-control','id':'name_form'}))
+    sales_rep = forms.ChoiceField(widget=forms.Select(choices=[],attrs={'class': 'form-control','id':'name_form'}))
+
+    class Meta:
+        fields = ['manufacturer','sales_rep']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        initial = kwargs.pop('initial')
+        if initial['manufacturer']:
+            manufacturer = Manufacturer.objects.filter(id=initial['manufacturer']).values_list('id','name')
+            self.fields['manufacturer'].choices = [(id, name) for id, name in manufacturer]
+            manufacturer_rep = ManufacturerRep.objects.get(id=initial['id'])
+            if manufacturer_rep.sales_rep is not None:
+                rep_list =SalesRep.objects.exclude(Q(id=manufacturer_rep.sales_rep.id) | Q(name='AUTO')).values_list('id','name')
+                self.fields['sales_rep'].choices = [(manufacturer_rep.sales_rep.id,manufacturer_rep.sales_rep.name),(None,'-------')] + [(id, name) for id, name in rep_list]
+            else:
+                rep_list = SalesRep.objects.all().values_list('id','name').exclude(name='AUTO')
+                self.fields['sales_rep'].choices =[(None,'-------')] + [(id,name) for id, name in rep_list]
+
+
+ManufacturerRepFormset = formset_factory(ManufacturerRepForm, extra=0)

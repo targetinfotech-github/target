@@ -17,9 +17,7 @@ from django.urls import reverse
 from icecream import ic
 
 from apps.billing.services.decorators import measure_execution_time
-from apps.billing.form import ManufacturerForm, ProductForm, ReceiptForm, GroupForm, CustomerForm, SignUpForm, \
-    LoginForm, LocationForm, TaxStructureForm, TaxStructureFormSet, SalesRepForm, AreaForm, ManufacturerAreaForm, \
-    CustomerManufacturerFormSet, ManufacturerAreaCustomerDisplayForm
+from apps.billing.form import *
 from django.shortcuts import render, redirect
 from apps.billing.models import Manufacturer, Product, Receipt, ReceiptProduct, ProductGroup, Customer, CustomUser, \
     Location, TaxStructure, SalesRep, Area, ManufacturerArea
@@ -717,7 +715,6 @@ def delete_group(request):
 @measure_execution_time
 def create_customer(request):
     # try:
-    Area.objects.get_or_create_area()
     if request.method == 'POST':
         location_form = LocationForm(request.POST)
         customer_form = CustomerForm(request.POST)
@@ -733,8 +730,10 @@ def create_customer(request):
             location_instance = None
         if location_instance:
             if customer_form.is_valid():
+                ic(customer_form.fields.items())
                 name = customer_form.cleaned_data.get('customer_name','')
                 area = customer_form.cleaned_data.get('area','')
+                sales_representative = customer_form.cleaned_data.get('sales_representative','')
                 try:
                     customer = customer_form.save(commit=True)
                     customer.location = location_instance
@@ -743,12 +742,18 @@ def create_customer(request):
                         if area.name == 'AUTO':
                             ic('auto area')
                             customer.is_auto_area = True
-                        customer.save()
                         ic(customer.is_auto_area)
                         manufacturer_area, created = ManufacturerArea.objects.get_or_create(customer=customer,
                                                                                             area=area)
-                    else:
-                        customer.save()
+                    if sales_representative:
+                        ic(sales_representative.name)
+                        if sales_representative.name == 'AUTO':
+                            ic('auto rep')
+                            customer.is_auto_rep = True
+                        ic(customer.is_auto_rep)
+                        manufacturer_rep, created = ManufacturerRep.objects.get_or_create(customer=customer,
+                                                                                            sales_rep_id=sales_representative.id)
+                    customer.save()
 
 
                     messages.success(request, f'Customer {name} successfully created')
@@ -980,7 +985,6 @@ def setup_tax_structure(request):
                 tax_structure_instance = TaxStructure.objects.filter(tax_type=tax_type)
                 tax_structure_formset = TaxStructureFormSet(initial=tax_structure_instance.values())
             else:
-                ic('else executed')
                 tax_structure_formset = TaxStructureFormSet(initial=tax_structure.values())
         elif request.method == 'POST':
             tax_type = request.GET.get('tax_type', '')
@@ -1037,6 +1041,7 @@ def search_router(request, model_search):
 @login_required(login_url="/login/")
 @measure_execution_time
 def setup_sales_rep(request):
+    auto_rep = SalesRep.objects.get_or_create_model()
     data = SalesRep.objects.exists()
     form = SalesRepForm()
     if request.method == 'POST':
@@ -1052,7 +1057,7 @@ def setup_sales_rep(request):
 @login_required(login_url="/login/")
 @measure_execution_time
 def view_sales_rep(request):
-    data = SalesRep.objects.all()
+    data = SalesRep.objects.all().exclude(name='AUTO')
     page_obj = pagination(request, data)
     context_obj = SetupContext(model_search='sales_rep', operation='view', segment='master-selection-sales',
                                page_obj=page_obj,data=data, label='View Sales Representative')
@@ -1079,7 +1084,7 @@ def update_sales_rep(request, pk):
 @measure_execution_time
 def get_sales_rep_modal(request):
     try:
-        representative_data = SalesRep.objects.values('id', 'name', 'sh_name','mobile_number').order_by('name')
+        representative_data = SalesRep.objects.values('id', 'name', 'sh_name','mobile_number').order_by('name').exclude(name='AUTO')
         if request.method == 'POST':
             if 'submit_selected_record' in request.POST:
                 id = request.POST['submit_selected_record']
@@ -1112,8 +1117,7 @@ def get_sales_rep_modal(request):
 @measure_execution_time
 def delete_sales_rep(request):
     try:
-        representative_data = SalesRep.objects.values('id', 'name', 'sh_name',
-                                                                                'mobile_number').order_by('name')
+        representative_data = SalesRep.objects.values('id', 'name', 'sh_name','mobile_number').order_by('name').exclude(name='AUTO')
         page_obj = pagination(request, representative_data)
         context_obj = SetupContext(model_search='sales_rep', operation='delete', page_obj=page_obj,
                                    segment='master-selection-sales',
@@ -1135,7 +1139,7 @@ def delete_sales_rep(request):
 @measure_execution_time
 def setup_area(request):
     try:
-        auto_area = Area.objects.get_or_create_area()
+        auto_area = Area.objects.get_or_create_model()
         data = Area.objects.exists()
         form = AreaForm()
         if request.method == 'POST':
@@ -1155,7 +1159,6 @@ def setup_area(request):
 @measure_execution_time
 def view_area(request):
     try:
-        auto_area = Area.objects.get_or_create_area()
         data = Area.objects.all().exclude(name='AUTO')
         ic(data)
         page_obj = pagination(request, data)
@@ -1248,16 +1251,30 @@ def delete_area(request):
 
 def create_missing_manufacturer_area(customer_instance):
     if isinstance(customer_instance,Customer):
-        none_manufacturers = ManufacturerArea.objects.select_related('manufacturer','customer').filter(customer_id=customer_instance.id,manufacturer_id__isnull=True)
+        none_manufacturers = ManufacturerArea.objects.select_related('manufacturer', 'customer').filter(customer_id=customer_instance.id,manufacturer_id__isnull=True)
         if none_manufacturers.exists():
-            none_manufacturers.delete()
-        existing_manufacturers = ManufacturerArea.objects.select_related('customer','manufacturer').filter(customer_id=customer_instance.id).\
+            delete = none_manufacturers.delete()
+        existing_manufacturers = ManufacturerArea.objects.select_related('manufacturer', 'customer').filter(customer_id=customer_instance.id).\
             exclude(manufacturer_id = None).values_list('manufacturer_id',flat=True)
         missing_manufacturers = Manufacturer.objects.exclude(id__in=existing_manufacturers)
         if missing_manufacturers:
             for manufacturer in missing_manufacturers:
                 manufacturer_creation = ManufacturerArea.objects.create(manufacturer=manufacturer,customer_id=customer_instance.id)
-                ic(manufacturer_creation.manufacturer.name)
+    else:
+        raise TypeError(f"Invalid Keyword")
+
+
+def create_missing_manufacturer_rep(customer_instance):
+    if isinstance(customer_instance,Customer):
+        none_manufacturers = ManufacturerRep.objects.select_related('manufacturer', 'customer').filter(customer_id=customer_instance.id,manufacturer_id__isnull=True)
+        if none_manufacturers.exists():
+            delete = none_manufacturers.delete()
+        existing_manufacturers = ManufacturerRep.objects.select_related('manufacturer', 'customer').filter(customer_id=customer_instance.id).\
+            exclude(manufacturer_id = None).values_list('manufacturer_id',flat=True)
+        missing_manufacturers = Manufacturer.objects.exclude(id__in=existing_manufacturers)
+        if missing_manufacturers:
+            for manufacturer in missing_manufacturers:
+                manufacturer_creation = ManufacturerRep.objects.create(manufacturer=manufacturer,customer_id=customer_instance.id)
     else:
         raise TypeError(f"Invalid Keyword")
 
@@ -1266,53 +1283,103 @@ def create_missing_manufacturer_area(customer_instance):
 @login_required(login_url="/login/")
 @measure_execution_time
 def setup_manufacturer_area(request):
-    # try:
-    data = ManufacturerArea.objects.exists()
-    data = 0
+    try:
+        if not (Customer.objects.exists() and Manufacturer.objects.exists() and Area.objects.exists()):
+            messages.info(request,'Kindly ensure Customer, Manufacturer, and Area is created.')
+            context = {'flag': False, 'label': 'Setup Manufacturer Representative','segment':'master-selection-ma'}
+            return render(request, 'billing/manufacturer_area.html', context=context)
+        else:
+            flag= True
+        customer_id = request.GET.get('customer','')
+        if customer_id:
+            customer_instance = Customer.objects.get(id=customer_id)
+            manufacturer_area = ManufacturerArea.objects.filter(customer_id=customer_instance.id)
+            create_missing_manufacturer_area(customer_instance)
+            manufacturer_data_form = ManufacturerAreaFormset(initial=manufacturer_area.values('id','manufacturer','area'))
+            customer_form = CustomerDisplayForm(initial={'customer':(customer_id, customer_instance.customer_name)})
+        else:
+            customer_instance = Customer.objects.order_by('-id').first()
+            create_missing_manufacturer_area(customer_instance)
+            manufacturer_area = ManufacturerArea.objects.filter(customer_id=customer_instance.id)
+            manufacturer_data_form = ManufacturerAreaFormset(initial=manufacturer_area.values('id','manufacturer','area'))
+            customer_form = CustomerDisplayForm()
+        if request.method == 'POST':
+            saved_data = request.POST.dict()
+            total = int(saved_data['form-TOTAL_FORMS'])
+            try:
+                with transaction.atomic():
+                    for i in range(total):
+                        area = saved_data.get(f'form-{i}-area','')
+                        manufacturer = saved_data.get(f'form-{i}-manufacturer','')
+                        if manufacturer:
+                            manufacturer_area_queryset = ManufacturerArea.objects.get(customer_id=customer_instance.id,manufacturer_id=int(manufacturer))
+                            if area:
+                                manufacturer_area_queryset.area_id = int(area)
+                                manufacturer_area_queryset.save()
+                            else:
+                                manufacturer_area_queryset.area = None
+                                manufacturer_area_queryset.save()
+                customer_form = CustomerDisplayForm(initial={'customer': (customer_instance.id, customer_instance.customer_name)})
+
+                messages.success(request,f'Manufacturer|Area of {customer_instance.customer_name.upper()} is saved Successfully')
+            except Exception as e:
+                print(f"An error occurred: {e}")
+                messages.error(request,'Exception occurred, Form not saved')
+        context_obj = SetupContext(model_search='manufacturer_area', operation='create', segment='master-selection-ma',
+                                   flag=flag,manufacturer_data_form=manufacturer_data_form,label='Setup Manufacturer Area',customer_form=customer_form)
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/manufacturer_area.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def setup_manufacturer_rep(request):
+    if not (Customer.objects.exists() and Manufacturer.objects.exists() and SalesRep.objects.exists()):
+        messages.info(request,'Kindly ensure Customer, Manufacturer, and Sales Representative is created.')
+        context = {'flag': False, 'label': 'Setup Manufacturer Representative','segment':'master-selection-mr'}
+        return render(request, 'billing/manufacturer_rep.html', context=context)
+    else:
+        flag= True
     customer_id = request.GET.get('customer','')
-    ic(ManufacturerArea.objects.values())
     if customer_id:
         customer_instance = Customer.objects.get(id=customer_id)
-        manufacturer_area = ManufacturerArea.objects.filter(customer_id=customer_instance.id)
-        create_missing_manufacturer_area(customer_instance)
-        manufacturer_data_form = CustomerManufacturerFormSet(initial=manufacturer_area.values())
-        customer_form = ManufacturerAreaCustomerDisplayForm(initial={'customer':(customer_id,customer_instance.customer_name)})
+        manufacturer_rep = ManufacturerRep.objects.filter(customer_id=customer_instance.id)
+        create_missing_manufacturer_rep(customer_instance)
+        manufacturer_data_form = ManufacturerRepFormset(initial=manufacturer_rep.values('id','manufacturer','sales_rep'))
+        customer_form = CustomerDisplayForm(initial={'customer':(customer_id, customer_instance.customer_name)})
     else:
         customer_instance = Customer.objects.order_by('-id').first()
-        create_missing_manufacturer_area(customer_instance)
-        manufacturer_area = ManufacturerArea.objects.filter(customer_id=customer_instance.id)
-        manufacturer_data_form = CustomerManufacturerFormSet(initial=manufacturer_area.values())
-        customer_form = ManufacturerAreaCustomerDisplayForm()
-    total = manufacturer_data_form.total_form_count()
-    ic(manufacturer_area)
+        create_missing_manufacturer_rep(customer_instance)
+        manufacturer_rep = ManufacturerRep.objects.filter(customer_id=customer_instance.id)
+        manufacturer_data_form = ManufacturerRepFormset(initial=manufacturer_rep.values('id','manufacturer','sales_rep'))
+        customer_form = CustomerDisplayForm()
     if request.method == 'POST':
-        ic(request.POST.dict())
-        # manufacturer_data_form = CustomerManufacturerFormSet(request.POST)
-        # if manufacturer_data_form.is_valid():
-        #     customer_id = manufacturer_data_form.cleaned_data.get('customer',None)
-        #
-        #     form_instance = manufacturer_data_form.save(commit=False)
-        #     ic(form_instance)
-        #     try:
-        #         if customer_id:
-        #             customer = Customer.objects.get(id=customer_id)
-        #             customer.ManufacturerArea = form_instance
-        #             form_instance.save()
-        #             customer.save()
-        #             messages.success(request, 'Customer Manufacturer Successfully created')
-        #     except Exception as e:
-        #         customer_manufacturer = ManufacturerArea.objects.filter(id=form_instance.id)
-        #         if customer_manufacturer.exists():
-        #             customer_manufacturer.delete()
-        #         messages.error(request,f'Exception occurred:{e} submit the Form again')
-
-
-        return redirect('setup_manufacturer_area')
-    context_obj = SetupContext(model_search='manufacturer_area', operation='create', segment='master-selection-cm',
-                               manufacturer_data_form=manufacturer_data_form, data=data, label='Setup Manufacturer Area',customer_form=customer_form,total=total)
+        saved_data = request.POST.dict()
+        total = int(saved_data['form-TOTAL_FORMS'])
+        try:
+            with transaction.atomic():
+                for i in range(total):
+                    sales_rep = saved_data.get(f'form-{i}-sales_rep','')
+                    manufacturer = saved_data.get(f'form-{i}-manufacturer','')
+                    if manufacturer:
+                        manufacturer_rep_queryset = ManufacturerRep.objects.get(customer_id=customer_instance.id,manufacturer_id=int(manufacturer))
+                        if sales_rep:
+                            manufacturer_rep_queryset.sales_rep_id = int(sales_rep)
+                            manufacturer_rep_queryset.save()
+                        else:
+                            manufacturer_rep_queryset.sales_rep = None
+                            manufacturer_rep_queryset.save()
+            customer_form = CustomerDisplayForm(initial={'customer': (customer_instance.id, customer_instance.customer_name)})
+            messages.success(request,f'Manufacturer|Sales Rep of {customer_instance.customer_name.upper()} is saved Successfully')
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            messages.error(request,'Exception occurred, Form not saved')
+    context_obj = SetupContext(model_search='manufacturer_rep', operation='create', segment='master-selection-mr',
+                               flag=flag,manufacturer_data_form=manufacturer_data_form,label='Setup Manufacturer Representative',customer_form=customer_form)
     context = context_obj.get_selection_list_context()
-    return render(request, 'billing/manufacturer_area.html', context=context)
-    # except template.TemplateDoesNotExist:
-    #     return render(request, 'billing/page-404.html')
-    # except:
-    #     return render(request, 'billing/page-500.html')
+    return render(request, 'billing/manufacturer_rep.html', context=context)
