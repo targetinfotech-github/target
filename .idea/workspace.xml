@@ -4,22 +4,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9b1ddd95-aa22-4abd-a599-5b65f6a4926a" name="Changes" comment="...">
-      <change afterPath="$PROJECT_DIR$/apps/billing/migrations/0020_salesrep.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/billing/migrations/0021_alter_companyprofile_postal_code_and_more.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/static/assets/js/selection_list.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/templates/billing/sales_rep.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/apps/templates/billing/selection_list_extended.html" afterDir="false" />
+    <list default="true" id="9b1ddd95-aa22-4abd-a599-5b65f6a4926a" name="Changes" comment="carriers">
+      <change afterPath="$PROJECT_DIR$/apps/billing/migrations/0037_units.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/billing/migrations/0038_departments.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/billing/migrations/0039_division.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/billing/migrations/0040_alter_division_division_id.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/billing/migrations/0041_discountclass_alter_departments_sh_name_and_more.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/templates/billing/customer_class.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/templates/billing/departments.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/templates/billing/discount_class.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/templates/billing/division.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/templates/billing/unit.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/billing/form.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/form.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/billing/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/billing/services/resource_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/resource_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/billing/services/search_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/services/search_manager.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/billing/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/billing/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/billing/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/templates/billing/dummy.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/dummy.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/templates/billing/manufacturer.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/manufacturer.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/templates/billing/master_extended.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/master_extended.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/billing/area.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/area.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/templates/billing/carriers.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/billing/carriers.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/apps/templates/includes/sidebar.html" beforeDir="false" afterPath="$PROJECT_DIR$/apps/templates/includes/sidebar.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -35,8 +38,8 @@
       <list>
         <option value="Python Script" />
         <option value="CSS File" />
-        <option value="HTML File" />
         <option value="JavaScript File" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -349,7 +352,17 @@
       <workItem from="1722076972524" duration="71000" />
       <workItem from="1722483623909" duration="13223000" />
       <workItem from="1722501483397" duration="9377000" />
-      <workItem from="1722570629555" duration="11288000" />
+      <workItem from="1722570629555" duration="11685000" />
+      <workItem from="1722588788603" duration="9742000" />
+      <workItem from="1722657940258" duration="13345000" />
+      <workItem from="1722676368402" duration="5177000" />
+      <workItem from="1722830242053" duration="14039000" />
+      <workItem from="1722848788017" duration="14871000" />
+      <workItem from="1722916889366" duration="13098000" />
+      <workItem from="1722935264078" duration="691000" />
+      <workItem from="1722935981038" duration="7348000" />
+      <workItem from="1723003128694" duration="13349000" />
+      <workItem from="1723021257324" duration="12244000" />
     </task>
     <task id="LOCAL-00001" summary="testing -- factory creation">
       <option name="closed" value="true" />
@@ -527,7 +540,103 @@
       <option name="project" value="LOCAL" />
       <updated>1722077031727</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="sales rep">
+      <option name="closed" value="true" />
+      <created>1722583942444</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1722583942444</updated>
+    </task>
+    <task id="LOCAL-00024" summary="area">
+      <option name="closed" value="true" />
+      <created>1722601620088</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1722601620088</updated>
+    </task>
+    <task id="LOCAL-00025" summary="...">
+      <option name="closed" value="true" />
+      <created>1722601644394</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1722601644394</updated>
+    </task>
+    <task id="LOCAL-00026" summary="area and customer-manufacturer">
+      <option name="closed" value="true" />
+      <created>1722681471946</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1722681471946</updated>
+    </task>
+    <task id="LOCAL-00027" summary="...">
+      <option name="closed" value="true" />
+      <created>1722681602374</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1722681602374</updated>
+    </task>
+    <task id="LOCAL-00028" summary="...">
+      <option name="closed" value="true" />
+      <created>1722844453658</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1722844453658</updated>
+    </task>
+    <task id="LOCAL-00029" summary="...">
+      <option name="closed" value="true" />
+      <created>1722863882207</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1722863882207</updated>
+    </task>
+    <task id="LOCAL-00030" summary="...">
+      <option name="closed" value="true" />
+      <created>1722863898444</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1722863898444</updated>
+    </task>
+    <task id="LOCAL-00031" summary="rep and area completed.">
+      <option name="closed" value="true" />
+      <created>1722938517087</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1722938517087</updated>
+    </task>
+    <task id="LOCAL-00032" summary="..">
+      <option name="closed" value="true" />
+      <created>1722938536885</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1722938536885</updated>
+    </task>
+    <task id="LOCAL-00033" summary="carriers">
+      <option name="closed" value="true" />
+      <created>1722946813401</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1722946813401</updated>
+    </task>
+    <task id="LOCAL-00034" summary="carriers">
+      <option name="closed" value="true" />
+      <created>1722946826966</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1722946826966</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -557,11 +666,16 @@
     <MESSAGE value="customer" />
     <MESSAGE value="customer design1" />
     <MESSAGE value="customer ,manufactuer -frontend" />
-    <MESSAGE value=".." />
     <MESSAGE value="tax structure and backend integration." />
     <MESSAGE value="tax structure.." />
+    <MESSAGE value="sales rep" />
+    <MESSAGE value="area" />
+    <MESSAGE value="area and customer-manufacturer" />
     <MESSAGE value="..." />
-    <option name="LAST_COMMIT_MESSAGE" value="..." />
+    <MESSAGE value="rep and area completed." />
+    <MESSAGE value=".." />
+    <MESSAGE value="carriers" />
+    <option name="LAST_COMMIT_MESSAGE" value="carriers" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/django_dashboard_volt_1_0_4$dummy.coverage" NAME="dummy Coverage Results" MODIFIED="1719377292762" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/apps/home" />

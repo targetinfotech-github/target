@@ -122,10 +122,11 @@ class SetupContext():
         return context
 
     def get_selection_list_context(self):
-        if self.model_search == 'sales_rep' or self.model_search == 'area':
-            model_prefix = self.model_search
-        else:
-            model_prefix = ''
+        # if self.model_search == 'sales_rep' or self.model_search == 'area' or self.model_search == 'carriers':
+        #     model_prefix = self.model_search
+        # else:
+        #     model_prefix = ''
+        model_prefix = self.model_search
         context = {}
         if self.operation == 'modal':
             flag = 'modal'

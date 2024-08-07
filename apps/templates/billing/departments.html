@@ -9,19 +9,15 @@
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Sh Name</th>
-                <th scope="col">Pin Code</th>
-                <th scope="col">Status</th>
             </tr>
             </thead>
             <tbody>
-            {% for area in data %}
-                <tr id="row-{{ area.id }}"
-                    onclick="selectList('{{ area.id }}')">
+            {% for department in data %}
+                <tr id="row-{{ department.id }}"
+                    onclick="selectList('{{ department.id }}')">
                     <th scope="row">{{ forloop.counter }}</th>
-                    <td>{{ area.name }}</td>
-                    <td>{{ area.sh_name }}</td>
-                    <td>{{ area.pin_code }}</td>
-                    <td>{{ area.area_status }}</td>
+                    <td>{{ department.name }}</td>
+                    <td>{{ department.sh_name }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -31,7 +27,7 @@
 {% endblock %}
 
 {% block modal_post_request %}
-    <form method="post" action="{% url 'get_area_modal' %}">
+    <form method="post" action="{% url 'get_departments_modal' %}">
         {% csrf_token %}
         <div class="modal-footer">
             <a href="{% url create_url %}">
@@ -61,20 +57,16 @@
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Sh Name</th>
-                <th scope="col">Pin Code</th>
-                <th scope="col">Status</th>
             </tr>
             </thead>
             <!-- Item -->
             <tbody>
 
-            {% for area in data %}
-                <tr id="row-{{ area.id }}">
+            {% for department in data %}
+                <tr id="row-{{ department.id }}">
                     <th scope="row">{{ forloop.counter }}</th>
-                    <td><a href="{% url update_url area.id %}">{{ area.name }}</a></td>
-                    <td>{{ area.sh_name }}</td>
-                    <td>{{ area.pin_code }}</td>
-                    <td>{{ area.area_status }}</td>
+                    <td><a href="{% url update_url department.id %}">{{ department.name }}</a></td>
+                    <td>{{ department.sh_name }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -92,39 +84,28 @@
 
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
-                        <div class="form-element">
-                            <label class="form-label" style="min-width: 4.3vw"
-                                   for="{{ form.name.id_for_label }}">{{ form.name.label }}:</label>
-                            {{ form.name }}
-                        </div>
-                    </div>
-                    <div class="col-lg-auto col-md-auto">
-                        <div class="form-element" style="margin-right: 2vw">
-                            <label class="form-label" style="min-width: 3.2vw"
-                                   for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}:</label>
-                            <span class="form-items">
+                    <div class="col-md-6 col-lg-6 col-sm-8">
+                        <div class="row justify-content-between">
+                            <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                                <div class="form-element">
+                                    <label class="form-label" style="min-width: 4.3vw"
+                                           for="{{ form.name.id_for_label }}">{{ form.name.label }}:</label>
+                                    {{ form.name }}
+                                </div>
+                            </div>
+                            <div class="col-lg-auto col-md-auto">
+                                <div class="form-element" style="margin-right: 2vw">
+                                    <label class="form-label" style="min-width: 3.2vw"
+                                           for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}:</label>
+                                    <span class="form-items">
                                     {{ form.sh_name }}
                                         </span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-lg-auto col-md-auto">
-                        <div class="form-element" style="margin-right: 2vw">
-                            <label class="form-label" style="min-width: 4.1vw"
-                                   for="{{ form.area_status.id_for_label }}">{{ form.area_status.label }}:</label>
 
-                            {{ form.area_status }}
-                        </div>
-                    </div>
-                    <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
-                        <div class="form-element">
-                            <label class="form-label" style="min-width: 3.5vw"
-                                   for="{{ form.pin_code.id_for_label }}">{{ form.pin_code.label }}:</label>
-                            {{ form.pin_code }}
-                        </div>
                     </div>
                 </div>
-
             </div>
 
             <div class="post_form" style="padding: 10px">

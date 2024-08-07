@@ -102,11 +102,6 @@
                                 <span class="sidebar-text">Customer</span>
                             </a>
                         </li>
-                        <li class="nav-item {% if 'group' in segment %} active {% endif %}">
-                            <a class="nav-link" href="{% url 'create_group' %}">
-                                <span class="sidebar-text">Group</span>
-                            </a>
-                        </li>
                         <li class="nav-item {% if 'tax_structure' in segment %} active {% endif %}">
                             <a class="nav-link" href="{% url 'setup_tax_structure' %}">
                                 <span class="sidebar-text">Tax Structure</span>
@@ -172,6 +167,66 @@
                                     <li class="nav-item {% if 'master-selection-carriers' in segment %} active {% endif %}">
                                         <a class="nav-link" href="{% url 'setup_carriers' %}">
                                             <span class="sidebar-text">Carriers</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="multi-level collapse {% if 'master-selection-' in segment %} show {% endif %}"
+                                 role="list" id="submenu-app" aria-expanded="false">
+                                <ul class="flex-column nav">
+                                    <li class="nav-item {% if 'master-selection-units' in segment %} active {% endif %}">
+                                        <a class="nav-link" href="{% url 'setup_units' %}">
+                                            <span class="sidebar-text">Units</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="multi-level collapse {% if 'master-selection-' in segment %} show {% endif %}"
+                                 role="list" id="submenu-app" aria-expanded="false">
+                                <ul class="flex-column nav">
+                                    <li class="nav-item {% if 'master-selection-departments' in segment %} active {% endif %}">
+                                        <a class="nav-link" href="{% url 'setup_departments' %}">
+                                            <span class="sidebar-text">Departments</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="multi-level collapse {% if 'master-selection-' in segment %} show {% endif %}"
+                                 role="list" id="submenu-app" aria-expanded="false">
+                                <ul class="flex-column nav">
+                                    <li class="nav-item {% if 'master-selection-division' in segment %} active {% endif %}">
+                                        <a class="nav-link" href="{% url 'setup_division' %}">
+                                            <span class="sidebar-text">Division</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="multi-level collapse {% if 'master-selection-' in segment %} show {% endif %}"
+                                 role="list" id="submenu-app" aria-expanded="false">
+                                <ul class="flex-column nav">
+                                    <li class="nav-item {% if 'master-selection-group' in segment %} active {% endif %}">
+                                        <a class="nav-link" href="{% url 'create_group' %}">
+                                            <span class="sidebar-text">Group</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="multi-level collapse {% if 'master-selection-' in segment %} show {% endif %}"
+                                 role="list" id="submenu-app" aria-expanded="false">
+                                <ul class="flex-column nav">
+                                    <li class="nav-item {% if 'master-selection-discount_class' in segment %} active {% endif %}">
+                                        <a class="nav-link" href="{% url 'setup_discount_class' %}">
+                                            <span class="sidebar-text">Discount Class</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="multi-level collapse {% if 'master-selection-' in segment %} show {% endif %}"
+                                 role="list" id="submenu-app" aria-expanded="false">
+                                <ul class="flex-column nav">
+                                    <li class="nav-item {% if 'master-selection-customer_class' in segment %} active {% endif %}">
+                                        <a class="nav-link" href="{% url 'setup_customer_class' %}">
+                                            <span class="sidebar-text">Customer Class</span>
                                         </a>
                                     </li>
                                 </ul>

@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from icecream import ic
 
 from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxStructure, SalesRep, Area, \
-    ManufacturerArea, ManufacturerRep, Carriers
+    ManufacturerArea, ManufacturerRep, Carriers, Units, Departments, Division, DiscountClass
 from django import forms
 from .models import Receipt, ReceiptProduct, Manufacturer, Product
 from django.db import transaction
@@ -562,6 +562,34 @@ class CarrierForm(forms.ModelForm):
             'fax': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter FAX'}),
             'state_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter State Name'}),
             'city': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter City'}),
+        }
+
+
+class GeneralSelectionListForm(forms.Form):
+    name = forms.CharField(max_length=30,required=True,widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Name', 'id': 'name_form'}))
+    sh_name = forms.CharField(max_length=10,required=True,widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Short Name', 'id':'sh_name_form'}))
+    remarks = forms.CharField(max_length=255,required=False,widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter Remarks', 'id':'address-form'}))
+
+    def __init__(self,*args,**kwargs):
+        self.model = kwargs.pop('model',None)
+        super().__init__(*args,**kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.model and self.model.objects.filter(name=cleaned_data['name']):
+            raise ValidationError(f'Name {cleaned_data['name']} already exists')
+        return cleaned_data
+
+class DivisionForm(forms.ModelForm):
+    class Meta:
+        model = Division
+        fields = '__all__'
+        widgets = {
+            'name': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Enter the Name', 'id': 'name_form'}),
+            'sh_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
+            'division_id': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
+            'customer': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
         }
 
 

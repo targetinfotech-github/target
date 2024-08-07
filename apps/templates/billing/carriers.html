@@ -10,18 +10,18 @@
                 <th scope="col">Name</th>
                 <th scope="col">Sh Name</th>
                 <th scope="col">Pin Code</th>
-                <th scope="col">Status</th>
+                <th scope="col">E Way ID</th>
             </tr>
             </thead>
             <tbody>
-            {% for rep in data %}
-                <tr id="row-{{ rep.id }}"
-                    onclick="selectList('{{ rep.id }}')">
+            {% for carrier in data %}
+                <tr id="row-{{ carrier.id }}"
+                    onclick="selectList('{{ carrier.id }}')">
                     <th scope="row">{{ forloop.counter }}</th>
-                    <td>{{ rep.name }}</td>
-                    <td>{{ rep.sh_name }}</td>
-                    <td>{{ rep.pin_code }}</td>
-                    <td>{{ rep.area_status }}</td>
+                    <td>{{ carrier.name }}</td>
+                    <td>{{ carrier.sh_name }}</td>
+                    <td>{{ carrier.pin_code }}</td>
+                    <td>{{ carrier.e_way_id }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -31,7 +31,7 @@
 {% endblock %}
 
 {% block modal_post_request %}
-    <form method="post" action="{% url 'get_area_modal' %}">
+    <form method="post" action="{% url 'get_carriers_modal' %}">
         {% csrf_token %}
         <div class="modal-footer">
             <a href="{% url create_url %}">
@@ -68,13 +68,13 @@
             <!-- Item -->
             <tbody>
 
-            {% for rep in data %}
-                <tr id="row-{{ rep.id }}">
+            {% for carrier in data %}
+                <tr id="row-{{ carrier.id }}">
                     <th scope="row">{{ forloop.counter }}</th>
-                    <td><a href="{% url update_url rep.id %}">{{ rep.name }}</a></td>
-                    <td>{{ rep.sh_name }}</td>
-                    <td>{{ rep.pin_code }}</td>
-                    <td>{{ rep.area_status }}</td>
+                    <td><a href="{% url 'update_carriers' carrier.id %}">{{ carrier.name }}</a></td>
+                    <td>{{ carrier.sh_name }}</td>
+                    <td>{{ carrier.pin_code }}</td>
+                    <td>{{ carrier.area_status }}</td>
                 </tr>
             {% endfor %}
             </tbody>

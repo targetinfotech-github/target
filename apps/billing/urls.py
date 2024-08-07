@@ -71,15 +71,53 @@ urlpatterns = [
     path('update_area/<int:pk>', views.update_area, name="update_area"),
     path('delete_area/', views.delete_area, name="delete_area"),
 
-    # customer manufacturer
+    # manufacturer area
     path('setup_manufacturer_area/', views.setup_manufacturer_area, name="setup_manufacturer_area"),
+
+    #manufacturer Representative
     path('setup_manufacturer_rep/', views.setup_manufacturer_rep, name="setup_manufacturer_rep"),
+
+    #carriers
     path('setup_carriers/', views.setup_carriers, name="setup_carriers"),
+    path('view_carriers/', views.view_carriers, name="view_carriers"),
+    path('update_carriers/<int:pk>', views.update_carriers, name="update_carriers"),
+    path('delete_carriers/', views.delete_carriers, name="delete_carriers"),
+    path('get_carriers_modal/', views.get_carriers_modal, name="get_carriers_modal"),
 
+    # units
+    path('setup_units/', views.setup_units, name="setup_units"),
+    path('view_units/', views.view_units, name="view_units"),
+    path('update_units/<int:pk>', views.update_units, name="update_units"),
+    path('delete_units/', views.delete_units, name="delete_units"),
+    path('get_units_modal/', views.get_units_modal, name="get_units_modal"),
 
+    #departments
+    path('setup_departments/', views.setup_departments, name="setup_departments"),
+    path('view_departments/', views.view_departments, name="view_departments"),
+    path('update_departments/<int:pk>', views.update_departments, name="update_departments"),
+    path('delete_departments/<int:pk>', views.delete_departments, name="delete_departments"),
+    path('get_departments_modal/', views.get_departments_modal, name="get_departments_modal"),
 
+    #division
+    path('setup_division/', views.setup_division, name="setup_division"),
+    path('view_division/', views.view_division, name="view_division"),
+    path('update_division/<int:pk>', views.update_division, name="update_division"),
+    path('delete_division/', views.delete_division, name="delete_division"),
+    path('get_division_modal/', views.get_division_modal, name="get_division_modal"),
 
+    # discount
+    path('setup_discount_class/', views.setup_discount_class, name="setup_discount_class"),
+    path('view_discount_class/', views.view_discount_class, name="view_discount_class"),
+    path('update_discount_class/<int:pk>', views.update_discount_class, name="update_discount_class"),
+    path('delete_discount_class/', views.delete_discount_class, name="delete_discount_class"),
+    path('get_discount_class_modal/', views.get_discount_class_modal, name="get_discount_class_modal"),
 
+    #customer class
+    path('setup_customer_class/', views.setup_customer_class, name="setup_customer_class"),
+    path('view_customer_class/', views.view_customer_class, name="view_customer_class"),
+    path('update_customer_class/<int:pk>', views.update_customer_class, name="update_customer_class"),
+    path('delete_customer_class/', views.delete_customer_class, name="delete_customer_class"),
+    path('get_customer_class_modal/', views.get_customer_class_modal, name="get_customer_class_modal"),
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 
