@@ -1,0 +1,323 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Master {% endblock %}
+{% load static %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{% static 'assets/css/master.css' %}">
+{% endblock stylesheets %}
+{% load humanize %}
+{% block content %}
+    <h2 class="h4">{{ label }}</h2>
+    <div class="row" style="margin-left: 20px">
+        <div class="col">
+            {% if flag != 'create' %}
+                <a href="{% url create_url %}">
+                    <button class="btn btn-sm btn-info" type="button">Create</button>
+                </a>
+            {% endif %}
+            {% if data %}
+                <a href="{% url modal_url %}">
+                    <button class="btn btn-sm btn-tertiary" type="button">Update</button>
+                </a>
+                {% if flag != 'view' %}
+                    <a href="{% url view_url chosen_method %}">
+                        <button class="btn btn-sm btn-success" type="button">View</button>
+                    </a>
+                {% endif %}
+                <a href="{% url delete_url %}">
+                    <button class="btn btn-sm btn-danger" type="button">Delete</button>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="d-flex justify-content-center">
+                <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <hr class="basic-line">
+    {% if flag != 'update' %}
+    <div class='payment_method_get_form'>
+        <form method="GET" id="get_form">
+            <div class="form-group" style="display: inline-flex">
+                <label for="form_select" style="padding-right: 20px">Payment Method:</label>
+                <select name="payment_method" onchange="get_form_submit()" id="form_select" class="form-control"
+                        required>
+                    <option value="bank" {% if chosen_method == 'bank' %} selected{% endif %}>Sales
+                        Bank
+                    </option>
+                    <option value="payment_mode" {% if chosen_method == 'payment_mode' %} selected{% endif %}>
+                        Payment Mode
+                    </option>
+                </select>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+    <hr class="basic-line">
+    {% if flag == 'modal'  or flag == 'delete' %}
+        {% if data %}
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+                            <div class="table-responsive">
+                                <table class="table table-centered table-nowrap mb-0 rounded">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Sh Name</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for unit in data %}
+                                        <tr id="row-{{ unit.id }}"
+                                            onclick="selectList('{{ unit.id }}')">
+                                            <th scope="row">{{ forloop.counter }}</th>
+                                            <td>{{ unit.name }}</td>
+                                            <td>{{ unit.sh_name }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                    <!-- End of Item -->
+                                </table>
+                            </div>
+                            {% if master_data %}
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination">
+                                        <li class="page-item">
+                                            <a class="page-link" href="?{{ input_name }}={{ query }}&page=1"
+                                               aria-label="First">
+                                                <span aria-hidden="true">&laquo;</span>
+                                                <span class="sr-only">First</span>
+                                            </a>
+                                        </li>
+                                        {% if page_obj.has_previous %}
+                                            <li class="page-item"><a class="page-link"
+                                                                     href="?{{ input_name }}={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                                            </li>
+                                        {% endif %}
+                                        <li class="page-item active"><a class="page-link"
+                                                                        href="#">{{ page_obj.number }}</a>
+                                        </li>
+                                        {% if page_obj.has_next %}
+                                            <li class="page-item"><a class="page-link"
+                                                                     href="?{{ input_name }}={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                                            </li>
+                                        {% endif %}
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="?{{ input_name }}={{ query }}&page={{ page_obj.paginator.num_pages }}"
+                                               aria-label="Last">
+                                                <span aria-hidden="true">&raquo;</span>
+                                                <span class="sr-only">Last</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            {% endif %}
+
+                        </div>
+                        <form method="post" action="{% url 'get_units_modal' %}">
+                            {% csrf_token %}
+                            <div class="modal-footer">
+                                <a href="{% url create_url %}">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </a>
+                                {% if flag == 'modal' %}
+                                    <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
+                                            name="submit_selected_record" value="" style="display: flex">Update
+                                    </button>
+                                {% endif %}
+                                {% if flag == 'delete' %}
+                                    <button type="submit" class="btn btn-danger" id="delete_selected_record"
+                                            name="delete_selected_record" value="" style="display: flex">Delete
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+    {% if flag == 'view' and data %}
+
+        <div class="card border-0 shadow mb-4">
+            <div class="card-body">
+
+
+                <div class="table-responsive">
+                    <table class="table table-centered table-nowrap mb-0 rounded">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Sh Name</th>
+                        </tr>
+                        </thead>
+                        <!-- Item -->
+                        <tbody>
+
+                        {% for unit in data %}
+                            <tr id="row-{{ unit.id }}">
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td><a href="{% url update_url unit.id %}">{{ unit.name }}</a></td>
+                                <td>{{ unit.sh_name }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if data %}
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item">
+                                <a class="page-link" href="?{{ input_name }}={{ query }}&page=1" aria-label="First">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">First</span>
+                                </a>
+                            </li>
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?{{ input_name }}={{ query }}&page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+                                </li>
+                            {% endif %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ page_obj.number }}</a></li>
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link"
+                                                         href="?{{ input_name }}={{ query }}&page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+                                </li>
+                            {% endif %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="?{{ input_name }}={{ query }}&page={{ page_obj.paginator.num_pages }}"
+                                   aria-label="Last">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Last</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %}
+                {#                    {% include 'billing/common_pagination.html' with query=query page_location='manufacturer_details' page_obj=page_obj %}#}
+
+            </div>
+        </div>
+
+    {% endif %}
+
+
+    {% if flag == 'create' or flag == 'update' %}
+
+
+        {% include 'billing/form_errors.html' with form=form %}
+
+        <div class="container">
+            <form method="post">
+                {% csrf_token %}
+
+                {% if chosen_method == 'bank' %}
+                    <div class="row">
+                        <div class="col-md-6 col-lg-6 col-sm-8">
+                            <div class="row justify-content-between">
+                                <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                                    <div class="form-element">
+                                        <label class="form-label" style="min-width: 4.3vw"
+                                               for="{{ form.name.id_for_label }}">{{ form.name.label }}:</label>
+                                        {{ form.name }}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="row">
+                        <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                            <div class="form-element">
+                                <label class="form-label" style="min-width: 4.3vw"
+                                       for="{{ form.name.id_for_label }}">{{ form.name.label }}:</label>
+                                {{ form.name }}
+                            </div>
+                        </div>
+                        <div class="col-lg-auto col-md-auto">
+                            <div class="form-element" style="gap: 0;margin: 0;padding:0">
+                                <label class="form-label" style="min-width: 3.2vw"
+                                       for="{{ form.type_id.id_for_label }}">{{ form.type_id.label }}:</label>
+                                <span class="form-items">
+                                    {{ form.type_id }}
+                                        </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-auto col-md-auto">
+                            <div class="form-element" style="gap: 0;margin: 0;padding:0">
+                                <label class="form-label" style="min-width: 3.2vw"
+                                       for="{{ form.account_link.id_for_label }}">{{ form.account_link.label }}:</label>
+                                <span class="form-items">
+                                    {{ form.account_link }}
+                                        </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-auto col-md-auto">
+                            <div class="form-element" style="gap: 0;margin: 0;padding:0">
+                                <label class="form-label"
+                                       for="{{ form.domination_breakup.id_for_label }}">{{ form.domination_breakup.label }}:</label>
+                                <span class="form-items">
+                                    {{ form.domination_breakup }}
+                                        </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                            <div class="form-element">
+                                <label class="form-label" style="min-width: 4.3vw"
+                                       for="{{ form.payment_mode.id_for_label }}">{{ form.payment_mode.label }}:</label>
+                                {{ form.payment_mode }}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="post_form" style="padding: 10px">
+                    <div class="row" style="justify-content: center">
+                        <div class="col-auto">
+                            <button type="submit" name="payment_method_submit" value='{{ chosen_method }}'
+                                    class="btn btn-primary">Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+
+
+    {% endif %}
+{% endblock %}
+{% block javascripts %}
+    <script src="{% static 'assets/js/selection_list.js' %}"></script>
+
+    <script>
+        save_form = document.getElementById('form_submit');
+
+
+        save_form.addEventListener('click', function (event) {
+            var confirmation = confirm('Are you sure you want to create this record?');
+            if (!confirmation) {
+                event.preventDefault();
+            }
+        });
+
+    </script>
+{% endblock javascripts %}

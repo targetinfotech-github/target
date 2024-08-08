@@ -2192,30 +2192,30 @@ def get_uom_modal(request):
 @login_required(login_url="/login/")
 @measure_execution_time
 def setup_brand_name(request):
-    # try:
-    data = BrandName.objects.exists()
-    if data:
-        brand = BrandName.objects.order_by('-id').first()
-        form = GeneralSelectionListForm(initial={'brand_code': brand.brand_code})
-    else:
-        form = GeneralSelectionListForm(initial={'brand_code': 1})
-    if request.method == 'POST':
-        form = GeneralSelectionListForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data.get('name', '')
-            sh_name = form.cleaned_data.get('sh_name', '')
-            brand_code = form.cleaned_data.get('brand_code', '')
-            brand_name = BrandName.objects.create(name=name, sh_name=sh_name,brand_code=brand_code)
-            messages.success(request,f'Brand {brand_name.name} created successfully')
-            return redirect('setup_brand_name')
-    context_obj = SetupContext(model_search='brand_name', operation='create',segment='master-selection-brand_name',
-                               form=form,data=data,label='Setup Brand')
-    context = context_obj.get_selection_list_context()
-    return render(request, 'billing/brand_name.html', context=context)
-    # except template.TemplateDoesNotExist:
-    #     return render(request, 'billing/page-404.html')
-    # except:
-    #     return render(request, 'billing/page-500.html')
+    try:
+        data = BrandName.objects.exists()
+        if data:
+            brand = BrandName.objects.order_by('-id').first()
+            form = GeneralSelectionListForm(initial={'brand_code': brand.brand_code})
+        else:
+            form = GeneralSelectionListForm(initial={'brand_code': 1})
+        if request.method == 'POST':
+            form = GeneralSelectionListForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data.get('name', '')
+                sh_name = form.cleaned_data.get('sh_name', '')
+                brand_code = form.cleaned_data.get('brand_code', '')
+                brand_name = BrandName.objects.create(name=name, sh_name=sh_name,brand_code=brand_code)
+                messages.success(request,f'Brand {brand_name.name} created successfully')
+                return redirect('setup_brand_name')
+        context_obj = SetupContext(model_search='brand_name', operation='create',segment='master-selection-brand_name',
+                                   form=form,data=data,label='Setup Brand')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/brand_name.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
 
 @login_required(login_url="/login/")
 @measure_execution_time
@@ -2305,4 +2305,137 @@ def get_brand_name_modal(request):
         return render(request, 'billing/page-500.html')
 
 
+@login_required(login_url="/login/")
+@measure_execution_time
+def setup_payment_method(request):
+    # try:
+    # data = PaymentMethod.objects.exists()
+    payment_method = request.GET.get('payment_method','')
+    chosen_method = 'bank'
+    if payment_method:
+        chosen_method = payment_method
+    if chosen_method == 'bank':
+        data = BankDetails.objects.exists()
+        form = BankDetailsForm()
+    else:
+        data = PaymentDetails.objects.exists()
+        form = PaymentDetailsForm()
+    if request.method == 'POST':
+        payment_method_submit = request.POST.get('payment_method_submit','')
+        if payment_method_submit:
+            ic(payment_method_submit)
+            if payment_method_submit == 'bank':
+                form = BankDetailsForm(request.POST)
+            else:
+                form = PaymentDetailsForm(request.POST)
+            if form.is_valid():
+                details = form.save()
+                messages.success(request,f'{details.name} created successfully')
+                ic(details.name)
+                return redirect('setup_payment_method')
+        else:
+            messages.error(request,'Kindly resubmit the Payment Method')
+    context_obj = SetupContext(data=data,model_search='payment_method', chosen_method=chosen_method,operation='create',segment='master-selection-payment_method',
+                               form=form,label='Setup Payment Method')
+    context = context_obj.get_selection_list_context()
+    return render(request, 'billing/payment_method.html', context=context)
+    # except template.TemplateDoesNotExist:
+    #     return render(request, 'billing/page-404.html')
+    # except:
+    #     return render(request, 'billing/page-500.html')
 
+@login_required(login_url="/login/")
+@measure_execution_time
+def view_payment_method(request,chosen_method):
+    try:
+        payment_method = request.GET.get('payment_method', '')
+        if payment_method:
+            chosen_method = payment_method
+        if chosen_method == 'bank':
+            data = BankDetails.objects.values().order_by('-id')
+        else:
+            data = PaymentDetails.objects.values().order_by('-id')
+        if not data:
+            messages.info(request,f'{chosen_method} record not created!')
+        page_obj = pagination(request, data)
+        context_obj = SetupContext(model_search='payment_method',chosen_method=chosen_method, operation='view', segment='master-selection-payment_method',
+                                   page_obj=page_obj, data=data, label='View Payment Method')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/payment_method.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def update_payment_method(request,pk):
+    try:
+        data = BrandName.objects.get(id=pk)
+        form = GeneralSelectionListForm(initial={'name':data.name,'sh_name':data.sh_name,'brand_code':data.brand_code})
+        if request.method == 'POST':
+            form = GeneralSelectionListForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data.get('name', '')
+                sh_name = form.cleaned_data.get('sh_name', '')
+                data.name = name
+                data.sh_name = sh_name
+                data.save()
+                messages.success(request,f'Payment {data.name} is updated Successfully.')
+                return redirect('setup_payment_method')
+        context_obj = SetupContext(model_search='payment_method', operation='update', segment='master-selection-payment_method',
+                                   form=form, data=data, label='Update Payment Method')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/payment_method.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def delete_payment_method(request):
+    try:
+        # data = PaymentMethod.objects.values().order_by('-id')
+        data = 0
+        page_obj = pagination(request, data)
+        context_obj = SetupContext(model_search='payment_method', operation='delete', page_obj=page_obj,
+                                   segment='master-selection-payment_method',
+                                   data=data, label='Delete Payment Method')
+        context = context_obj.get_selection_list_context()
+        if not data:
+            messages.info(request, 'Records not found')
+        return render(request, 'billing/payment_method.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def get_payment_method_modal(request):
+    try:
+        data = BrandName.objects.values().order_by('-id')
+        if request.method == 'POST':
+            if 'submit_selected_record' in request.POST:
+                id = request.POST['submit_selected_record']
+                return redirect('update_payment_method', int(id))
+            elif 'delete_selected_record' in request.POST:
+                id = request.POST['delete_selected_record']
+                model = BrandName.objects.get(id=id)
+                delete_models(request, model, name=model.name)
+            else:
+                messages.info(request, 'No operation performed.')
+            return redirect('setup_payment_method')
+        page_obj = pagination(request, data)
+        context_obj = SetupContext(model_search='payment_method', operation='modal', page_obj=page_obj,
+                                   segment='master-selection-payment_method',
+                                   data=data, label='Update Payment Method')
+        context = context_obj.get_selection_list_context()
+        if not data:
+            messages.info(request, 'Records not found')
+        return render(request, 'billing/payment_method.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')

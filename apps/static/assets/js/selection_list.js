@@ -7,6 +7,17 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     myModal.show();
 });
+
+function get_form_submit() {
+    const form = document.getElementById('get_form');
+    if (form) {
+        form.submit();
+    }
+    else{
+        alert('Unable to fetch Payment Method');
+    }
+}
+
 var input_record = document.getElementById('submit_selected_record');
 var delete_record = document.getElementById('delete_selected_record');
 var selectedRowId = null;
@@ -18,7 +29,6 @@ if (delete_record) {
     delete_record.style.display = 'none';
 
 }
-
 
 
 function selectRemovableList(id, related) {
@@ -70,8 +80,6 @@ function selectRemovableList(id, related) {
         selectedRowId = id;
     }
 }
-
-
 
 
 function selectList(id) {

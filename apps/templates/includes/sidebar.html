@@ -251,6 +251,16 @@
                                     </li>
                                 </ul>
                             </div>
+                            <div class="multi-level collapse {% if 'master-selection-' in segment %} show {% endif %}"
+                                 role="list" id="submenu-app" aria-expanded="false">
+                                <ul class="flex-column nav">
+                                    <li class="nav-item {% if 'master-selection-payment_method' in segment %} active {% endif %}">
+                                        <a class="nav-link" href="{% url 'setup_payment_method' %}">
+                                            <span class="sidebar-text">Payment Method</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                     </ul>
                 </div>

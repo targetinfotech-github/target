@@ -252,6 +252,30 @@ class BrandName(models.Model):
         db_table = 'BrandName'
 
 
+class BankDetails(models.Model):
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    class Meta:
+        ordering = ['-id',]
+        db_table = 'BankDetails'
+
+class PaymentDetails(models.Model):
+    DOMINATION_BREAKUP = [('yes','YES'),
+                          ('no','NO')]
+    PAYMENT_MODE = [('cards_coupon','Cards/Coupons'),
+                    ('cash','Cash'),
+                    ('credit','Credit'),
+                    ('others','Others')]
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    domination_breakup = models.CharField(choices=DOMINATION_BREAKUP, max_length=5, null=True, blank=True)
+    type_id = models.PositiveSmallIntegerField(null=True,blank=True)
+    payment_mode = models.CharField(choices=PAYMENT_MODE, max_length=20, null=True, blank=True)
+    account_link = models.CharField(max_length=10, null=True, blank=True)# change this when account is created.
+
+    class Meta:
+        ordering = ['-id',]
+        db_table = 'PaymentDetails'
+
+
 class ProductGroup(models.Model):
     CONSOLIDATION_STATUS = [('yes','Yes'),
                             ('no','No')]
@@ -513,7 +537,6 @@ class Customer(models.Model):
             self.location.delete()
 
 
-
 class ManufacturerArea(models.Model):
     id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     manufacturer = models.ForeignKey(Manufacturer,null=True,blank=True, on_delete=models.CASCADE, related_name='manufacturer_area')
@@ -532,10 +555,12 @@ class ManufacturerRep(models.Model):
     sales_rep = models.ForeignKey(SalesRep, on_delete=models.CASCADE, null=True,blank=True, related_name='manufacturer_rep')
     customer = models.ForeignKey(Customer, null=True, blank=True, on_delete=models.CASCADE
                                           , related_name='manufacturer_rep')
+
     class Meta:
         unique_together = ('customer','manufacturer', 'sales_rep')
         db_table = 'ManufacturerRep'
         ordering = ['-id',]
+
     def __str__(self):
         return f'{self.customer.customer_name}-{self.manufacturer.name}'
 

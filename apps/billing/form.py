@@ -11,7 +11,8 @@ from django.core.exceptions import ValidationError
 from icecream import ic
 
 from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxStructure, SalesRep, Area, \
-    ManufacturerArea, ManufacturerRep, Carriers, Units, Departments, Division, DiscountClass, CustomerClass
+    ManufacturerArea, ManufacturerRep, Carriers, Units, Departments, Division, DiscountClass, CustomerClass, \
+    BankDetails, PaymentDetails
 from django import forms
 from .models import Receipt, ReceiptProduct, Manufacturer, Product
 from django.db import transaction
@@ -589,6 +590,7 @@ class GeneralSelectionListForm(forms.Form):
             raise ValidationError(f'Name {cleaned_data['name']} already exists')
         return cleaned_data
 
+
 class DivisionForm(forms.ModelForm):
     class Meta:
         model = Division
@@ -599,6 +601,29 @@ class DivisionForm(forms.ModelForm):
             'sh_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
             'division_id': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
             'customer': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Enter the short name'}),
+        }
+
+class BankDetailsForm(forms.ModelForm):
+    class Meta:
+        model = BankDetails
+        fields = '__all__'
+        widgets = {
+            'name': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Enter the Name', 'id': 'name_form'}),
+        }
+
+
+class PaymentDetailsForm(forms.ModelForm):
+    class Meta:
+        model = PaymentDetails
+        fields = '__all__'
+        widgets = {
+            'name': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Enter the Name', 'id': 'name_form'}),
+            'type_id': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Type ID'}),
+            'account_link': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Acc Link'}),
+            'domination_breakup': forms.Select(attrs={'class': 'form-control'}),
+            'payment_mode': forms.Select(attrs={'class': 'form-control'}),
         }
 
 
