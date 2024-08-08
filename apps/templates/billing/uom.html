@@ -1,0 +1,116 @@
+{% extends 'billing/selection_list_extended.html' %}
+
+
+{% block modal_display %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Sh Name</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for uom in data %}
+                <tr id="row-{{ uom.id }}"
+                    onclick="selectList('{{ uom.id }}')">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ uom.name }}</td>
+                    <td>{{ uom.sh_name }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <!-- End of Item -->
+        </table>
+    </div>
+{% endblock %}
+
+{% block modal_post_request %}
+    <form method="post" action="{% url 'get_uom_modal' %}">
+        {% csrf_token %}
+        <div class="modal-footer">
+            <a href="{% url create_url %}">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </a>
+            {% if flag == 'modal' %}
+                <button type="submit" class="btn btn-tertiary" id="submit_selected_record"
+                        name="submit_selected_record" value="" style="display: flex">Update
+                </button>
+            {% endif %}
+            {% if flag == 'delete' %}
+                <button type="submit" class="btn btn-danger" id="delete_selected_record"
+                        name="delete_selected_record" value="" style="display: flex">Delete
+                </button>
+            {% endif %}
+        </div>
+    </form>
+{% endblock modal_post_request %}
+
+
+
+{% block master-view %}
+    <div class="table-responsive">
+        <table class="table table-centered table-nowrap mb-0 rounded">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Sh Name</th>
+            </tr>
+            </thead>
+            <!-- Item -->
+            <tbody>
+
+            {% for uom in data %}
+                <tr id="row-{{ uom.id }}">
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td><a href="{% url 'update_uom' uom.id %}">{{ uom.name }}</a></td>
+                    <td>{{ uom.sh_name }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+
+{% block create_form %}
+
+    {% if flag == 'create' or flag == 'update' %}
+        <form method="post">
+            {% csrf_token %}
+            {% include 'billing/form_errors.html' with form=form %}
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-auto col-md-auto" style="gap: 0;margin: 0;padding:0">
+                        <div class="form-element">
+                            <label class="form-label" style="min-width: 4.3vw"
+                                   for="{{ form.name.id_for_label }}">{{ form.name.label }}:</label>
+                            {{ form.name }}
+                        </div>
+                    </div>
+                    <div class="col-lg-auto col-md-auto">
+                        <div class="form-element" style="margin-right: 2vw">
+                            <label class="form-label" style="min-width: 3.2vw"
+                                   for="{{ form.sh_name.id_for_label }}">{{ form.sh_name.label }}:</label>
+                            <span class="form-items">
+                                    {{ form.sh_name }}
+                                        </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+                <div class="post_form" style="padding: 10px">
+                    <div class="row" style="justify-content: center">
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
+                </div>
+        </form>
+    {% endif %}
+{% endblock %}

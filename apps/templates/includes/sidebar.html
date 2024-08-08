@@ -231,6 +231,26 @@
                                     </li>
                                 </ul>
                             </div>
+                            <div class="multi-level collapse {% if 'master-selection-' in segment %} show {% endif %}"
+                                 role="list" id="submenu-app" aria-expanded="false">
+                                <ul class="flex-column nav">
+                                    <li class="nav-item {% if 'master-selection-uom' in segment %} active {% endif %}">
+                                        <a class="nav-link" href="{% url 'setup_uom' %}">
+                                            <span class="sidebar-text">UOM</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="multi-level collapse {% if 'master-selection-' in segment %} show {% endif %}"
+                                 role="list" id="submenu-app" aria-expanded="false">
+                                <ul class="flex-column nav">
+                                    <li class="nav-item {% if 'master-selection-brand_name' in segment %} active {% endif %}">
+                                        <a class="nav-link" href="{% url 'setup_brand_name' %}">
+                                            <span class="sidebar-text">Brand</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
                     </ul>
                 </div>

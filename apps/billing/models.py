@@ -36,6 +36,69 @@ def validate_gstin(value):
         )
 
 # Create your models here.
+
+
+
+
+#add this manager after creation of company profile- no need for give select_related on every queryset
+#give BaseManager for objects in model
+# so that i can use objects manager and by default it fetches select_related..
+class BaseManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related('company_profile')
+
+
+
+class GroupManager(models.Manager):
+    def get_or_create_general_group(self):
+        group, created = self.get_or_create(
+            group_name__icontains='General Group',
+            defaults={'group_name': 'General Group'}
+        )
+        return group
+
+
+class ManufacturerManager(models.Manager):
+    def get_or_create_general_manufacturer(self):
+        manufacturer, created = self.get_or_create(
+            name__icontains='General Manufacturer',
+            defaults={'name': 'General Manufacturer'}
+        )
+        return manufacturer
+
+
+class ModelCreationManager(models.Manager):
+    def get_or_create_model(self):
+        model, created = self.get_or_create(
+            name='AUTO',
+            defaults={'name': 'AUTO','sh_name':'auto'}
+        )
+        return model
+
+
+class SalesRep(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    REP_TYPE_ID = [('r','R'),
+                ('d','D'),
+                ('s','S')]
+    objects = ModelCreationManager()
+
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=30, null=True, blank=True)
+    rep_indent = models.CharField(max_length=30, null=True, blank=True)
+    rep_type_id = models.CharField(max_length=25,choices=REP_TYPE_ID,null=True,blank=True)
+    address = models.TextField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=100)
+    postal_code = models.PositiveIntegerField(null=True, blank=True)
+    state_name = models.CharField(max_length=50, null=True, blank=True)
+    telephone = models.CharField(max_length=15, null=True, blank=True)
+    fax = models.CharField(max_length=20, null=True, blank=True)
+    mobile_number = models.CharField(max_length=15, null=True, blank=True, verbose_name='Mb No')
+
+    def __str__(self):
+        return f'{self.name}'
+
+
 class CustomUser(AbstractUser):
     class Meta:
         db_table = 'CustomUser'
@@ -72,7 +135,9 @@ class CompanyProfile(models.Model):
     def __str__(self):
         return str(self.company_name)
 
-
+    class Meta:
+        ordering=  ['-id',]
+        db_table = 'CompanyProfile'
 class Account(models.Model):
     company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE, related_name='accounts')
     account_year_from = models.DateField(verbose_name="Account Year From", default=default_account_year_from)
@@ -81,7 +146,9 @@ class Account(models.Model):
 
     def __str__(self):
         return f"Account for {self.company.company_name} from {self.account_year_from} to {self.account_year_upto}"
-
+    class Meta:
+        ordering=  ['-id',]
+        db_table = 'Account'
 class Location(models.Model):
     SALE_STATE_LIST = [('within_state', 'Within State'),
                        ('outside_state', 'Outside State'),
@@ -99,22 +166,91 @@ class Location(models.Model):
         ordering = ['-id']
         db_table = 'Location'
 
-#add this manager after creation of company profile- no need for give select_related on every queryset
-#give BaseManager for objects in model
-# so that i can use objects manager and by default it fetches select_related..
-class BaseManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().select_related('company_profile')
 
 
+class TaxStructure(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    TAX_TYPE = [('sales_taxes','Sales Taxes'),
+                ('purchase_taxes','Purchase Taxes')]
 
-class GroupManager(models.Manager):
-    def get_or_create_general_group(self):
-        group, created = self.get_or_create(
-            group_name__icontains='General Group',
-            defaults={'group_name': 'General Group'}
-        )
-        return group
+    tax_type = models.CharField(max_length=25,choices=TAX_TYPE,null=True,blank=True)
+    tax_id = models.CharField(max_length=20, blank=True,null=True, unique=True)
+    sgst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
+    cgst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
+    igst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
+    description = models.CharField(max_length=50, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.tax_type}-{self.tax_id}'
+
+    class Meta:
+        ordering=  ['-id',]
+        db_table = 'TaxStructure'
+class Carriers(models.Model):
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=30, null=True, blank=True)
+    address = models.TextField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
+    postal_code = models.PositiveIntegerField(null=True, blank=True)
+    state_name = models.CharField(max_length=50, null=True, blank=True)
+    telephone = models.CharField(max_length=15, null=True, blank=True)
+    fax = models.CharField(max_length=20, null=True, blank=True)
+    mobile_number = models.CharField(max_length=15, null=True, blank=True, verbose_name='Mb No')
+    gstin = models.CharField(max_length=15, validators=[validate_gstin], null=True, blank=True)
+    e_way_id = models.CharField(max_length=12 ,null=True, blank=True)
+    regn_no = models.CharField(max_length=15, null=True, blank=True)
+    remarks = models.TextField(max_length=100, null=True, blank=True)
+    class Meta:
+        ordering=  ['-id',]
+        db_table = 'Carriers'
+
+class Units(models.Model):
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=10, null=True, blank=True)
+    class Meta:
+        ordering=  ['-id',]
+        db_table = 'Units'
+class Departments(models.Model):
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=10, null=True, blank=True)
+
+    class Meta:
+        ordering=  ['-id',]
+        db_table = 'Departments'
+class DiscountClass(models.Model):
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=10, null=True, blank=True)
+
+    class Meta:
+        ordering=  ['-id',]
+        db_table = 'DiscountClass'
+
+class CustomerClass(models.Model):
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=10, null=True, blank=True)
+    remarks = models.TextField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        ordering = ['-id',]
+        db_table = 'CustomerClass'
+
+class UOM(models.Model):
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=10, null=True, blank=True)
+
+    class Meta:
+        ordering=  ['-id',]
+        db_table = 'UOM'
+
+class BrandName(models.Model):
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=10, null=True, blank=True)
+    brand_code = models.PositiveSmallIntegerField(null=True,blank=True)
+
+    class Meta:
+        ordering = ['-id',]
+        db_table = 'BrandName'
+
 
 class ProductGroup(models.Model):
     CONSOLIDATION_STATUS = [('yes','Yes'),
@@ -145,28 +281,22 @@ class ProductGroup(models.Model):
             self.print_name = self.group_name
         super().save(*args, **kwargs)
 
+class Area(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    STATUS = [('active','Active'),
+                ('inactive','Inactive')]
+    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
+    sh_name = models.CharField(max_length=30, null=True, blank=True)
+    pin_code = models.PositiveIntegerField(null=True, blank=True)
+    area_status = models.CharField(max_length=20,null=True,blank=True,choices=STATUS)
+    objects = ModelCreationManager()
+    def __str__(self):
+        # return f'{self.name}-{self.company}'
+        return f'{self.name}'
 
-class ManufacturerManager(models.Manager):
-    def get_or_create_general_manufacturer(self):
-        manufacturer, created = self.get_or_create(
-            name__icontains='General Manufacturer',
-            defaults={'name': 'General Manufacturer'}
-        )
-        return manufacturer
-
-
-class ModelCreationManager(models.Manager):
-    def get_or_create_model(self):
-        model, created = self.get_or_create(
-            name='AUTO',
-            defaults={'name': 'AUTO','sh_name':'auto'}
-        )
-        return model
-
-
-
-
-
+    class Meta:
+        ordering=  ['-id',]
+        db_table = 'Area'
 
 
 class Manufacturer(models.Model):
@@ -193,7 +323,6 @@ class Manufacturer(models.Model):
                  ('composite_dealer','Composite Dealer'),
                  ('unregistered_dealer','Unregistered Dealer')]
 
-
     STANDARD_FORM = [('form_c','Form C'),
                      ('form_d','Form D'),
                      ('form_37','Form 37')]
@@ -217,15 +346,15 @@ class Manufacturer(models.Model):
     purchase_type = models.CharField(choices=PURCHASE_TYPE, max_length=30,null=True,blank=True)
     tin = models.CharField(max_length=15,null=True,blank=True)
     gtax_type = models.CharField(choices=GTAX_TYPE, max_length=30,default='gst_registered',null=True,blank=True)
-    class_name = models.CharField(max_length=20, null=True, blank=True)
+    customer_class = models.ForeignKey(CustomerClass, on_delete=models.PROTECT, max_length=20, null=True, blank=True)
     contact2 = models.CharField(max_length=15, null=True, blank=True)
     telephone = models.CharField(max_length=15, null=True, blank=True)
     mobile_number = models.CharField(max_length=15, null=True, blank=True, verbose_name='Mb No')
-    area = models.CharField(max_length=15, null=True, blank=True, verbose_name='Area')
+    area = models.ForeignKey(Area,on_delete=models.PROTECT, null=True, blank=True)
     fax = models.CharField(max_length=20, null=True, blank=True)
     std_form = models.CharField(choices=STANDARD_FORM, max_length=50, null=True, blank=True)
     formIR = models.CharField(choices=FORM_IR, max_length=50, null=True, blank=True)
-    customer_representative = models.CharField(max_length=15, null=True, blank=True)
+    sales_representative = models.ForeignKey(SalesRep,on_delete=models.PROTECT, null=True, blank=True)
     cst = models.CharField(max_length=15, null=True, blank=True,verbose_name='CST')
     purchase_account = models.CharField(max_length=50, null=True, blank=True)
     invoice_prefix = models.CharField(max_length=5, null=True, blank=True)
@@ -307,42 +436,6 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         self.last_accessed = now()
         super().save(*args, **kwargs)
-
-class SalesRep(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    REP_TYPE_ID = [('r','R'),
-                ('d','D'),
-                ('s','S')]
-    objects = ModelCreationManager()
-
-    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
-    sh_name = models.CharField(max_length=30, null=True, blank=True)
-    rep_indent = models.CharField(max_length=30, null=True, blank=True)
-    rep_type_id = models.CharField(max_length=25,choices=REP_TYPE_ID,null=True,blank=True)
-    address = models.TextField(max_length=255, null=True, blank=True)
-    city = models.CharField(max_length=100)
-    postal_code = models.PositiveIntegerField(null=True, blank=True)
-    state_name = models.CharField(max_length=50, null=True, blank=True)
-    telephone = models.CharField(max_length=15, null=True, blank=True)
-    fax = models.CharField(max_length=20, null=True, blank=True)
-    mobile_number = models.CharField(max_length=15, null=True, blank=True, verbose_name='Mb No')
-
-    def __str__(self):
-        return f'{self.name}'
-
-
-class Area(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    STATUS = [('active','Active'),
-                ('inactive','Inactive')]
-    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
-    sh_name = models.CharField(max_length=30, null=True, blank=True)
-    pin_code = models.PositiveIntegerField(null=True, blank=True)
-    area_status = models.CharField(max_length=20,null=True,blank=True,choices=STATUS)
-    objects = ModelCreationManager()
-    def __str__(self):
-        # return f'{self.name}-{self.company}'
-        return f'{self.name}'
 
 
 class Customer(models.Model):
@@ -441,7 +534,8 @@ class ManufacturerRep(models.Model):
                                           , related_name='manufacturer_rep')
     class Meta:
         unique_together = ('customer','manufacturer', 'sales_rep')
-
+        db_table = 'ManufacturerRep'
+        ordering = ['-id',]
     def __str__(self):
         return f'{self.customer.customer_name}-{self.manufacturer.name}'
 
@@ -510,57 +604,12 @@ class ReceiptProduct(models.Model):
     #     self.full_clean()
     #     super().save(*args,**kwargs)
 
-
-class TaxStructure(models.Model):
-    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    TAX_TYPE = [('sales_taxes','Sales Taxes'),
-                ('purchase_taxes','Purchase Taxes')]
-
-    tax_type = models.CharField(max_length=25,choices=TAX_TYPE,null=True,blank=True)
-    tax_id = models.CharField(max_length=20, blank=True,null=True, unique=True)
-    sgst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
-    cgst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
-    igst = models.DecimalField(decimal_places=2, max_digits=12, null=True, blank=True)
-    description = models.CharField(max_length=50, null=True, blank=True)
-
-    def __str__(self):
-        return f'{self.tax_type}-{self.tax_id}'
-
-
-class Carriers(models.Model):
-    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
-    sh_name = models.CharField(max_length=30, null=True, blank=True)
-    address = models.TextField(max_length=255, null=True, blank=True)
-    city = models.CharField(max_length=100, null=True, blank=True)
-    postal_code = models.PositiveIntegerField(null=True, blank=True)
-    state_name = models.CharField(max_length=50, null=True, blank=True)
-    telephone = models.CharField(max_length=15, null=True, blank=True)
-    fax = models.CharField(max_length=20, null=True, blank=True)
-    mobile_number = models.CharField(max_length=15, null=True, blank=True, verbose_name='Mb No')
-    gstin = models.CharField(max_length=15, validators=[validate_gstin], null=True, blank=True)
-    e_way_id = models.CharField(max_length=12 ,null=True, blank=True)
-    regn_no = models.CharField(max_length=15, null=True, blank=True)
-    remarks = models.TextField(max_length=100, null=True, blank=True)
-
-class Units(models.Model):
-    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
-    sh_name = models.CharField(max_length=10, null=True, blank=True)
-
-class Departments(models.Model):
-    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
-    sh_name = models.CharField(max_length=10, null=True, blank=True)
-
 class Division(models.Model):
     name = models.CharField(unique=True, max_length=30, null=True, blank=True)
     sh_name = models.CharField(max_length=10, null=True, blank=True)
     division_id = models.PositiveSmallIntegerField(unique=True, null=True, blank=True)
     customer = models.ForeignKey(Customer,on_delete=models.CASCADE, null=True,blank=True)
 
-class DiscountClass(models.Model):
-    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
-    sh_name = models.CharField(max_length=10, null=True, blank=True)
-
-class CustomerClass(models.Model):
-    name = models.CharField(unique=True, max_length=30, null=True, blank=True)
-    sh_name = models.CharField(max_length=10, null=True, blank=True)
-    remarks = models.TextField(max_length=255, null=True, blank=True)
+    class Meta:
+        ordering = ['-id',]
+        db_table = 'Division'

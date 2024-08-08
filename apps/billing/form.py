@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from icecream import ic
 
 from .models import Manufacturer, Product, ProductGroup, Customer, CustomUser, Location, TaxStructure, SalesRep, Area, \
-    ManufacturerArea, ManufacturerRep, Carriers, Units, Departments, Division, DiscountClass
+    ManufacturerArea, ManufacturerRep, Carriers, Units, Departments, Division, DiscountClass, CustomerClass
 from django import forms
 from .models import Receipt, ReceiptProduct, Manufacturer, Product
 from django.db import transaction
@@ -175,15 +175,17 @@ class LocationForm(forms.ModelForm):
 
 
 class ManufacturerForm(forms.ModelForm):
+
     PURCHASE_TYPE = [('within_state', 'Within State'),
                      ('outside_state', 'Outside State'),
                      ('sale_in_transit', 'Sale in Transit'),
                      ('import', 'Import')]
-    customer_representative = forms.CharField(
+
+    sales_representative = forms.ModelChoiceField(
+        SalesRep.objects.exclude(name='AUTO'),
         label='Rep', required=False,
-        widget=forms.TextInput(attrs={
+        widget=forms.Select(attrs={
             'class': 'form-control',
-            'placeholder': 'Enter REP'
         })
     )
     telephone = forms.CharField(
@@ -194,8 +196,10 @@ class ManufacturerForm(forms.ModelForm):
     name = forms.CharField(label='Name', widget=(
         forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the name', 'id': 'name_form'})))
 
-    class_name = forms.CharField(label='Class', required=False,
-                                 widget=(forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Class Name'})))
+    customer_class = forms.ModelChoiceField(
+        queryset=CustomerClass.objects.all(),
+        label='Class', required=False,
+                                 widget=(forms.Select(attrs={'class': 'form-control'})))
 
     purchase_type = forms.ChoiceField(
         choices=PURCHASE_TYPE,
@@ -205,6 +209,11 @@ class ManufacturerForm(forms.ModelForm):
     purchase_account = forms.CharField(label='Purc Acc', required=False, widget=(
         forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Purchase Account'})))
 
+    area = forms.ModelChoiceField(
+        Area.objects.exclude(name='AUTO'),
+        label='Area', required=False,
+        widget=(forms.Select(attrs={'class': 'form-control'}))
+    )
     class Meta:
         model = Manufacturer
         fields = '__all__'
@@ -218,7 +227,6 @@ class ManufacturerForm(forms.ModelForm):
             'mobile_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Mobile Number'}),
             'contact1': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact 1'}),
             'contact2': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact 2'}),
-            'area': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Area'}),
             'tin': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter TIN'}),
             'cst': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter CST'}),
             'fax': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter FAX'}),
@@ -569,6 +577,7 @@ class GeneralSelectionListForm(forms.Form):
     name = forms.CharField(max_length=30,required=True,widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the Name', 'id': 'name_form'}))
     sh_name = forms.CharField(max_length=10,required=True,widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Short Name', 'id':'sh_name_form'}))
     remarks = forms.CharField(max_length=255,required=False,widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter Remarks', 'id':'address-form'}))
+    brand_code = forms.CharField(required=False,widget=forms.TextInput(attrs={'class': 'form-control','readonly':'readonly'}))
 
     def __init__(self,*args,**kwargs):
         self.model = kwargs.pop('model',None)

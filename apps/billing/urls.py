@@ -118,6 +118,20 @@ urlpatterns = [
     path('update_customer_class/<int:pk>', views.update_customer_class, name="update_customer_class"),
     path('delete_customer_class/', views.delete_customer_class, name="delete_customer_class"),
     path('get_customer_class_modal/', views.get_customer_class_modal, name="get_customer_class_modal"),
+
+    # UOM
+    path('setup_uom/', views.setup_uom, name="setup_uom"),
+    path('view_uom/', views.view_uom, name="view_uom"),
+    path('update_uom/<int:pk>', views.update_uom, name="update_uom"),
+    path('delete_uom/', views.delete_uom, name="delete_uom"),
+    path('get_uom_modal/', views.get_uom_modal, name="get_uom_modal"),
+
+    # brand name
+    path('setup_brand_name/', views.setup_brand_name, name="setup_brand_name"),
+    path('view_brand_name/', views.view_brand_name, name="view_brand_name"),
+    path('update_brand_name/<int:pk>', views.update_brand_name, name="update_brand_name"),
+    path('delete_brand_name/', views.delete_brand_name, name="delete_brand_name"),
+    path('get_brand_name_modal/', views.get_brand_name_modal, name="get_brand_name_modal"),
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 

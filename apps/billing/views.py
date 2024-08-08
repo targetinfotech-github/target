@@ -10,7 +10,7 @@ from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import transaction, IntegrityError
-from django.db.models import Count, Q, QuerySet
+from django.db.models import Count, Q, QuerySet, Exists, OuterRef
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import loader
 from django.urls import reverse
@@ -21,7 +21,7 @@ from apps.billing.services.decorators import measure_execution_time
 from apps.billing.form import *
 from django.shortcuts import render, redirect
 from apps.billing.models import Manufacturer, Product, Receipt, ReceiptProduct, ProductGroup, Customer, CustomUser, \
-    Location, TaxStructure, SalesRep, Area, ManufacturerArea, Departments, Division, DiscountClass
+    Location, TaxStructure, SalesRep, Area, ManufacturerArea, Departments, Division, DiscountClass, UOM, BrandName
 import json
 
 # views.py or any module
@@ -295,7 +295,7 @@ def update_manufacturer(request, pk):
         else:
             manufacturer_form = ManufacturerForm(instance=manufacturer_data)
             location_form = LocationForm(instance=location_data)
-        context_obj = SetupContext(model_search='manufacturer', page_obj=manufacturer_data, operation='update',segment='master-product',
+        context_obj = SetupContext(model_search='manufacturer', page_obj=manufacturer_data, operation='update',segment='master-manufacturer',
                                    manufacturer_form=manufacturer_form,location_form=location_form)
         context = context_obj.get_master_context()
 
@@ -316,14 +316,12 @@ def delete_manufacturer(request):
             'id', 'name', 'type', 'sh_name', 'print_name', 'product_count'
         ).order_by('name')
         page_obj = pagination(request, manufacturer_data)
-        context_obj = SetupContext(model_search='manufacturer_modal', page_obj=page_obj, operation='delete',segment='master-product')
+        context_obj = SetupContext(model_search='manufacturer_modal', page_obj=page_obj, operation='delete',segment='master-manufacturer')
         context = context_obj.get_master_context()
 
         if not manufacturer_data:
             messages.info(request, 'Records not found')
-            return render(request, 'billing/manufacturer.html', context=context)
-        else:
-            return render(request, 'billing/manufacturer.html', context=context)
+        return render(request, 'billing/manufacturer.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
     except:
@@ -347,7 +345,7 @@ def view_manufacturer(request):
             manufacturer_data = Manufacturer.objects.all().values('id', 'name', 'print_name', 'sh_name', 'contact1') \
                 .order_by('name')
         page_obj = pagination(request, manufacturer_data)
-        context_obj = SetupContext(model_search='manufacturer', page_obj=page_obj, operation='view',segment='master-product')
+        context_obj = SetupContext(model_search='manufacturer', page_obj=page_obj, operation='view',segment='master-manufacturer')
         context = context_obj.get_master_context()
 
         if not manufacturer_data:
@@ -1166,7 +1164,7 @@ def setup_area(request):
 @measure_execution_time
 def view_area(request):
     try:
-        data = Area.objects.all().exclude(name='AUTO')
+        data = Area.objects.all().exclude(name='AUTO').order_by('-id')
         ic(data)
         page_obj = pagination(request, data)
         context_obj = SetupContext(model_search='area', operation='view', segment='master-selection-area',
@@ -1221,7 +1219,6 @@ def update_area(request,pk):
         form = AreaForm(instance=data)
         if request.method == 'POST':
             form = AreaForm(request.POST, instance=data)
-
             if form.is_valid():
                 form.save()
                 return redirect('setup_area')
@@ -1239,7 +1236,7 @@ def update_area(request,pk):
 @measure_execution_time
 def delete_area(request):
     try:
-        data = Area.objects.values('id', 'name', 'pin_code', 'sh_name','area_status').order_by('name').exclude(name='AUTO')
+        data = Area.objects.values('id', 'name', 'pin_code', 'sh_name','area_status').order_by('-id').exclude(name='AUTO')
         page_obj = pagination(request, data)
         context_obj = SetupContext(model_search='area', operation='delete', page_obj=page_obj,
                                    segment='master-selection-area',
@@ -1248,9 +1245,7 @@ def delete_area(request):
 
         if not data:
             messages.info(request, 'Records not found')
-            return render(request, 'billing/area.html', context=context)
-        else:
-            return render(request, 'billing/area.html', context=context)
+        return render(request, 'billing/area.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
     except:
@@ -1972,15 +1967,15 @@ def get_discount_class_modal(request):
 @measure_execution_time
 def setup_customer_class(request):
     try:
-        data = DiscountClass.objects.exists()
+        data = CustomerClass.objects.exists()
         form = GeneralSelectionListForm()
         if request.method == 'POST':
             form = GeneralSelectionListForm(request.POST)
             if form.is_valid():
                 name = form.cleaned_data.get('name', '')
                 sh_name = form.cleaned_data.get('sh_name', '')
-                discount = DiscountClass.objects.create(name=name, sh_name=sh_name)
-                messages.success(request,f'Customer Class {discount.name} created successfully')
+                customer_class = CustomerClass.objects.create(name=name, sh_name=sh_name)
+                messages.success(request,f'Customer Class {customer_class.name} created successfully')
                 return redirect('setup_customer_class')
         context_obj = SetupContext(model_search='customer_class', operation='create',segment='master-selection-customer_class',
                                    form=form,data=data,label='Setup Customer Class')
@@ -1995,7 +1990,7 @@ def setup_customer_class(request):
 @measure_execution_time
 def view_customer_class(request):
     try:
-        data = DiscountClass.objects.values().order_by('-id')
+        data = CustomerClass.objects.values().order_by('-id')
         page_obj = pagination(request, data)
         context_obj = SetupContext(model_search='customer_class', operation='view', segment='master-selection-customer_class',
                                    page_obj=page_obj, data=data, label='View Customer Class')
@@ -2010,7 +2005,7 @@ def view_customer_class(request):
 @measure_execution_time
 def update_customer_class(request,pk):
     try:
-        data = DiscountClass.objects.get(id=pk)
+        data = CustomerClass.objects.get(id=pk)
         form = GeneralSelectionListForm(initial={'name':data.name,'sh_name':data.sh_name})
         if request.method == 'POST':
             form = GeneralSelectionListForm(request.POST)
@@ -2035,7 +2030,7 @@ def update_customer_class(request,pk):
 @measure_execution_time
 def delete_customer_class(request):
     try:
-        data = DiscountClass.objects.values().order_by('-id')
+        data = CustomerClass.objects.values().order_by('-id')
         page_obj = pagination(request, data)
         context_obj = SetupContext(model_search='customer_class', operation='delete', page_obj=page_obj,
                                    segment='master-selection-customer_class',
@@ -2043,9 +2038,7 @@ def delete_customer_class(request):
         context = context_obj.get_selection_list_context()
         if not data:
             messages.info(request, 'Records not found')
-            return render(request, 'billing/customer_class.html', context=context)
-        else:
-            return render(request, 'billing/customer_class.html', context=context)
+        return render(request, 'billing/customer_class.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
     except:
@@ -2055,19 +2048,18 @@ def delete_customer_class(request):
 @measure_execution_time
 def get_customer_class_modal(request):
     try:
-        data = DiscountClass.objects.values().order_by('-id')
+        data = CustomerClass.objects.values().order_by('-id')
         if request.method == 'POST':
             if 'submit_selected_record' in request.POST:
                 id = request.POST['submit_selected_record']
                 return redirect('update_customer_class', int(id))
             elif 'delete_selected_record' in request.POST:
                 id = request.POST['delete_selected_record']
-                model = DiscountClass.objects.get(id=id)
+                model = CustomerClass.objects.get(id=id)
                 delete_models(request, model, name=model.name)
-                return redirect('setup_customer_class')
             else:
                 messages.info(request, 'No operation performed.')
-                return redirect('setup_customer_class')
+            return redirect('setup_customer_class')
         page_obj = pagination(request, data)
         context_obj = SetupContext(model_search='customer_class', operation='modal', page_obj=page_obj,
                                    segment='master-selection-customer_class',
@@ -2082,4 +2074,235 @@ def get_customer_class_modal(request):
         return render(request, 'billing/page-404.html')
     except:
         return render(request, 'billing/page-500.html')
+
+
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def setup_uom(request):
+    try:
+        data = UOM.objects.exists()
+        form = GeneralSelectionListForm()
+        if request.method == 'POST':
+            form = GeneralSelectionListForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data.get('name', '')
+                sh_name = form.cleaned_data.get('sh_name', '')
+                uom = UOM.objects.create(name=name, sh_name=sh_name)
+                messages.success(request,f'UOM {uom.name} created successfully')
+                return redirect('setup_uom')
+        context_obj = SetupContext(model_search='uom', operation='create',segment='master-selection-uom',
+                                   form=form,data=data,label='Setup Unit of Measurement')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/uom.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def view_uom(request):
+    try:
+        data = UOM.objects.values().order_by('-id')
+        page_obj = pagination(request, data)
+        context_obj = SetupContext(model_search='uom', operation='view', segment='master-selection-uom',
+                                   page_obj=page_obj, data=data, label='View Unit of Measurement')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/uom.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def update_uom(request,pk):
+    try:
+        data = UOM.objects.get(id=pk)
+        form = GeneralSelectionListForm(initial={'name':data.name,'sh_name':data.sh_name})
+        if request.method == 'POST':
+            form = GeneralSelectionListForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data.get('name', '')
+                sh_name = form.cleaned_data.get('sh_name', '')
+                data.name = name
+                data.sh_name = sh_name
+                data.save()
+                messages.success(request,f'UOM {data.name} is updated Successfully.')
+                return redirect('setup_uom')
+        context_obj = SetupContext(model_search='uom', operation='update', segment='master-selection-uom',
+                                   form=form, data=data, label='Update Unit of Measurement')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/uom.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def delete_uom(request):
+    try:
+        data = UOM.objects.values().order_by('-id')
+        page_obj = pagination(request, data)
+        context_obj = SetupContext(model_search='uom', operation='delete', page_obj=page_obj,
+                                   segment='master-selection-uom',
+                                   data=data, label='Delete Unit of Measurement')
+        context = context_obj.get_selection_list_context()
+        if not data:
+            messages.info(request, 'Records not found')
+        return render(request, 'billing/uom.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def get_uom_modal(request):
+    try:
+        data = UOM.objects.values().order_by('-id')
+        if request.method == 'POST':
+            if 'submit_selected_record' in request.POST:
+                id = request.POST['submit_selected_record']
+                return redirect('update_uom', int(id))
+            elif 'delete_selected_record' in request.POST:
+                id = request.POST['delete_selected_record']
+                model = UOM.objects.get(id=id)
+                delete_models(request, model, name=model.name)
+            else:
+                messages.info(request, 'No operation performed.')
+            return redirect('setup_uom')
+        page_obj = pagination(request, data)
+        context_obj = SetupContext(model_search='uom', operation='modal', page_obj=page_obj,
+                                   segment='master-selection-uom',
+                                   data=data, label='Update Unit of Measurement')
+        context = context_obj.get_selection_list_context()
+        if not data:
+            messages.info(request, 'Records not found')
+        return render(request, 'billing/uom.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def setup_brand_name(request):
+    # try:
+    data = BrandName.objects.exists()
+    if data:
+        brand = BrandName.objects.order_by('-id').first()
+        form = GeneralSelectionListForm(initial={'brand_code': brand.brand_code})
+    else:
+        form = GeneralSelectionListForm(initial={'brand_code': 1})
+    if request.method == 'POST':
+        form = GeneralSelectionListForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data.get('name', '')
+            sh_name = form.cleaned_data.get('sh_name', '')
+            brand_code = form.cleaned_data.get('brand_code', '')
+            brand_name = BrandName.objects.create(name=name, sh_name=sh_name,brand_code=brand_code)
+            messages.success(request,f'Brand {brand_name.name} created successfully')
+            return redirect('setup_brand_name')
+    context_obj = SetupContext(model_search='brand_name', operation='create',segment='master-selection-brand_name',
+                               form=form,data=data,label='Setup Brand')
+    context = context_obj.get_selection_list_context()
+    return render(request, 'billing/brand_name.html', context=context)
+    # except template.TemplateDoesNotExist:
+    #     return render(request, 'billing/page-404.html')
+    # except:
+    #     return render(request, 'billing/page-500.html')
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def view_brand_name(request):
+    try:
+        data = BrandName.objects.values().order_by('-id')
+        page_obj = pagination(request, data)
+        context_obj = SetupContext(model_search='brand_name', operation='view', segment='master-selection-brand_name',
+                                   page_obj=page_obj, data=data, label='View Brand')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/brand_name.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def update_brand_name(request,pk):
+    try:
+        data = BrandName.objects.get(id=pk)
+        form = GeneralSelectionListForm(initial={'name':data.name,'sh_name':data.sh_name,'brand_code':data.brand_code})
+        if request.method == 'POST':
+            form = GeneralSelectionListForm(request.POST)
+            if form.is_valid():
+                name = form.cleaned_data.get('name', '')
+                sh_name = form.cleaned_data.get('sh_name', '')
+                data.name = name
+                data.sh_name = sh_name
+                data.save()
+                messages.success(request,f'Brand {data.name} is updated Successfully.')
+                return redirect('setup_brand_name')
+        context_obj = SetupContext(model_search='brand_name', operation='update', segment='master-selection-brand_name',
+                                   form=form, data=data, label='Update Brand')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/brand_name.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def delete_brand_name(request):
+    try:
+        data = BrandName.objects.values().order_by('-id')
+        page_obj = pagination(request, data)
+        context_obj = SetupContext(model_search='brand_name', operation='delete', page_obj=page_obj,
+                                   segment='master-selection-brand_name',
+                                   data=data, label='Delete Brand')
+        context = context_obj.get_selection_list_context()
+        if not data:
+            messages.info(request, 'Records not found')
+        return render(request, 'billing/brand_name.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+@login_required(login_url="/login/")
+@measure_execution_time
+def get_brand_name_modal(request):
+    try:
+        data = BrandName.objects.values().order_by('-id')
+        if request.method == 'POST':
+            if 'submit_selected_record' in request.POST:
+                id = request.POST['submit_selected_record']
+                return redirect('update_brand_name', int(id))
+            elif 'delete_selected_record' in request.POST:
+                id = request.POST['delete_selected_record']
+                model = BrandName.objects.get(id=id)
+                delete_models(request, model, name=model.name)
+            else:
+                messages.info(request, 'No operation performed.')
+            return redirect('setup_brand_name')
+        page_obj = pagination(request, data)
+        context_obj = SetupContext(model_search='brand_name', operation='modal', page_obj=page_obj,
+                                   segment='master-selection-brand_name',
+                                   data=data, label='Update Brand')
+        context = context_obj.get_selection_list_context()
+        if not data:
+            messages.info(request, 'Records not found')
+        return render(request, 'billing/brand_name.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
+
+
 
