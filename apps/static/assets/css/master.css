@@ -9,8 +9,9 @@
 
 .basic-line {
     border: 1px solid #0a0a0a;
-    padding: 0;
-    margin-bottom: 10px;
+    padding: 0; !important;
+    margin-bottom: 10px;!important;
+    margin-left: 0; !important;
 }
 
 .border-left {

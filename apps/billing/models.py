@@ -370,15 +370,15 @@ class Manufacturer(models.Model):
     purchase_type = models.CharField(choices=PURCHASE_TYPE, max_length=30,null=True,blank=True)
     tin = models.CharField(max_length=15,null=True,blank=True)
     gtax_type = models.CharField(choices=GTAX_TYPE, max_length=30,default='gst_registered',null=True,blank=True)
-    customer_class = models.ForeignKey(CustomerClass, on_delete=models.PROTECT, max_length=20, null=True, blank=True)
+    customer_class = models.ForeignKey(CustomerClass, on_delete=models.PROTECT, max_length=20, null=True, blank=True, related_name='manufacturer')
     contact2 = models.CharField(max_length=15, null=True, blank=True)
     telephone = models.CharField(max_length=15, null=True, blank=True)
     mobile_number = models.CharField(max_length=15, null=True, blank=True, verbose_name='Mb No')
-    area = models.ForeignKey(Area,on_delete=models.PROTECT, null=True, blank=True)
+    area = models.ForeignKey(Area,on_delete=models.PROTECT, null=True, blank=True ,related_name='manufacturer')
     fax = models.CharField(max_length=20, null=True, blank=True)
     std_form = models.CharField(choices=STANDARD_FORM, max_length=50, null=True, blank=True)
     formIR = models.CharField(choices=FORM_IR, max_length=50, null=True, blank=True)
-    sales_representative = models.ForeignKey(SalesRep,on_delete=models.PROTECT, null=True, blank=True)
+    sales_representative = models.ForeignKey(SalesRep,on_delete=models.PROTECT, null=True, blank=True, related_name='manufacturer')
     cst = models.CharField(max_length=15, null=True, blank=True,verbose_name='CST')
     purchase_account = models.CharField(max_length=50, null=True, blank=True)
     invoice_prefix = models.CharField(max_length=5, null=True, blank=True)
@@ -510,13 +510,13 @@ class Customer(models.Model):
     mobile_number = models.CharField(max_length=15, null=True, blank=True,verbose_name='Mb No')
     tin = models.CharField(max_length=15, null=True, blank=True)
     cst = models.CharField(max_length=15, null=True, blank=True)
-    carrier = models.CharField(max_length=15, null=True, blank=True)
+    carrier = models.ForeignKey(Carriers,on_delete=models.CASCADE,null=True, blank=True ,related_name='customer')
     contact1 = models.CharField(max_length=15, null=True, blank=True)
     contact2 = models.CharField(max_length=15, null=True, blank=True)
     fax = models.CharField(max_length=20, null=True, blank=True)
     price_option = models.CharField(max_length=20, null=True, blank=True)
     price_table = models.CharField(max_length=20, null=True, blank=True)
-    class_name = models.CharField(max_length=20, null=True, blank=True)
+    class_name = models.ForeignKey(CustomerClass,on_delete=models.CASCADE,null=True, blank=True, related_name='customer')
 
     def __str__(self):
         return f"{self.customer_name}"
@@ -633,7 +633,7 @@ class Division(models.Model):
     name = models.CharField(unique=True, max_length=30, null=True, blank=True)
     sh_name = models.CharField(max_length=10, null=True, blank=True)
     division_id = models.PositiveSmallIntegerField(unique=True, null=True, blank=True)
-    customer = models.ForeignKey(Customer,on_delete=models.CASCADE, null=True,blank=True)
+    customer = models.ForeignKey(Customer,on_delete=models.CASCADE, null=True,blank=True, related_name='division_customer')
 
     class Meta:
         ordering = ['-id',]

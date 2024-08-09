@@ -353,20 +353,24 @@ class CustomerForm(forms.ModelForm):
             'tin': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter TIN'}),
             'cst': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter CST'}),
             'fax': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter FAX'}),
-            'carrier': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Carrier'}),
+            'carrier': forms.Select(attrs={'class': 'form-control'}),
             'price_table': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': '0-9', 'id': 'price_table_id'}),
-            'class_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Class Name'}),
+            'class_name': forms.Select(attrs={'class': 'form-control'}),
             'sale_type': forms.Select(attrs={'class': 'form-control'}),
             'id_no': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter ID NO'}),
             'billing_stat': forms.Select(attrs={'class': 'form-control', 'id': 'billing_stat_form'}),
         }
 
     def __init__(self, *args, **kwargs):
+        # initial = kwargs.get('initial', {})
+        # if initial:
+        #     initial['area'] = initial['area']  # Ensure instance data is overridden
+        #     initial['sales_representative'] = initial['sales_representative']
+        # kwargs['initial'] = initial
         super().__init__(*args, **kwargs)
         self.fields['customer_name'].required = True
         self.fields['sh_name'].required = True
-
 
 
 class GroupForm(forms.ModelForm):

@@ -831,75 +831,121 @@ def get_customer_modal(request):
 @login_required(login_url="/login/")
 @measure_execution_time
 def update_customer(request, pk):
+    # try:
     try:
-        try:
-            customer_data = Customer.objects.get(id=pk)
-            manufacturer_area = ManufacturerArea.objects.filter(customer=customer_data).first()
-        except Exception as e:
-            print(e)
-            return render(request, 'billing/page-404.html')
-
-        location_data, created = Location.objects.get_or_create(customer_location__id=pk)
-        if customer_data.location is None:
-            customer_data.location = location_data
-            customer_data.save()
-        if request.method == 'POST':
-            location_form = LocationForm(request.POST, instance=location_data)
-            customer_form = CustomerForm(request.POST, instance=customer_data)
-            if location_form.is_valid():
-                try:
-                    location_instance = location_form.save()
-                except Exception as e:
-                    print(e)
-                    location_instance = None
-                    messages.error(request,
-                                   'Exception occurred while creating the location. Please submit the form again.')
-            else:
-                location_instance = None
-            if location_instance:
-                if customer_form.is_valid():
-                    name = customer_form.cleaned_data['customer_name']
-                    area = customer_form.cleaned_data['area']
-                    try:
-                        customer = customer_form.save(commit=False)
-                        customer.location = location_instance
-                        customer.save()
-                        if area != 'AUTO' and manufacturer_area.area.name == 'AUTO':
-                            delete = ManufacturerArea.objects.filter(customer=customer_data).delete()
-                        manufacturer_area, created = ManufacturerArea.objects.get_or_create(customer=customer,
-                                                                                        area=area)
-
-                        messages.info(request, f'Customer {name} updated.')
-                        return redirect('create_customer')
-                    except Exception as e:
-                        if not Customer.objects.filter(customer_name=name).exists():
-                            try:
-                                Location.objects.get(id=location_instance.id).delete()
-                            except:
-                                pass
-                        print(e)
-                        messages.error(request,
-                                       'Exception occurred while creating the manufacturer. Please submit the form again.')
-                else:
-                    Location.objects.get(id=location_instance.id).delete()
-                    print('invalid form')
-        else:
-
-            location_form = LocationForm(instance=location_data)
-            ic(manufacturer_area.area.name)
-            if manufacturer_area.area.name != 'AUTO':
-                customer_form = CustomerForm(instance=customer_data,initial={'area':manufacturer_area.area})
-            else:
-                customer_form = CustomerForm(instance=customer_data,initial={'area':manufacturer_area.area})
-
-        context_obj = SetupContext(model_search='customer', page_obj=customer_data, operation='update',segment='master-customer',
-        location_form = location_form,customer_form = customer_form)
-        context = context_obj.get_master_context()
-        return render(request, 'billing/customer.html', context=context)
-    except template.TemplateDoesNotExist:
+        customer_data = Customer.objects.get(id=pk)
+        # manufacturer_area = ManufacturerArea.objects.filter(customer=customer_data).first()
+    except Exception as e:
+        print(e)
         return render(request, 'billing/page-404.html')
-    except:
-        return render(request, 'billing/page-500.html')
+    ic(ManufacturerArea.objects.filter(customer_id=customer_data.id).count())
+    ic(ManufacturerArea.objects.filter(customer_id=customer_data.id).values())
+    ic(ManufacturerRep.objects.filter(customer_id=customer_data.id).count())
+    ic(ManufacturerRep.objects.filter(customer_id=customer_data.id).values())
+    ic('after', Customer.objects.filter(id=pk).values('is_auto_area', 'is_auto_rep'))
+
+    location_data, created = Location.objects.get_or_create(customer_location__id=pk)
+    if customer_data.location is None:
+        customer_data.location = location_data
+        customer_data.save()
+    if request.method == 'POST':
+        customer_data = Customer.objects.get(id=pk)
+        post_dict = request.POST.dict()
+        post_dict['is_auto_area'] = customer_data.is_auto_area
+        post_dict['is_auto_rep'] = customer_data.is_auto_rep
+        location_form = LocationForm(post_dict, instance=location_data)
+        customer_form = CustomerForm(post_dict, instance=customer_data)
+        if location_form.is_valid():
+            try:
+                location_instance = location_form.save()
+            except Exception as e:
+                print(e)
+                location_instance = None
+                messages.error(request,
+                               'Exception occurred while creating the location. Please submit the form again.')
+        else:
+            location_instance = None
+        if location_instance:
+            if customer_form.is_valid():
+                name = customer_form.cleaned_data['customer_name']
+                area = customer_form.cleaned_data.get('area',None)
+                rep = customer_form.cleaned_data.get('sales_representative',None)
+                ic(area)
+                try:
+                    customer_data = customer_form.save(commit=False)
+                    manufacturer_area_all = ManufacturerArea.objects.filter(customer_id=customer_data.id)
+                    manufacturer_rep_all = ManufacturerRep.objects.filter(customer_id=customer_data.id)
+                    if area and area.name != 'AUTO' and customer_data.is_auto_area:
+                        ic('area not auto')
+                        delete = manufacturer_area_all.delete()
+                        ic(delete)
+                        if delete:
+                            customer_data.is_auto_area = False
+                            ic('false')
+                            id = area.id
+                            ic(id)
+                            area = Area.objects.get(id=id)
+                            ic(area)
+                            customer = Customer.objects.get(id=customer_data.id)
+                            ic(customer)
+                            manufacturer_area_, created = ManufacturerArea.objects.get_or_create(customer_id=customer.id,
+                                                                                            area=area)
+                    elif area and area.name == 'AUTO':
+                        customer_data.is_auto_area = True
+                    manufacturer_area = ManufacturerArea.objects.get(customer_id=customer_data.id)
+                    manufacturer_area.area = area
+                    manufacturer_area.save()
+                    if rep.name != 'AUTO' and customer_data.is_auto_rep:
+
+                        delete = manufacturer_rep_all.delete()
+                        if delete:
+                            customer_data.is_auto_rep = False
+                            try:
+                                manufacturer_rep_, created = ManufacturerRep.objects.get_or_create(customer_id=customer_data.id,
+                                                                                    sales_rep=rep)
+                            except Exception as e:
+                                ic(e)
+                    elif rep and rep.name == 'AUTO':
+                        customer_data.is_auto_rep = True
+                    manufacturer_rep = ManufacturerRep.objects.get(customer_id=customer_data.id)
+                    manufacturer_rep.sales_rep = rep
+                    manufacturer_rep.save()
+                    customer_data.save()
+                    messages.info(request, f'Customer {customer_data.customer_name} updated.')
+                    return redirect('create_customer')
+                except Exception as e:
+                    if not Customer.objects.filter(customer_name=name).exists():
+                        try:
+                            Location.objects.get(id=location_instance.id).delete()
+                        except:
+                            pass
+                    print(e)
+                    messages.error(request,
+                                   'Exception occurred while updating the Customer. Please submit the form again.')
+            else:
+                Location.objects.get(id=location_instance.id).delete()
+                print('invalid form')
+    else:
+        location_form = LocationForm(instance=location_data)
+        if customer_data.is_auto_area:
+            area = Area.objects.get(name='AUTO')
+        else:
+            manufacturer_area_instance = ManufacturerArea.objects.get(customer_id=customer_data.id)
+            area = Area.objects.get(id=manufacturer_area_instance.area_id)
+        if customer_data.is_auto_rep:
+            sales_rep = SalesRep.objects.get(name='AUTO')
+        else:
+            manufacturer_rep_instance = ManufacturerRep.objects.get(customer_id=customer_data.id)
+            sales_rep = SalesRep.objects.get(id=manufacturer_rep_instance.sales_rep.id)
+        customer_form = CustomerForm(instance=customer_data,initial={'area':area,'sales_representative':sales_rep})
+    context_obj = SetupContext(model_search='customer', page_obj=customer_data, operation='update',segment='master-customer',
+    location_form = location_form,customer_form = customer_form)
+    context = context_obj.get_master_context()
+    return render(request, 'billing/customer.html', context=context)
+    # except template.TemplateDoesNotExist:
+    #     return render(request, 'billing/page-404.html')
+    # except:
+    #     return render(request, 'billing/page-500.html')
 
 
 @login_required(login_url="/login/")
@@ -2308,55 +2354,56 @@ def get_brand_name_modal(request):
 @login_required(login_url="/login/")
 @measure_execution_time
 def setup_payment_method(request):
-    # try:
+    try:
     # data = PaymentMethod.objects.exists()
-    payment_method = request.GET.get('payment_method','')
-    chosen_method = 'bank'
-    if payment_method:
-        chosen_method = payment_method
-    if chosen_method == 'bank':
-        data = BankDetails.objects.exists()
-        form = BankDetailsForm()
-    else:
-        data = PaymentDetails.objects.exists()
-        form = PaymentDetailsForm()
-    if request.method == 'POST':
-        payment_method_submit = request.POST.get('payment_method_submit','')
-        if payment_method_submit:
-            ic(payment_method_submit)
-            if payment_method_submit == 'bank':
+        payment_method = request.GET.get('payment_method','')
+        chosen_method = 1
+        if payment_method:
+            chosen_method = int(payment_method)
+        if chosen_method:
+            data = BankDetails.objects.exists()
+            form = BankDetailsForm()
+        else:
+            data = PaymentDetails.objects.exists()
+            form = PaymentDetailsForm()
+        ic(form)
+        if request.method == 'POST':
+            payment_method_submit = request.POST.get('payment_method_submit','')
+            if payment_method_submit.isdigit():
+                payment_method_submit = int(payment_method_submit)
+            else:
+                messages.error(request,'Kindly resubmit the Payment Method')
+                return redirect('setup_payment_method')
+            if payment_method_submit:
                 form = BankDetailsForm(request.POST)
             else:
                 form = PaymentDetailsForm(request.POST)
             if form.is_valid():
                 details = form.save()
                 messages.success(request,f'{details.name} created successfully')
-                ic(details.name)
                 return redirect('setup_payment_method')
-        else:
-            messages.error(request,'Kindly resubmit the Payment Method')
-    context_obj = SetupContext(data=data,model_search='payment_method', chosen_method=chosen_method,operation='create',segment='master-selection-payment_method',
-                               form=form,label='Setup Payment Method')
-    context = context_obj.get_selection_list_context()
-    return render(request, 'billing/payment_method.html', context=context)
-    # except template.TemplateDoesNotExist:
-    #     return render(request, 'billing/page-404.html')
-    # except:
-    #     return render(request, 'billing/page-500.html')
+        context_obj = SetupContext(data=data,model_search='payment_method', chosen_method=chosen_method,operation='create',segment='master-selection-payment_method',
+                                   form=form,label='Setup Payment Method')
+        context = context_obj.get_selection_list_context()
+        return render(request, 'billing/payment_method.html', context=context)
+    except template.TemplateDoesNotExist:
+        return render(request, 'billing/page-404.html')
+    except:
+        return render(request, 'billing/page-500.html')
 
 @login_required(login_url="/login/")
 @measure_execution_time
 def view_payment_method(request,chosen_method):
     try:
         payment_method = request.GET.get('payment_method', '')
-        if payment_method:
-            chosen_method = payment_method
-        if chosen_method == 'bank':
+        if payment_method.isdigit():
+            chosen_method = int(payment_method)
+        if chosen_method:
             data = BankDetails.objects.values().order_by('-id')
         else:
             data = PaymentDetails.objects.values().order_by('-id')
         if not data:
-            messages.info(request,f'{chosen_method} record not created!')
+            messages.info(request,f'{'Bank' if chosen_method else 'Payment Method'} record not created!')
         page_obj = pagination(request, data)
         context_obj = SetupContext(model_search='payment_method',chosen_method=chosen_method, operation='view', segment='master-selection-payment_method',
                                    page_obj=page_obj, data=data, label='View Payment Method')
@@ -2369,21 +2416,24 @@ def view_payment_method(request,chosen_method):
 
 @login_required(login_url="/login/")
 @measure_execution_time
-def update_payment_method(request,pk):
+def update_payment_method(request,chosen_method,pk):
     try:
-        data = BrandName.objects.get(id=pk)
-        form = GeneralSelectionListForm(initial={'name':data.name,'sh_name':data.sh_name,'brand_code':data.brand_code})
+        if chosen_method:
+            data = BankDetails.objects.get(id=pk)
+            form = BankDetailsForm(instance=data)
+        else:
+            data = PaymentDetails.objects.get(id=pk)
+            form = PaymentDetailsForm(instance=data)
         if request.method == 'POST':
-            form = GeneralSelectionListForm(request.POST)
+            if chosen_method:
+                form = BankDetailsForm(request.POST,instance=data)
+            else:
+                form = PaymentDetailsForm(request.POST,instance=data)
             if form.is_valid():
-                name = form.cleaned_data.get('name', '')
-                sh_name = form.cleaned_data.get('sh_name', '')
-                data.name = name
-                data.sh_name = sh_name
-                data.save()
+                form.save()
                 messages.success(request,f'Payment {data.name} is updated Successfully.')
                 return redirect('setup_payment_method')
-        context_obj = SetupContext(model_search='payment_method', operation='update', segment='master-selection-payment_method',
+        context_obj = SetupContext(model_search='payment_method',chosen_method=chosen_method, operation='update', segment='master-selection-payment_method',
                                    form=form, data=data, label='Update Payment Method')
         context = context_obj.get_selection_list_context()
         return render(request, 'billing/payment_method.html', context=context)
@@ -2394,17 +2444,22 @@ def update_payment_method(request,pk):
 
 @login_required(login_url="/login/")
 @measure_execution_time
-def delete_payment_method(request):
+def delete_payment_method(request,chosen_method):
     try:
-        # data = PaymentMethod.objects.values().order_by('-id')
-        data = 0
+        payment_method = request.GET.get('payment_method', '')
+        if payment_method.isdigit():
+            chosen_method = int(payment_method)
+        if chosen_method:
+            data = BankDetails.objects.values().order_by('-id')
+        else:
+            data = PaymentDetails.objects.values().order_by('-id')
         page_obj = pagination(request, data)
         context_obj = SetupContext(model_search='payment_method', operation='delete', page_obj=page_obj,
                                    segment='master-selection-payment_method',
-                                   data=data, label='Delete Payment Method')
+                                   data=data, label='Delete Payment Method',chosen_method=chosen_method)
         context = context_obj.get_selection_list_context()
         if not data:
-            messages.info(request, 'Records not found')
+            messages.info(request, f'{'Bank' if chosen_method else 'Payment Method'} record not created!')
         return render(request, 'billing/payment_method.html', context=context)
     except template.TemplateDoesNotExist:
         return render(request, 'billing/page-404.html')
@@ -2413,22 +2468,32 @@ def delete_payment_method(request):
 
 @login_required(login_url="/login/")
 @measure_execution_time
-def get_payment_method_modal(request):
+def get_payment_method_modal(request,chosen_method):
     try:
-        data = BrandName.objects.values().order_by('-id')
+        payment_method = request.GET.get('payment_method', '')
+        if payment_method.isdigit():
+            chosen_method = int(payment_method)
+        chosen_method=int(chosen_method)
+        if chosen_method:
+            data = BankDetails.objects.values().order_by('-id')
+        else:
+            data = PaymentDetails.objects.values().order_by('-id')
         if request.method == 'POST':
             if 'submit_selected_record' in request.POST:
                 id = request.POST['submit_selected_record']
-                return redirect('update_payment_method', int(id))
+                return redirect('update_payment_method',chosen_method, int(id))
             elif 'delete_selected_record' in request.POST:
                 id = request.POST['delete_selected_record']
-                model = BrandName.objects.get(id=id)
+                if chosen_method:
+                    model = BankDetails.objects.get(id=id)
+                else:
+                    model = PaymentDetails.objects.get(id=id)
                 delete_models(request, model, name=model.name)
             else:
-                messages.info(request, 'No operation performed.')
+                messages.info(request, f'{'Bank' if chosen_method else 'Payment Method'} record not created!')
             return redirect('setup_payment_method')
         page_obj = pagination(request, data)
-        context_obj = SetupContext(model_search='payment_method', operation='modal', page_obj=page_obj,
+        context_obj = SetupContext(model_search='payment_method',chosen_method=chosen_method, operation='modal', page_obj=page_obj,
                                    segment='master-selection-payment_method',
                                    data=data, label='Update Payment Method')
         context = context_obj.get_selection_list_context()

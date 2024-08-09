@@ -135,10 +135,11 @@ urlpatterns = [
 
     # payment method
     path('setup_payment_method/', views.setup_payment_method, name="setup_payment_method"),
-    path('view_payment_method/<str:chosen_method>', views.view_payment_method, name="view_payment_method"),
-    path('update_payment_method/<int:pk>', views.update_payment_method, name="update_payment_method"),
-    path('delete_brand_name/', views.delete_payment_method, name="delete_payment_method"),
-    path('get_payment_method_modal/', views.get_payment_method_modal, name="get_payment_method_modal"),
+    path('view_payment_method/<int:chosen_method>', views.view_payment_method, name="view_payment_method"),
+    path('update_payment_method/<int:chosen_method>/<int:pk>', views.update_payment_method, name="update_payment_method"),
+    path('delete_brand_name/<int:chosen_method>', views.delete_payment_method, name="delete_payment_method"),
+    path('get_payment_method_modal/<int:chosen_method>', views.get_payment_method_modal, name="get_payment_method_modal"),
+
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 
